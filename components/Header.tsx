@@ -2,43 +2,44 @@ import Link from 'next/link';
 import { css } from '@emotion/react';
 
 const headerStyles = css`
-  padding: 20px 20px;
+  padding: 12px 12px;
   margin: 1rem 1rem;
   border-radius: 8px;
-  background-color: #01397a;
+  background-color: #2a6592;
   display: flex;
   justify-content: space-between;
+  border: 2px solid black;
 
   a {
     color: white;
     text-decoration: none;
     margin: 5px;
-    font-size: 32px;
+    font-size: 36px;
     padding: 8px;
-    border-radius: 8px;
-    :hover {
-      background-color: #787878;
-      transition: 0.3s ease-out;
+
+    display: inline-block;
+    position: relative;
+
+    :after {
+      content: '';
+      position: absolute;
+      width: 100%;
+      transform: scaleX(0);
+      height: 2px;
+      bottom: 0;
+      left: 0;
+      background-color: white;
+      transform-origin: bottom right;
+      transition: transform 0.3s ease-out;
     }
-  }
-  span {
-    color: white;
-    font-size: 28px;
+
+    :hover:after {
+      transform: scaleX(1);
+      transform-origin: bottom left;
+    }
   }
 `;
 
-const circleStyles = css`
-  margin: auto;
-  background-color: black;
-  width: 2rem;
-  height: 2rem;
-  padding: 4px;
-  text-align: center;
-  border-radius: 50%;
-  box-shadow: rgb(85, 91, 255) 0px 0px 0px 3px, rgb(31, 193, 27) 0px 0px 0px 6px,
-    rgb(255, 217, 19) 0px 0px 0px 9px, rgb(255, 156, 85) 0px 0px 0px 12px,
-    rgb(255, 85, 85) 0px 0px 0px 15px;
-`;
 const flexContainerStyles = css`
   display: flex;
   gap: 2rem;
@@ -48,11 +49,11 @@ export default function Header() {
   return (
     <header css={headerStyles}>
       <Link href="/">
-        <a>Products</a>
+        <a>Splitify</a>
       </Link>
       <div css={flexContainerStyles}>
-        <Link href="/cart">
-          <a data-test-id="cart-link">Cart</a>
+        <Link href="/signup">
+          <a>Sign Up</a>
         </Link>
       </div>
     </header>
