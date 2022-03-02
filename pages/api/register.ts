@@ -15,8 +15,8 @@ export type RegisterResponseBody =
   | { user: User };
 
 export default async function registerHandler(
-  request: NextApiRequest,
-  response: NextApiResponse,
+  request: RegisterNextApiRequest,
+  response: NextApiResponse<RegisterResponseBody>,
 ) {
   if (request.method === 'POST') {
     if (
