@@ -13,10 +13,10 @@ const headerStyles = css`
   a {
     color: white;
     text-decoration: none;
-    margin: 5px;
+    margin: 4px;
     font-size: 36px;
     padding: 8px;
-
+    max-height: 42px;
     display: inline-block;
     position: relative;
 
@@ -42,7 +42,7 @@ const headerStyles = css`
 
 const flexContainerStyles = css`
   display: flex;
-  gap: 2rem;
+  flex-direction: column;
 `;
 
 export default function Header() {
@@ -52,8 +52,11 @@ export default function Header() {
         <a>Splitify</a>
       </Link>
       <div css={flexContainerStyles}>
-        <Link href="/signup">
+        <Link href="/register">
           <a>Sign Up</a>
+        </Link>
+        <Link href="/login">
+          <a>Login</a>
         </Link>
       </div>
     </header>
