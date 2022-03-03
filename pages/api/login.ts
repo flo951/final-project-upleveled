@@ -1,6 +1,12 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
-import { getUserWithPasswordHashByUsername, User } from '../../util/database';
+import {
+  createSession,
+  getUserWithPasswordHashByUsername,
+  User,
+} from '../../util/database';
+import crypto from 'node:crypto';
+import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 
 type LoginRequestBody = {
   username: string;
@@ -58,9 +64,22 @@ export default async function loginHandler(
       });
       return;
     }
-    // todo return created session in cookie
+
+    // 1. Create a unique token
+    const token = crypto.randomBytes(64).toString('base64');
+    const session = await createSession(token, userWithPasswordHash.id);
+
+    // 2. Serialize the cookie
+    const serializedCookie = await createSerializedRegisterSessionTokenCookie(
+      session.token,
+    );
+    // 3. Add the cookie to the header response
+
     // status code 201 means something was created
-    response.status(201).json({ user: { id: userWithPasswordHash.id } });
+    response
+      .status(201)
+      .setHeader('Set-Cookie', serializedCookie)
+      .json({ user: { id: userWithPasswordHash.id } });
     return;
   }
 
