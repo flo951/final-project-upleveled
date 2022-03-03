@@ -14,7 +14,7 @@ const headerStyles = css`
     color: white;
     text-decoration: none;
     margin: 4px;
-    font-size: 36px;
+    font-size: 24px;
     padding: 8px;
     max-height: 42px;
     display: inline-block;
@@ -45,12 +45,21 @@ const flexContainerStyles = css`
   flex-direction: column;
 `;
 
-export default function Header() {
+export default function Header(props) {
+  console.log(props);
   return (
     <header css={headerStyles}>
-      <Link href="/">
-        <a>Splitify</a>
-      </Link>
+      <div css={flexContainerStyles}>
+        <Link href="/">
+          <a>Splitify</a>
+        </Link>
+        <Link href="/logout">
+          <a>Logout</a>
+        </Link>
+        <Link href="/users/protectedUser">
+          <a>Protected User</a>
+        </Link>
+      </div>
       <div css={flexContainerStyles}>
         <Link href="/register">
           <a>Sign Up</a>
@@ -59,6 +68,7 @@ export default function Header() {
           <a>Login</a>
         </Link>
       </div>
+      {props.userObject && <div>{props.userObject.username}</div>}
     </header>
   );
 }
