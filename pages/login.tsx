@@ -1,8 +1,10 @@
 import { css } from '@emotion/react';
+import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
-import { Router, useRouter } from 'next/router';
+import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { formContainerStyles, formStyles } from '../styles/styles';
+import { getValidSessionByToken } from '../util/database';
 import { LoginResponseBody } from './api/login';
 
 const nameInputStyles = css`
@@ -37,11 +39,18 @@ const errorStyles = css`
 `;
 type Errors = { message: string }[];
 
-export default function Login() {
+type Props = {
+  refreshUserProfile: () => void;
+  userObject: { username: string };
+};
+
+export default function Login(props: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>([]);
   const router = useRouter();
+
+  console.log(props);
   return (
     <>
       <Head>
@@ -75,6 +84,8 @@ export default function Login() {
               setErrors(loginResponseBody.errors);
               return;
             }
+
+            //get the query paramaeter from next.js router
             const returnTo = router.query.returnTo;
             console.log('returnTo', returnTo);
 
@@ -90,9 +101,10 @@ export default function Login() {
             }
 
             // clear errors
-            setErrors([]); // maybe not necessary with redirect
+            // maybe not necessary with redirect setErrors([]);
+            props.refreshUserProfile();
             await router
-              .push(`/users/${loginResponseBody.user.id}`)
+              .push(`/users/protectedUser`)
               .catch((error) => console.log(error));
           }}
         >
@@ -134,4 +146,24 @@ export default function Login() {
       </div>
     </>
   );
+}
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  // 1. check if there is a token and is valid from the cookie
+
+  const token = context.req.cookies.sessionToken;
+  // 2. if its valid redirect otherwise render the page
+  if (token) {
+    const session = await getValidSessionByToken(token);
+    if (session) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+  }
+  return {
+    props: {},
+  };
 }
