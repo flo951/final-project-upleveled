@@ -1,8 +1,11 @@
 import { css } from '@emotion/react';
+import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { formContainerStyles, formStyles } from '../styles/styles';
+import { getValidSessionByToken } from '../util/database';
+import { RegisterResponseBody } from './api/register';
 
 const nameInputStyles = css`
   padding: 8px 8px;
@@ -39,7 +42,12 @@ const errorStyles = css`
 
 type Errors = { message: string }[];
 
-export default function Register() {
+type Props = {
+  refreshUserProfile: () => void;
+  userObject: { username: string };
+};
+
+export default function Register(props: Props) {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState<Errors>([]);
@@ -70,12 +78,14 @@ export default function Register() {
               }),
             });
 
-            const registerResponseBody = await registerResponse.json();
+            const registerResponseBody =
+              (await registerResponse.json()) as RegisterResponseBody;
 
             if ('errors' in registerResponseBody) {
               setErrors(registerResponseBody.errors);
               return;
             }
+            props.refreshUserProfile();
 
             await router.push('./login').catch((error) => console.log(error));
           }}
@@ -120,4 +130,24 @@ export default function Register() {
       </div>
     </>
   );
+}
+export async function getServerSideProps(context: GetServerSidePropsContext) {
+  // 1. check if there is a token and is valid from the cookie
+
+  const token = context.req.cookies.sessionToken;
+  // 2. if its valid redirect otherwise render the page
+  if (token) {
+    const session = await getValidSessionByToken(token);
+    if (session) {
+      return {
+        redirect: {
+          destination: '/',
+          permanent: false,
+        },
+      };
+    }
+  }
+  return {
+    props: {},
+  };
 }
