@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import Head from 'next/head';
+import { useEffect } from 'react';
 
 const mainStyles = css`
   display: flex;
@@ -21,7 +22,15 @@ const imageStyles = css`
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
-export default function Home() {
+
+type Props = {
+  refreshUserProfile: () => void;
+  userObject: { username: string };
+};
+export default function Home(props: Props) {
+  useEffect(() => {
+    props.refreshUserProfile();
+  }, [props]);
   return (
     <>
       <Head>
