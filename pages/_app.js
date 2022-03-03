@@ -1,7 +1,26 @@
 import { css, Global } from '@emotion/react';
+import { useCallback, useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 
 function MyApp({ Component, pageProps }) {
+  const [user, setUser] = useState();
+
+  const refreshUserProfile = useCallback(async () => {
+    const response = await fetch('/api/profile');
+    const data = await response.json();
+
+    if ('errors' in data) {
+      console.log(data.errors);
+      setUser(undefined);
+      return;
+    }
+
+    setUser(data.user);
+  }, []);
+
+  useEffect(() => {
+    refreshUserProfile().catch(() => {});
+  }, [refreshUserProfile]);
   return (
     <>
       <Global
@@ -16,8 +35,8 @@ function MyApp({ Component, pageProps }) {
           }
         `}
       />
-      <Layout>
-        <Component {...pageProps} />
+      <Layout userObject={user} refreshUserProfile={refreshUserProfile}>
+        <Component {...pageProps} refreshUserProfile={refreshUserProfile} />
       </Layout>
     </>
   );
