@@ -41,7 +41,6 @@ type Errors = { message: string }[];
 
 type Props = {
   refreshUserProfile: () => void;
-  userObject: { username: string };
 };
 
 export default function Login(props: Props) {
@@ -50,7 +49,6 @@ export default function Login(props: Props) {
   const [errors, setErrors] = useState<Errors>([]);
   const router = useRouter();
 
-  console.log(props);
   return (
     <>
       <Head>
@@ -85,7 +83,7 @@ export default function Login(props: Props) {
               return;
             }
 
-            //get the query paramaeter from next.js router
+            // get the query paramaeter from next.js router
             const returnTo = router.query.returnTo;
             console.log('returnTo', returnTo);
 
@@ -104,7 +102,7 @@ export default function Login(props: Props) {
             // maybe not necessary with redirect setErrors([]);
             props.refreshUserProfile();
             await router
-              .push(`/users/protectedUser`)
+              .push(`/users/protected`)
               .catch((error) => console.log(error));
           }}
         >
@@ -148,6 +146,19 @@ export default function Login(props: Props) {
   );
 }
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  // Redirect from HTTP to HTTPS on Heroku
+  if (
+    context.req.headers.host &&
+    context.req.headers['x-forwarded-proto'] &&
+    context.req.headers['x-forwarded-proto'] !== 'https'
+  ) {
+    return {
+      redirect: {
+        destination: `https://${context.req.headers.host}/login`,
+        permanent: true,
+      },
+    };
+  }
   // 1. check if there is a token and is valid from the cookie
 
   const token = context.req.cookies.sessionToken;
