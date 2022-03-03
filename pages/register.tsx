@@ -44,7 +44,6 @@ type Errors = { message: string }[];
 
 type Props = {
   refreshUserProfile: () => void;
-  userObject: { username: string };
 };
 
 export default function Register(props: Props) {
@@ -90,16 +89,16 @@ export default function Register(props: Props) {
             await router.push('./login').catch((error) => console.log(error));
           }}
         >
-          <label htmlFor="first-name">
+          <label htmlFor="username">
             <span css={spanLabelStyles}>Username</span>
           </label>
           <input
             css={nameInputStyles}
-            data-test-id="signup-first-name"
-            id="first-name"
+            data-test-id="signup-username"
+            id="username"
             value={username}
             onChange={(e) => setUsername(e.currentTarget.value)}
-            placeholder="First Name"
+            placeholder="Username"
             required
           />
           <label htmlFor="password">
@@ -132,8 +131,20 @@ export default function Register(props: Props) {
   );
 }
 export async function getServerSideProps(context: GetServerSidePropsContext) {
+  // Redirect from HTTP to HTTPS on Heroku
+  if (
+    context.req.headers.host &&
+    context.req.headers['x-forwarded-proto'] &&
+    context.req.headers['x-forwarded-proto'] !== 'https'
+  ) {
+    return {
+      redirect: {
+        destination: `https://${context.req.headers.host}/register`,
+        permanent: true,
+      },
+    };
+  }
   // 1. check if there is a token and is valid from the cookie
-
   const token = context.req.cookies.sessionToken;
   // 2. if its valid redirect otherwise render the page
   if (token) {
