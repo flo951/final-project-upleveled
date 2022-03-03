@@ -1,14 +1,20 @@
 import Link from 'next/link';
 import { css } from '@emotion/react';
+import { User } from '../util/database';
 
 const headerStyles = css`
   padding: 12px 12px;
   margin: 1rem 1rem;
   border-radius: 8px;
   background-color: #2a6592;
-  display: flex;
-  justify-content: space-between;
+
   border: 2px solid black;
+  color: white;
+
+  h3 {
+    margin: 4px;
+    padding: 8px;
+  }
 
   a {
     color: white;
@@ -44,31 +50,46 @@ const flexContainerStyles = css`
   display: flex;
   flex-direction: column;
 `;
+const flexRowHeaderStyles = css`
+  display: flex;
+  justify-content: space-between;
+`;
 
-export default function Header(props) {
-  console.log(props);
+type Props = {
+  userObject?: User;
+};
+
+export default function Header(props: Props) {
   return (
     <header css={headerStyles}>
-      <div css={flexContainerStyles}>
-        <Link href="/">
-          <a>Splitify</a>
-        </Link>
-        <Link href="/logout">
-          <a>Logout</a>
-        </Link>
-        <Link href="/users/protectedUser">
-          <a>Protected User</a>
-        </Link>
-      </div>
-      <div css={flexContainerStyles}>
-        <Link href="/register">
-          <a>Sign Up</a>
-        </Link>
-        <Link href="/login">
-          <a>Login</a>
-        </Link>
-      </div>
-      {props.userObject && <div>{props.userObject.username}</div>}
+      {props.userObject ? (
+        <div css={flexRowHeaderStyles}>
+          <div css={flexContainerStyles}>
+            <Link href="/users/protected">
+              <a>Dashboard</a>
+            </Link>
+            <Link href="/createevent">
+              <a>Create Event</a>
+            </Link>
+          </div>
+          <div css={flexContainerStyles}>
+            <h3>Hi {props.userObject.username}</h3>
+            <a href="/logout">Logout</a>
+          </div>
+        </div>
+      ) : (
+        <div css={flexRowHeaderStyles}>
+          <Link href="/">
+            <a>Splitify</a>
+          </Link>
+          <Link href="/register">
+            <a>Sign Up</a>
+          </Link>
+          <Link href="/login">
+            <a>Login</a>
+          </Link>
+        </div>
+      )}
     </header>
   );
 }

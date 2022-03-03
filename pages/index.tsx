@@ -23,14 +23,14 @@ const imageStyles = css`
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
 
-type Props = {
-  refreshUserProfile: () => void;
-  userObject: { username: string };
-};
-export default function Home(props: Props) {
-  useEffect(() => {
-    props.refreshUserProfile();
-  }, [props]);
+// type Props = {
+//   refreshUserProfile: () => void;
+//   userObject: { username: string };
+// };
+export default function Home() {
+  // useEffect(() => {
+  //   props.refreshUserProfile();
+  // }, [props]);
   return (
     <>
       <Head>
@@ -39,16 +39,16 @@ export default function Home(props: Props) {
       </Head>
       <main css={mainStyles}>
         <h1>Welcome to Splitify</h1>
-        <span css={spanStyles}>Take a sneak peak how the app works</span>
+        <span css={spanStyles}>Take a sneak peek how the app works</span>
         <img
           css={imageStyles}
-          src={'/images/example_result.png'}
-          alt="Picture of an example calculation"
+          src="/images/example_result.png"
+          alt="example calculation"
           height="367.75px"
           width="304.5px"
         />
         <span css={spanStyles}>
-          <a href="./signup">Create an Account</a> to use our Service
+          <a href="./register">Create an Account</a> to use our Service
         </span>
       </main>
     </>

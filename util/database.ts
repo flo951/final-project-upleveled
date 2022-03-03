@@ -43,6 +43,22 @@ export async function getUserById(id: number) {
   return user && camelcaseKeys(user);
 }
 
+export async function getUserByValidSessionToken(token: string | undefined) {
+  if (!token) return undefined;
+  const [user] = await sql<[User | undefined]>`
+  SELECT users.id ,
+  users.username
+   FROM users,
+   sessions WHERE sessions.token = ${token}
+    AND sessions.user_id = users.id
+     AND expiry_timestamp > now()
+
+
+
+  `;
+  return user && camelcaseKeys(user);
+}
+
 export async function getUserByUsername(username: string) {
   const [user] = await sql<[{ id: number } | undefined]>`
     SELECT id FROM users WHERE username = ${username}
@@ -73,10 +89,9 @@ type Session = {
   token: string;
   userId: number;
 };
-export async function getValidSessionByToken(token: string | undefined) {
-  if (!token) return undefined;
+export async function getValidSessionByToken(token: string) {
   const [session] = await sql<[Session | undefined]>`
-    SELECT * FROM sessions WHERE token = ${token}
+    SELECT * FROM sessions WHERE token = ${token} AND expiry_timestamp > now()
  `;
   await deleteExpiredSessions();
   return session && camelcaseKeys(session);
@@ -120,3 +135,22 @@ export async function deleteExpiredSessions() {
 
   return sessions.map((session: Session) => camelcaseKeys(session));
 }
+
+// type Person = {
+//   id: number;
+//   token: string;
+//   userId: number;
+// };
+
+// export async function createPerson(personName: string) {
+//   const [person] = await sql<[Person]>`
+
+//   INSERT INTO people
+//   (name)
+//   VALUES
+//   (${personName})
+//   RETURNING *
+//   `;
+
+//   return camelcaseKeys(person);
+// }
