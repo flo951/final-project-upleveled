@@ -5,7 +5,7 @@ import { config } from 'dotenv-safe';
 config();
 
 declare module globalThis {
-  let __postgresSqlClient: ReturnType<typeof postgres> | undefined;
+  let postgresSqlClient: ReturnType<typeof postgres> | undefined;
 }
 
 function connectOneTimeToDatabase() {
@@ -18,10 +18,10 @@ function connectOneTimeToDatabase() {
     // https://devcenter.heroku.com/changelog-items/852
     sql = postgres({ ssl: { rejectUnauthorized: false } });
   } else {
-    if (!globalThis.__postgresSqlClient) {
-      globalThis.__postgresSqlClient = postgres();
+    if (!globalThis.postgresSqlClient) {
+      globalThis.postgresSqlClient = postgres();
     }
-    sql = globalThis.__postgresSqlClient;
+    sql = globalThis.postgresSqlClient;
   }
   return sql;
 }
@@ -73,6 +73,14 @@ type Session = {
   token: string;
   userId: number;
 };
+export async function getValidSessionByToken(token: string | undefined) {
+  if (!token) return undefined;
+  const [session] = await sql<[Session | undefined]>`
+    SELECT * FROM sessions WHERE token = ${token}
+ `;
+  await deleteExpiredSessions();
+  return session && camelcaseKeys(session);
+}
 
 export async function createSession(token: string, userId: number) {
   const [session] = await sql<[Session]>`
@@ -87,20 +95,8 @@ export async function createSession(token: string, userId: number) {
   return camelcaseKeys(session);
 }
 
-export async function deleteExpiredSessions() {
-  const sessions = await sql<Session[]>`
-
-  DELETE FROM
-  sessions
-  WHERE
-  expiry_timestamp < NOW()
-  RETURNING *
-  `;
-
-  return sessions.map((session: Session) => camelcaseKeys(session));
-}
 export async function deleteSessionByToken(token: string) {
-  const [session] = await sql<Session | undefined>`
+  const [session] = await sql<[Session | undefined]>`
 
   DELETE FROM
   sessions
@@ -112,10 +108,15 @@ export async function deleteSessionByToken(token: string) {
   return session && camelcaseKeys(session);
 }
 
-export async function getValidSessionByToken(token: string) {
-  const [session] = await sql<[Session | undefined]>`
-    SELECT * FROM sessions WHERE token = ${token}
- `;
-  await deleteExpiredSessions();
-  return session && camelcaseKeys(session);
+export async function deleteExpiredSessions() {
+  const sessions = await sql<Session[]>`
+
+  DELETE FROM
+  sessions
+  WHERE
+  expiry_timestamp < NOW()
+  RETURNING *
+  `;
+
+  return sessions.map((session: Session) => camelcaseKeys(session));
 }
