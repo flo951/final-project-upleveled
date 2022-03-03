@@ -1,6 +1,14 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import bcrypt from 'bcrypt';
-import { createUser, getUserByUsername, User } from '../../util/database';
+import {
+  createSession,
+  createUser,
+  getUserByUsername,
+  User,
+} from '../../util/database';
+
+import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
+import crypto from 'node:crypto';
 type RegisterRequestBody = {
   username: string;
   password: string;
@@ -41,14 +49,27 @@ export default async function registerHandler(
           },
         ],
       });
-      return; // Important: will prevent "Headers already sent" error
+      return; // Important: will prevent "Headers already sent" error, if you forget return it will go to the next return
     }
 
     const passwordHash = await bcrypt.hash(request.body.password, 12);
 
     const user = await createUser(request.body.username, passwordHash);
+
+    // 1. Create a unique token
+    const token = crypto.randomBytes(64).toString('base64');
+    const session = await createSession(token, user.id);
+
+    // 2. Serialize the cookie
+    const serializedCookie = await createSerializedRegisterSessionTokenCookie(
+      session.token,
+    );
+
     // status code 201 means something was created
-    response.status(201).json({ user: user });
+    response
+      .status(201)
+      .setHeader('Set-Cookie', serializedCookie)
+      .json({ user: user });
     return;
   }
   response.status(405).json({ errors: [{ message: 'Method not supported' }] });
