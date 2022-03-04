@@ -1,9 +1,5 @@
 import { GetServerSidePropsContext } from 'next';
-import {
-  getUserById,
-  getUserByValidSessionToken,
-  getValidSessionByToken,
-} from '../../util/database';
+import { getUserByValidSessionToken } from '../../util/database';
 import { css } from '@emotion/react';
 
 const mainStyles = css`
