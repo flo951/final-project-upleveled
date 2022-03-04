@@ -9,9 +9,11 @@ import {
 
 import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 import crypto from 'node:crypto';
+import { verifyCsrfToken } from '../../util/auth';
 type RegisterRequestBody = {
   username: string;
   password: string;
+  csrfToken: string;
 };
 
 type RegisterNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -31,13 +33,25 @@ export default async function registerHandler(
       typeof request.body.username !== 'string' ||
       !request.body.username ||
       typeof request.body.password !== 'string' ||
-      !request.body.password
+      !request.body.password ||
+      typeof request.body.csrfToken !== 'string' ||
+      !request.body.csrfToken
     ) {
       // 400 bad request
-      response
-        .status(400)
-        .json({ errors: [{ message: 'Username or Password not provided' }] });
+      response.status(400).json({
+        errors: [{ message: 'Username,Password or CSRF token not provided' }],
+      });
       return; // Important, prevents error for multiple requests
+    }
+
+    // Verify csrf token
+    const csrfTokenMatches = verifyCsrfToken(request.body.csrfToken);
+
+    if (!csrfTokenMatches) {
+      response.status(403).json({
+        errors: [{ message: 'Invalid CSRF token' }],
+      });
+      return;
     }
     // If there is already a user matching the username,
     // return error message
