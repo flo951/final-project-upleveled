@@ -1,9 +1,11 @@
 import { css } from '@emotion/react';
+import Tokens from 'csrf';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { formContainerStyles, formStyles } from '../styles/styles';
+import { createCsrfToken } from '../util/auth';
 import { getValidSessionByToken } from '../util/database';
 import { LoginResponseBody } from './api/login';
 
@@ -41,6 +43,7 @@ type Errors = { message: string }[];
 
 type Props = {
   refreshUserProfile: () => void;
+  csrfToken: string;
 };
 
 export default function Login(props: Props) {
@@ -72,6 +75,7 @@ export default function Login(props: Props) {
               body: JSON.stringify({
                 username: username,
                 password: password,
+                csrfToken: props.csrfToken,
               }),
             });
 
@@ -174,7 +178,11 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       };
     }
   }
+  // 3. Otherwise, generate CSRF token and render the page
+
   return {
-    props: {},
+    props: {
+      csrfToken: createCsrfToken(),
+    },
   };
 }
