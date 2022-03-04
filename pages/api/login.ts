@@ -7,10 +7,12 @@ import {
 } from '../../util/database';
 import crypto from 'node:crypto';
 import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
+import { verifyCsrfToken } from '../../util/auth';
 
 type LoginRequestBody = {
   username: string;
   password: string;
+  csrfToken: string;
 };
 
 type LoginNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -30,16 +32,28 @@ export default async function loginHandler(
       typeof request.body.username !== 'string' ||
       !request.body.username ||
       typeof request.body.password !== 'string' ||
-      !request.body.password
+      !request.body.password ||
+      typeof request.body.csrfToken !== 'string' ||
+      !request.body.csrfToken
     ) {
       response.status(400).json({
         errors: [
           {
-            message: 'Username or password not provided',
+            message: 'Username, password or CSRF Token not provided',
           },
         ],
       });
       return; // Important: will prevent "Headers already sent" error
+    }
+
+    // Verify csrf token
+    const csrfTokenMatches = verifyCsrfToken(request.body.csrfToken);
+
+    if (!csrfTokenMatches) {
+      response.status(403).json({
+        errors: [{ message: 'Invalid CSRF token' }],
+      });
+      return;
     }
 
     const userWithPasswordHash = await getUserWithPasswordHashByUsername(
@@ -66,8 +80,8 @@ export default async function loginHandler(
     }
 
     // 1. Create a unique token
-    const token = crypto.randomBytes(64).toString('base64');
-    const session = await createSession(token, userWithPasswordHash.id);
+    const sessionToken = crypto.randomBytes(64).toString('base64');
+    const session = await createSession(sessionToken, userWithPasswordHash.id);
 
     // 2. Serialize the cookie
     const serializedCookie = await createSerializedRegisterSessionTokenCookie(
