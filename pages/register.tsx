@@ -4,6 +4,8 @@ import Head from 'next/head';
 import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { formContainerStyles, formStyles } from '../styles/styles';
+import { createCsrfToken } from '../util/auth';
+
 import { getValidSessionByToken } from '../util/database';
 import { RegisterResponseBody } from './api/register';
 
@@ -44,6 +46,7 @@ type Errors = { message: string }[];
 
 type Props = {
   refreshUserProfile: () => void;
+  csrfToken: string;
 };
 
 export default function Register(props: Props) {
@@ -74,6 +77,7 @@ export default function Register(props: Props) {
               body: JSON.stringify({
                 username: username,
                 password: password,
+                csrfToken: props.csrfToken,
               }),
             });
 
@@ -159,6 +163,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     }
   }
   return {
-    props: {},
+    props: { csrfToken: createCsrfToken() },
   };
 }
