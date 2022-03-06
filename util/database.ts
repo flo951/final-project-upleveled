@@ -90,8 +90,18 @@ type Session = {
   userId: number;
 };
 export async function getValidSessionByToken(token: string) {
+  if (!token) return undefined;
   const [session] = await sql<[Session | undefined]>`
     SELECT * FROM sessions WHERE token = ${token} AND expiry_timestamp > now()
+ `;
+  await deleteExpiredSessions();
+  return session && camelcaseKeys(session);
+}
+
+export async function getValidSessionById(userId: number) {
+  if (!userId) return undefined;
+  const [session] = await sql<[Session | undefined]>`
+    SELECT * FROM sessions WHERE user_id = ${userId} AND expiry_timestamp > now()
  `;
   await deleteExpiredSessions();
   return session && camelcaseKeys(session);
@@ -111,6 +121,7 @@ export async function createSession(token: string, userId: number) {
 }
 
 export async function deleteSessionByToken(token: string) {
+  if (!token) return undefined;
   const [session] = await sql<[Session | undefined]>`
 
   DELETE FROM
@@ -136,21 +147,70 @@ export async function deleteExpiredSessions() {
   return sessions.map((session: Session) => camelcaseKeys(session));
 }
 
-// type Person = {
-//   id: number;
-//   token: string;
-//   userId: number;
-// };
+export type Person = {
+  id: number;
+  name: string;
+  userId?: number;
+};
 
-// export async function createPerson(personName: string) {
-//   const [person] = await sql<[Person]>`
+// connect person to user that created it
+export async function createPerson(personName: string, userId: number) {
+  const [person] = await sql<[Person]>`
 
-//   INSERT INTO people
-//   (name)
-//   VALUES
-//   (${personName})
-//   RETURNING *
-//   `;
+  INSERT INTO people
+  (name, user_id)
+  VALUES
+  (${personName}, ${userId})
+  RETURNING *
+  `;
 
-//   return camelcaseKeys(person);
-// }
+  return camelcaseKeys(person);
+}
+
+export async function deletePersonById(id: number, userId: number) {
+  const [person] = await sql<[Person | undefined]>`
+    DELETE FROM
+      people
+    WHERE
+      id = ${id} AND user_id = ${userId}
+    RETURNING *
+  `;
+  return person && camelcaseKeys(person);
+}
+
+export async function getAllPeopleWhereIdMatches(userId: number) {
+  if (!userId) return undefined;
+  const people = await sql<[Person][]>`
+  SELECT id, name FROM people WHERE user_id = ${userId};
+
+
+`;
+  return people;
+}
+
+export type Event = {
+  id: number;
+  eventname: string;
+};
+
+export async function createEvent(eventName: string, userId: number) {
+  const [event] = await sql<[Event]>`
+
+  INSERT INTO events
+  (eventname, user_id)
+  VALUES
+  (${eventName}, ${userId})
+  RETURNING *
+  `;
+
+  return camelcaseKeys(event);
+}
+export async function getAllEventsWhereIdMatches(userId: number) {
+  if (!userId) return undefined;
+  const events = await sql<[Event][]>`
+  SELECT eventname FROM events WHERE user_id = ${userId};
+
+
+`;
+  return events;
+}
