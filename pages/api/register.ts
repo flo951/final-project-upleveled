@@ -10,6 +10,7 @@ import {
 import { createSerializedRegisterSessionTokenCookie } from '../../util/cookies';
 import crypto from 'node:crypto';
 import { verifyCsrfToken } from '../../util/auth';
+
 type RegisterRequestBody = {
   username: string;
   password: string;
@@ -53,8 +54,8 @@ export default async function registerHandler(
       });
       return;
     }
-    // If there is already a user matching the username,
-    // return error message
+    // If there is already a user matching the username,return error message
+
     if (await getUserByUsername(request.body.username)) {
       response.status(409).json({
         errors: [
@@ -68,6 +69,7 @@ export default async function registerHandler(
 
     const passwordHash = await bcrypt.hash(request.body.password, 12);
 
+    // Create user in DB
     const user = await createUser(request.body.username, passwordHash);
 
     // 1. Create a unique token
