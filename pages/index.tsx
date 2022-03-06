@@ -1,6 +1,5 @@
 import { css } from '@emotion/react';
 import Head from 'next/head';
-import { useEffect } from 'react';
 
 const mainStyles = css`
   display: flex;

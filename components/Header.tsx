@@ -74,7 +74,9 @@ export default function Header(props: Props) {
           </div>
           <div css={flexContainerStyles}>
             <h3>Hi {props.userObject.username}</h3>
-            <a href="/logout">Logout</a>
+            <Link href="/logout">
+              <a>Logout</a>
+            </Link>
           </div>
         </div>
       ) : (

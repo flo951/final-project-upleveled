@@ -18,8 +18,12 @@ export default function Logout() {
 
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const token = context.req.cookies.sessionToken;
-  console.log(token);
+
   const session = await deleteSessionByToken(token);
+  if (!session) {
+    console.log('something went wrong with the session');
+    return;
+  }
 
   if (token) {
     context.res.setHeader(

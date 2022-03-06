@@ -1,5 +1,4 @@
 import { css } from '@emotion/react';
-import Tokens from 'csrf';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
 import { useRouter } from 'next/router';
