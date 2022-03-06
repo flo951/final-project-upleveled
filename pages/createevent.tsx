@@ -11,7 +11,10 @@ import {
   getValidSessionByToken,
   Person,
 } from '../util/database';
-import { CreatePersonResponseBody } from './api/person';
+import {
+  CreatePersonResponseBody,
+  DeletePersonResponseBody,
+} from './api/person';
 
 const errorStyles = css`
   color: red;
@@ -76,19 +79,14 @@ const personStyles = css`
   padding: 12px 0px;
 `;
 
-type Props =
-  | {
-      peopleInDb: Person[];
-    }
-  | {
-      eventsInDb: Event[];
-    }
-  | {
-      error: string;
-    }
-  | {
-      user: { id: number; username: string };
-    };
+type Props = {
+  peopleInDb: Person[];
+
+  eventsInDb: Event[];
+  user?: { id: number; username: string };
+
+  errors?: string;
+};
 
 type Errors = { message: string }[];
 
@@ -96,12 +94,12 @@ export default function CreateEvent(props: Props) {
   const [personName, setPersonName] = useState('');
   const [eventName, setEventName] = useState('');
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
-  const [errors, setErrors] = useState<Errors>([]);
+  const [errors, setErrors] = useState<Errors | undefined>([]);
 
   if ('error' in props) {
     return (
       <main>
-        <p>{props.error}</p>
+        <p>{props.errors}</p>
       </main>
     );
   }
@@ -118,7 +116,7 @@ export default function CreateEvent(props: Props) {
       }),
     });
     const deletePersonResponseBody =
-      (await deleteResponse.json()) as CreatePersonResponseBody;
+      (await deleteResponse.json()) as DeletePersonResponseBody;
 
     if ('error' in deletePersonResponseBody) {
       setErrors(deletePersonResponseBody.errors);
@@ -157,7 +155,7 @@ export default function CreateEvent(props: Props) {
               });
 
               const createPersonResponseBody =
-                (await createPersonResponse.json()) as CreatePersonResponseBody;
+                (await createPersonResponse.json()) as DeletePersonResponseBody;
 
               const createdPeople = [
                 ...peopleList,
@@ -298,9 +296,11 @@ export default function CreateEvent(props: Props) {
       })}
 
       <div css={errorStyles}>
-        {errors.map((error) => {
-          return <div key={`error-${error.message}`}>{error.message}</div>;
-        })}
+        {errors !== undefined
+          ? errors.map((error) => {
+              return <div key={`error-${error.message}`}>{error.message}</div>;
+            })
+          : ''}
       </div>
     </>
   );
