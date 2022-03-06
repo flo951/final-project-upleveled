@@ -1,7 +1,9 @@
 import postgres from 'postgres';
 import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
+import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
+setPostgresDefaultsOnHeroku();
 config();
 
 declare module globalThis {
