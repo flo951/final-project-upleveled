@@ -2,7 +2,8 @@ exports.up = async (sql) => {
   await sql`
 	 CREATE TABLE people (
 	 	id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	 	name varchar(30) NOT NULL
+	 	name varchar(30) NOT NULL,
+		user_id integer REFERENCES users (id) ON DELETE CASCADE
 
 		 );
 `;
