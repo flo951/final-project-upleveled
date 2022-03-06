@@ -6,10 +6,17 @@ import {
   User,
 } from '../../util/database';
 
-export type CreatePersonResponseBody =
-  | { errors: { message: string }[] }
-  | { person: Person }
-  | { personId: number };
+export type CreatePersonResponseBody = {
+  errors?: { message: string }[];
+  person?: Person;
+  personId?: number;
+  user?: User;
+};
+
+export type DeletePersonResponseBody = {
+  person: Person;
+  errors?: { message: string }[];
+};
 
 export type CreatePersonRequestBody = {
   name: string;
@@ -47,6 +54,18 @@ export default async function createPersonHandler(
     response.status(201).json({ person: person });
     return;
   } else if (request.method === 'DELETE') {
+    if (
+      typeof request.body.personId !== 'number' ||
+      !request.body.personId ||
+      typeof request.body.user.username !== 'string' ||
+      !request.body.user.username
+    ) {
+      // 400 bad request
+      response.status(400).json({
+        errors: [{ message: 'id or name not provided' }],
+      });
+      return; // Important, prevents error for multiple requests
+    }
     // if the method is DELETE delete the person matching the id and user_id
     const deletedGuest = await deletePersonById(
       request.body.personId,
