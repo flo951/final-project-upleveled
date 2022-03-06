@@ -16,7 +16,6 @@ export default function UserDetail(props: Props) {
           <meta name="description" content="User not found" />
         </Head>
         <h1>User not found</h1>
-        Better luck next time
       </>
     );
   }
@@ -48,7 +47,7 @@ export async function getServerSideProps(
   if (!user) {
     context.res.statusCode = 404;
     return {
-      //notFound: true, also works but generates a generic 404 page
+      // notFound: true, also works but generates a generic 404 page
       props: {},
     };
   }
