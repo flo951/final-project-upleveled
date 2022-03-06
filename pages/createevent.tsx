@@ -17,16 +17,26 @@ const errorStyles = css`
   color: red;
   font-size: 24px;
 `;
-const divListStyles = css`
-  display: flex;
-  flex-direction: column;
+const divGridListStyles = css`
+  display: grid;
+  grid-template-columns: 30% 30% 30%;
+  grid-template-rows: 30% 30% 30%;
+  grid-gap: 8px;
   list-style: none;
   margin: 12px;
+  max-width: 342px;
 `;
 const formStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  margin: 12px;
+  max-width: 342px;
+`;
+
+const mainContainerDivStyles = css`
+  display: flex;
+  flex-direction: column;
   margin: 12px;
 `;
 const smallContainerDivStyles = css`
@@ -34,11 +44,6 @@ const smallContainerDivStyles = css`
     font-size: 24px;
     margin: 12px;
   }
-`;
-const mainContainerDivStyles = css`
-  display: flex;
-  flex-direction: column;
-  margin: 12px;
 `;
 const spanStyles = css`
   font-size: 24px;
@@ -49,6 +54,7 @@ const inputSubmitStyles = css`
   font-size: 24px;
   color: white;
   border-radius: 4px;
+  cursor: pointer;
 `;
 const nameInputStyles = css`
   padding: 8px 8px;
@@ -64,6 +70,10 @@ const removeButtonStyles = css`
   border: none;
   background-color: white;
   font-size: 24px;
+  cursor: pointer;
+`;
+const personStyles = css`
+  padding: 12px 0px;
 `;
 
 type Props =
@@ -182,28 +192,28 @@ export default function CreateEvent(props: Props) {
               value="Create"
             />
           </form>
-
-          {peopleList.map((person: Person) => {
-            return (
-              <div
-                css={divListStyles}
-                data-test-id={`product-${person.id}`}
-                key={`this is ${person.name} witdh ${person.id}`}
-              >
-                <div>
-                  <span css={spanStyles}>{person.name}</span>
-                  <button
-                    css={removeButtonStyles}
-                    onClick={() => {
-                      deletePerson(person.id).catch(() => {});
-                    }}
-                  >
-                    X
-                  </button>
+          <div css={divGridListStyles}>
+            {peopleList.map((person: Person) => {
+              return (
+                <div
+                  data-test-id={`product-${person.id}`}
+                  key={`this is ${person.name} witdh ${person.id}`}
+                >
+                  <div css={personStyles}>
+                    <span css={spanStyles}>{person.name}</span>
+                    <button
+                      css={removeButtonStyles}
+                      onClick={() => {
+                        deletePerson(person.id).catch(() => {});
+                      }}
+                    >
+                      X
+                    </button>
+                  </div>
                 </div>
-              </div>
-            );
-          })}
+              );
+            })}
+          </div>
         </div>
         <div css={smallContainerDivStyles}>
           <h1>Create Event</h1>
@@ -263,7 +273,6 @@ export default function CreateEvent(props: Props) {
       {props.eventsInDb.map((event: Event) => {
         return (
           <div
-            css={divListStyles}
             data-test-id={`product-${event.id}`}
             key={`this is ${event.eventname} witdh ${Math.random()}`}
           >
@@ -271,7 +280,6 @@ export default function CreateEvent(props: Props) {
             {props.peopleInDb.map((person: Person) => {
               return (
                 <div
-                  css={divListStyles}
                   data-test-id={`product-${person.id}`}
                   key={`this is ${person.name} witdh ${Math.random()}`}
                 >
