@@ -1,25 +1,10 @@
 import { serialize } from 'cookie';
-// export function createSerializedSessionTokenCookie(token: string) {
-//   // check if we are in production
-//   const isProduction = process.env.NODE_ENV === 'production';
-//   const maxAge = 60 * 10;
-//   serialize('sessionToken', token, {
-//     maxAge: maxAge,
-//     expires: new Date(Date.now() + maxAge * 1000),
-
-//     httpOnly: true,
-//     // important for security
-//     // set secure cookie in production
-//     secure: isProduction,
-//     path: '/',
-//   });
-// }
 
 export function createSerializedRegisterSessionTokenCookie(token: string) {
   // check if we are in production e.g. Heroku
   const isProduction = process.env.NODE_ENV === 'production';
 
-  const maxAge = 60 * 10; // 10 minutes
+  const maxAge = 60 * 100; // 100 minutes
 
   return serialize('sessionToken', token, {
     maxAge: maxAge,
