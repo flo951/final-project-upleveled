@@ -22,6 +22,7 @@ export type CreatePersonRequestBody = {
   name: string;
   user: User;
   personId: number;
+  eventId: number;
 };
 
 type CreatePersonNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -49,7 +50,11 @@ export default async function createPersonHandler(
 
     // Create person in DB
 
-    const person = await createPerson(request.body.name, request.body.user.id);
+    const person = await createPerson(
+      request.body.name,
+      request.body.eventId,
+      request.body.user.id,
+    );
 
     response.status(201).json({ person: person });
     return;
