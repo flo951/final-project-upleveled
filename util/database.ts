@@ -152,17 +152,23 @@ export async function deleteExpiredSessions() {
 export type Person = {
   id: number;
   name: string;
+  eventId?: number;
   userId?: number;
+  person?: string;
 };
 
 // connect person to user that created it
-export async function createPerson(personName: string, userId: number) {
+export async function createPerson(
+  personName: string,
+  eventId: number,
+  userId: number,
+) {
   const [person] = await sql<[Person]>`
 
   INSERT INTO people
-  (name, user_id)
+  (name, event_id, user_id)
   VALUES
-  (${personName}, ${userId})
+  (${personName}, ${eventId}, ${userId})
   RETURNING *
   `;
 
@@ -180,14 +186,17 @@ export async function deletePersonById(id: number, userId: number) {
   return person && camelcaseKeys(person);
 }
 
-export async function getAllPeopleWhereIdMatches(userId: number) {
+export async function getAllPeopleWhereUserIdMatches(
+  userId: number | undefined,
+) {
   if (!userId) return undefined;
-  const people = await sql<[Person][]>`
-  SELECT id, name FROM people WHERE user_id = ${userId};
-
+  const people = await sql<Person[]>`
+  SELECT id, name, event_id
+  FROM people
+  WHERE user_id = ${userId}
 
 `;
-  return people;
+  return people.map((person: Person) => camelcaseKeys(person));
 }
 
 export type Event = {
@@ -207,12 +216,59 @@ export async function createEvent(eventName: string, userId: number) {
 
   return camelcaseKeys(event);
 }
+export async function deleteEventById(id: number, userId: number) {
+  const [event] = await sql<[Event | undefined]>`
+    DELETE FROM
+      events
+    WHERE
+      id = ${id} AND user_id = ${userId}
+    RETURNING *
+  `;
+  return event && camelcaseKeys(event);
+}
 export async function getAllEventsWhereIdMatches(userId: number) {
   if (!userId) return undefined;
   const events = await sql<[Event][]>`
-  SELECT eventname FROM events WHERE user_id = ${userId};
+  SELECT id, eventname FROM events WHERE user_id = ${userId};
 
 
 `;
   return events;
+}
+
+export type Expense = {
+  id: number;
+  expensename: string;
+  personExpense: number;
+  cost: number;
+  eventId: number;
+
+  paymaster: number;
+};
+
+export async function createExpense(
+  expenseName: string,
+  cost: number,
+
+  eventId: number,
+  paymaster: number,
+) {
+  const [expense] = await sql<[Expense]>`
+
+  INSERT INTO expenses
+  (expensename, cost, event_id, paymaster)
+  VALUES
+  (${expenseName},${cost}, ${eventId}, ${paymaster})
+  RETURNING *
+  `;
+
+  return camelcaseKeys(expense);
+}
+
+export async function getAllExpensesWhereIdMatches() {
+  const expenses = await sql<Expense[]>`
+  SELECT * FROM expenses ;
+
+`;
+  return expenses.map((expense: Expense) => camelcaseKeys(expense));
 }
