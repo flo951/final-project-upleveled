@@ -1,35 +1,31 @@
 import { css } from '@emotion/react';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
-
 import { useState } from 'react';
 import {
   Event,
   getAllEventsWhereIdMatches,
-  getAllPeopleWhereIdMatches,
   getUserByValidSessionToken,
   getValidSessionByToken,
-  Person,
 } from '../util/database';
-import {
-  CreatePersonResponseBody,
-  DeletePersonResponseBody,
-} from './api/person';
+import { CreateEventResponseBody } from './api/event';
 
 const errorStyles = css`
   color: red;
   font-size: 24px;
 `;
-const divGridListStyles = css`
+export const divGridListStyles = css`
   display: grid;
   grid-template-columns: 30% 30% 30%;
-  grid-template-rows: 30% 30% 30%;
+  grid-template-rows: auto;
   grid-gap: 8px;
+  justify-items: end;
+  align-items: center;
   list-style: none;
   margin: 12px;
   max-width: 342px;
 `;
-const formStyles = css`
+export const formStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -40,48 +36,43 @@ const formStyles = css`
 const mainContainerDivStyles = css`
   display: flex;
   flex-direction: column;
+  align-items: center;
   margin: 12px;
 `;
-const smallContainerDivStyles = css`
+
+export const smallContainerDivStyles = css`
   h1 {
     font-size: 24px;
     margin: 12px;
   }
 `;
-const spanStyles = css`
+export const spanStyles = css`
   font-size: 24px;
 `;
-const inputSubmitStyles = css`
+export const inputSubmitStyles = css`
   background-color: #2a6592;
-  padding: 8px 8px;
+  padding: 4px;
   font-size: 24px;
   color: white;
   border-radius: 4px;
   cursor: pointer;
+  min-width: 342px;
 `;
-const nameInputStyles = css`
-  padding: 8px 8px;
+export const nameInputStyles = css`
   font-size: 24px;
-
+  max-width: 342px;
   border-radius: 4px;
+  padding: 4px;
   :focus {
     transition: 0.3s ease-out;
   }
 `;
-const removeButtonStyles = css`
-  color: red;
-  border: none;
-  background-color: white;
-  font-size: 24px;
-  cursor: pointer;
-`;
-const personStyles = css`
+
+export const personStyles = css`
   padding: 12px 0px;
 `;
 
 type Props = {
-  peopleInDb: Person[];
-
   eventsInDb: Event[];
   user?: { id: number; username: string };
 
@@ -91,12 +82,12 @@ type Props = {
 type Errors = { message: string }[];
 
 export default function CreateEvent(props: Props) {
-  const [personName, setPersonName] = useState('');
   const [eventName, setEventName] = useState('');
-  const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
+  const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
+
   const [errors, setErrors] = useState<Errors | undefined>([]);
 
-  if ('error' in props) {
+  if ('errors' in props) {
     return (
       <main>
         <p>{props.errors}</p>
@@ -104,31 +95,13 @@ export default function CreateEvent(props: Props) {
     );
   }
 
-  async function deletePerson(id: number) {
-    const deleteResponse = await fetch(`/api/person`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        personId: id,
-        user: props.user,
-      }),
-    });
-    const deletePersonResponseBody =
-      (await deleteResponse.json()) as DeletePersonResponseBody;
-
-    if ('error' in deletePersonResponseBody) {
-      setErrors(deletePersonResponseBody.errors);
-      return;
-    }
-
-    const newPeopleList = peopleList.filter((person) => {
-      return deletePersonResponseBody.person.id !== person.id;
-    });
-
-    setPeopleList(newPeopleList);
-  }
+  // function handlePersonSelect(e) {
+  //   const person: object = e.target.value;
+  //   console.log(person);
+  //   const addPersonList = [...peopleListCopy, { person }];
+  //   setPeopleListCopy(addPersonList);
+  //   console.log(addPersonList);
+  // }
 
   return (
     <>
@@ -137,82 +110,6 @@ export default function CreateEvent(props: Props) {
         <meta name="Create New Events" content="" />
       </Head>
       <div css={mainContainerDivStyles}>
-        <div css={smallContainerDivStyles}>
-          <h1>Add People for your events</h1>
-
-          <form
-            onSubmit={async (e) => {
-              e.preventDefault();
-              const createPersonResponse = await fetch('/api/person', {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                },
-                body: JSON.stringify({
-                  name: personName,
-                  user: props.user,
-                }),
-              });
-
-              const createPersonResponseBody =
-                (await createPersonResponse.json()) as DeletePersonResponseBody;
-
-              const createdPeople = [
-                ...peopleList,
-                createPersonResponseBody.person,
-              ];
-              setPeopleList(createdPeople);
-
-              setPersonName('');
-              if ('errors' in createPersonResponseBody) {
-                setErrors(createPersonResponseBody.errors);
-                return;
-              }
-            }}
-            css={formStyles}
-          >
-            <label htmlFor="e-mail">
-              <span css={spanStyles}>Name</span>
-            </label>
-            <input
-              css={nameInputStyles}
-              data-test-id="create-person"
-              placeholder="Name"
-              value={personName}
-              onChange={(e) => setPersonName(e.currentTarget.value)}
-              required
-            />
-
-            <input
-              css={inputSubmitStyles}
-              data-test-id="complete-create-person"
-              type="submit"
-              value="Create"
-            />
-          </form>
-          <div css={divGridListStyles}>
-            {peopleList.map((person: Person) => {
-              return (
-                <div
-                  data-test-id={`product-${person.id}`}
-                  key={`this is ${person.name} witdh ${person.id}`}
-                >
-                  <div css={personStyles}>
-                    <span css={spanStyles}>{person.name}</span>
-                    <button
-                      css={removeButtonStyles}
-                      onClick={() => {
-                        deletePerson(person.id).catch(() => {});
-                      }}
-                    >
-                      X
-                    </button>
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        </div>
         <div css={smallContainerDivStyles}>
           <h1>Create Event</h1>
 
@@ -231,14 +128,13 @@ export default function CreateEvent(props: Props) {
               });
 
               const createPersonResponseBody =
-                (await createPersonResponse.json()) as CreatePersonResponseBody;
+                (await createPersonResponse.json()) as CreateEventResponseBody;
+              const createdEvents = [
+                ...eventList,
+                createPersonResponseBody.event,
+              ];
 
-              // const person: object = createPersonResponseBody.person.name;
-              // console.log(typeof person);
-              // const createdPeople = [...peopleList, person];
-              // setPeopleList(createdPeople);
-
-              // console.log(peopleList);
+              setEventList(createdEvents);
               setEventName('');
               if ('errors' in createPersonResponseBody) {
                 setErrors(createPersonResponseBody.errors);
@@ -268,33 +164,90 @@ export default function CreateEvent(props: Props) {
           </form>
         </div>
       </div>
-      {props.eventsInDb.map((event: Event) => {
+      {eventList.map((event: Event) => {
         return (
           <div
             data-test-id={`product-${event.id}`}
-            key={`this is ${event.eventname} witdh ${Math.random()}`}
+            key={`this is ${event.eventname} witdh ${event.id}`}
           >
             <h2 css={spanStyles}>{event.eventname}</h2>
-            {props.peopleInDb.map((person: Person) => {
-              return (
-                <div
-                  data-test-id={`product-${person.id}`}
-                  key={`this is ${person.name} witdh ${Math.random()}`}
-                >
-                  <div>
-                    <span css={spanStyles}>{person.name}</span>
-                    <label htmlFor="event-person-expense">€</label>
-                    <input />
-                    <button>Save</button>
-                  </div>
-                </div>
-              );
-            })}
-            <button>Calculate</button>
           </div>
         );
       })}
+      {/* <div css={eventContainerStyles}>
+        {props.eventsInDb.map((event: Event) => {
+          return (
+            <div
+              data-test-id={`product-${event.id}`}
+              key={`this is ${event.eventname} witdh ${event.id}`}
+            >
+              <h2 css={spanStyles}>{event.eventname}</h2>
+              <select id="dropdown" onChange={handlePersonSelect}>
+              <option key="template" value="">
+                Select Person
+              </option>
+              {peopleList.map((person) => {
+                return (
+                  <option
+                    key={`person-${person.name}-${person.id}`}
+                    value={person.name}
+                  >
+                    {person.name}
+                  </option>
+                );
+              })}
+            </select>
 
+              {peopleList.map((person: Person) => {
+                const isDisabled = isEditPersonId !== person.id;
+                return (
+                  <div
+                    data-test-id={`product-${person.id}`}
+                    key={`this is ${person.name} witdh ${person.id}`}
+                  >
+                    <div>
+                      <form
+                        onSubmit={(e) => {
+                          e.preventDefault();
+                        }}
+                      >
+                        <span css={spanStyles}>{person.name}</span>
+                        <label htmlFor="event-person-expense">€</label>
+                        <input
+                          value={personExpense}
+                          type="number"
+                          disabled={isDisabled}
+                          onChange={(e) => {
+                            setPersonExpense(parseInt(e.currentTarget.value));
+                          }}
+                        />
+                        {isDisabled ? (
+                          <button
+                            onClick={() => {
+                              setIsEditPersonId(person.id);
+                            }}
+                          >
+                            Edit
+                          </button>
+                        ) : (
+                          <button
+                            onClick={() => {
+                              setIsEditPersonId(undefined);
+                            }}
+                          >
+                            Save
+                          </button>
+                        )}
+                      </form>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          );
+        })}
+        <button>Calculate</button>
+      </div> */}
       <div css={errorStyles}>
         {errors !== undefined
           ? errors.map((error) => {
@@ -325,7 +278,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!session) {
     return {
       props: {
-        error: 'You are not allowed to see this page, please login',
+        errors: 'You are not allowed to see this page, please login',
       },
     };
   }
@@ -334,30 +287,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   if (!user) {
     return {
       props: {
-        error: 'You are not logged in',
+        errors: 'You are not logged in',
       },
     };
   }
-  const peopleInDb = await getAllPeopleWhereIdMatches(user.id);
-  if (!peopleInDb) {
-    return {
-      props: {
-        error: 'You are not logged in',
-      },
-    };
-  }
+
   const eventsInDb = await getAllEventsWhereIdMatches(user.id);
+
   if (!eventsInDb) {
     return {
       props: {
-        error: 'You are not logged in',
+        errors: 'You are not logged in',
       },
     };
   }
 
   return {
     props: {
-      peopleInDb: peopleInDb,
       eventsInDb: eventsInDb,
       user: user,
     },
