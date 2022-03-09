@@ -84,7 +84,7 @@ type Errors = { message: string }[];
 export default function CreateEvent(props: Props) {
   const [eventName, setEventName] = useState('');
   const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
-
+  // test for heroku
   const [errors, setErrors] = useState<Errors | undefined>([]);
 
   if ('errors' in props) {
