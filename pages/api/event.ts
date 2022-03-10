@@ -1,10 +1,9 @@
 import { NextApiRequest, NextApiResponse } from 'next';
 import { createEvent, deleteEventById, Event, User } from '../../util/database';
 
-export type CreateEventResponseBody = {
-  event?: Event;
-  errors?: { message: string }[];
-};
+export type CreateEventResponseBody =
+  | { event: Event }
+  | { errors: { message: string }[] };
 
 type CreateEventRequestBody = {
   eventname: string;
@@ -25,9 +24,10 @@ export default async function createEventHandler(
       typeof request.body.eventname !== 'string' ||
       !request.body.eventname ||
       typeof request.body.user.username !== 'string' ||
-      !request.body.user.username
+      !request.body.user.username ||
+      typeof request.body.user.id !== 'number' ||
+      !request.body.user.id
     ) {
-      console.log(request.body);
       // 400 bad request
       response.status(400).json({
         errors: [{ message: 'Eventname not provided' }],
@@ -45,7 +45,6 @@ export default async function createEventHandler(
     response.status(201).json({ event: event });
     return;
   } else if (request.method === 'DELETE') {
-    console.log(request.body);
     if (
       typeof request.body.eventId !== 'number' ||
       !request.body.eventId ||
