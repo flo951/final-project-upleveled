@@ -13,10 +13,9 @@ export type CreatePersonResponseBody = {
   user?: User;
 };
 
-export type DeletePersonResponseBody = {
-  person: Person;
-  errors?: { message: string }[];
-};
+export type DeletePersonResponseBody =
+  | { person: Person }
+  | { errors: { message: string }[] };
 
 export type CreatePersonRequestBody = {
   name: string;
@@ -33,7 +32,6 @@ export default async function createPersonHandler(
   request: CreatePersonNextApiRequest,
   response: NextApiResponse<CreatePersonResponseBody>,
 ) {
-  console.log(request.query);
   if (request.method === 'POST') {
     if (
       typeof request.body.name !== 'string' ||
