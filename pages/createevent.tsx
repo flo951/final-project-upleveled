@@ -79,12 +79,12 @@ type Props = {
   errors?: string;
 };
 
-type Errors = { message: string }[];
+export type Errors = { message: string }[];
 
 export default function CreateEvent(props: Props) {
   const [eventName, setEventName] = useState('');
   const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
-  // test for heroku
+
   const [errors, setErrors] = useState<Errors | undefined>([]);
 
   if ('errors' in props) {
@@ -127,17 +127,21 @@ export default function CreateEvent(props: Props) {
                 }),
               });
 
-              const createPersonResponseBody =
+              const createEventResponseBody =
                 (await createPersonResponse.json()) as CreateEventResponseBody;
-              const createdEvents = [
-                ...eventList,
-                createPersonResponseBody.event,
-              ];
 
-              setEventList(createdEvents);
-              setEventName('');
-              if ('errors' in createPersonResponseBody) {
-                setErrors(createPersonResponseBody.errors);
+              if ('event' in createEventResponseBody) {
+                const createdEvents: Event[] = [
+                  ...eventList,
+                  createEventResponseBody.event,
+                ];
+
+                setEventList(createdEvents);
+                setEventName('');
+              }
+
+              if ('errors' in createEventResponseBody) {
+                setErrors(createEventResponseBody.errors);
                 return;
               }
             }}
@@ -174,80 +178,7 @@ export default function CreateEvent(props: Props) {
           </div>
         );
       })}
-      {/* <div css={eventContainerStyles}>
-        {props.eventsInDb.map((event: Event) => {
-          return (
-            <div
-              data-test-id={`product-${event.id}`}
-              key={`this is ${event.eventname} witdh ${event.id}`}
-            >
-              <h2 css={spanStyles}>{event.eventname}</h2>
-              <select id="dropdown" onChange={handlePersonSelect}>
-              <option key="template" value="">
-                Select Person
-              </option>
-              {peopleList.map((person) => {
-                return (
-                  <option
-                    key={`person-${person.name}-${person.id}`}
-                    value={person.name}
-                  >
-                    {person.name}
-                  </option>
-                );
-              })}
-            </select>
 
-              {peopleList.map((person: Person) => {
-                const isDisabled = isEditPersonId !== person.id;
-                return (
-                  <div
-                    data-test-id={`product-${person.id}`}
-                    key={`this is ${person.name} witdh ${person.id}`}
-                  >
-                    <div>
-                      <form
-                        onSubmit={(e) => {
-                          e.preventDefault();
-                        }}
-                      >
-                        <span css={spanStyles}>{person.name}</span>
-                        <label htmlFor="event-person-expense">€</label>
-                        <input
-                          value={personExpense}
-                          type="number"
-                          disabled={isDisabled}
-                          onChange={(e) => {
-                            setPersonExpense(parseInt(e.currentTarget.value));
-                          }}
-                        />
-                        {isDisabled ? (
-                          <button
-                            onClick={() => {
-                              setIsEditPersonId(person.id);
-                            }}
-                          >
-                            Edit
-                          </button>
-                        ) : (
-                          <button
-                            onClick={() => {
-                              setIsEditPersonId(undefined);
-                            }}
-                          >
-                            Save
-                          </button>
-                        )}
-                      </form>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          );
-        })}
-        <button>Calculate</button>
-      </div> */}
       <div css={errorStyles}>
         {errors !== undefined
           ? errors.map((error) => {
