@@ -1,15 +1,20 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createExpense, Expense } from '../../util/database';
+import { createExpense, deleteExpenseById, Expense } from '../../util/database';
 
-export type CreateEventResponseBody =
+export type CreateExpenseResponseBody =
   | { errors: { message: string }[] }
   | { expense: Expense };
+
+export type DeleteExpenseResponseBody = {
+  expense: Expense;
+  errors?: { message: string }[];
+};
 
 type CreateEventRequestBody = {
   expensename: string;
   cost: number;
   eventId: number;
-
+  expenseId?: number;
   paymaster: number;
 };
 
@@ -19,7 +24,7 @@ type CreateEventNextApiRequest = Omit<NextApiRequest, 'body'> & {
 
 export default async function createEventHandler(
   request: CreateEventNextApiRequest,
-  response: NextApiResponse<CreateEventResponseBody>,
+  response: NextApiResponse<CreateExpenseResponseBody>,
 ) {
   if (request.method === 'POST') {
     if (
@@ -30,7 +35,6 @@ export default async function createEventHandler(
       typeof request.body.paymaster !== 'number' ||
       request.body.paymaster === 0
     ) {
-      console.log(request.body);
       // 400 bad request
       response.status(400).json({
         errors: [
@@ -54,34 +58,25 @@ export default async function createEventHandler(
 
     response.status(201).json({ expense: expense });
     return;
-  }
-  // } else if (request.method === 'DELETE') {
-  //   console.log(request.body);
-  //   if (
-  //     typeof request.body.eventId !== 'number' ||
-  //     !request.body.eventId ||
-  //     typeof request.body.user.username !== 'string' ||
-  //     !request.body.user.username
-  //   ) {
-  //     // 400 bad request
-  //     response.status(400).json({
-  //       errors: [{ message: 'id or event name not provided' }],
-  //     });
-  //     return; // Important, prevents error for multiple requests
-  //   }
-  //   // if the method is DELETE delete the person matching the id and user_id
-  //   const deletedEvent = await deleteEventById(
-  //     request.body.eventId,
-  //     request.body.user.id,
-  //   );
+  } else if (request.method === 'DELETE') {
+    console.log(request.body);
+    if (typeof request.body.expenseId !== 'number' || !request.body.expenseId) {
+      // 400 bad request
+      response.status(400).json({
+        errors: [{ message: 'id or event name not provided' }],
+      });
+      return; // Important, prevents error for multiple requests
+    }
+    // if the method is DELETE delete the person matching the id and user_id
+    const deletedExpense = await deleteExpenseById(request.body.expenseId);
 
-  //   if (!deletedEvent) {
-  //     response.status(404).json({ errors: [{ message: 'Name not provided' }] });
-  //     return;
-  //   }
-  //   response.status(201).json({ event: deletedEvent });
-  //   return;
-  // }
+    if (!deletedExpense) {
+      response.status(404).json({ errors: [{ message: 'Name not provided' }] });
+      return;
+    }
+    response.status(201).json({ expense: deletedExpense });
+    return;
+  }
 
   response.status(405).json({ errors: [{ message: 'Method not supported' }] });
 }
