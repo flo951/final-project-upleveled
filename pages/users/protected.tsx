@@ -21,6 +21,8 @@ import {
   smallContainerDivStyles,
   spanStyles,
 } from '../createevent';
+import { CreateEventResponseBody } from '../api/event';
+import { DeleteExpenseResponseBody } from '../api/expense';
 
 const mainStyles = css`
   margin: 1rem 1rem;
@@ -38,6 +40,33 @@ const eventNameButtonRowStyles = css`
     font-size: 18px;
   }
 `;
+const selectStyles = css`
+  padding: 8px;
+  font-size: 22px;
+`;
+const inputExpenseStyles = css`
+  padding: 8px;
+  width: 150px;
+  font-size: 22px;
+`;
+const expenseContainerStyles = css`
+  display: flex;
+  flex-direction: column;
+`;
+const expenseBigContainerStyles = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`;
+const inputExpenseSubmitStyles = css`
+  background-color: #2a6592;
+  margin-top: 12px;
+  padding: 4px;
+  font-size: 24px;
+  color: white;
+  border-radius: 4px;
+  cursor: pointer;
+`;
 
 type Props = {
   user: { id: number; username: string };
@@ -48,13 +77,17 @@ type Props = {
 };
 type Errors = { message: string }[];
 export default function ProtectedUser(props: Props) {
-  const [personExpense, setPersonExpense] = useState<number>(0);
+  const [personExpense, setPersonExpense] = useState(0);
   const [expenseName, setExpenseName] = useState('');
   const [personName, setPersonName] = useState('');
   const [selectedPerson, setSelectedPerson] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
+  const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
+  const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
   const [errors, setErrors] = useState<Errors | undefined>([]);
+  const [noSelectError, setNoSelectError] = useState('');
+  console.log(selectedPerson);
   console.log(errors);
   if ('errors' in props) {
     return (
@@ -63,6 +96,7 @@ export default function ProtectedUser(props: Props) {
       </main>
     );
   }
+  // function to delete created people
   async function deletePerson(id: number) {
     const deleteResponse = await fetch(`/api/person`, {
       method: 'DELETE',
@@ -77,20 +111,20 @@ export default function ProtectedUser(props: Props) {
     const deletePersonResponseBody =
       (await deleteResponse.json()) as DeletePersonResponseBody;
 
-    if ('error' in deletePersonResponseBody) {
+    if ('errors' in deletePersonResponseBody) {
       setErrors(deletePersonResponseBody.errors);
       return;
     }
-
-    const newPeopleList = peopleList.filter((person) => {
-      return deletePersonResponseBody.person.id !== person.id;
-    });
-
-    setPeopleList(newPeopleList);
+    if ('person' in deletePersonResponseBody) {
+      const newPeopleList = peopleList.filter((person) => {
+        return deletePersonResponseBody.person.id !== person.id;
+      });
+      setPeopleList(newPeopleList);
+      return;
+    }
   }
-
+  // function to delete created events
   async function deleteEvent(id: number) {
-    console.log(id);
     const deleteResponse = await fetch(`/api/event`, {
       method: 'DELETE',
       headers: {
@@ -102,20 +136,70 @@ export default function ProtectedUser(props: Props) {
       }),
     });
     const deleteEventResponseBody =
-      (await deleteResponse.json()) as DeletePersonResponseBody;
+      (await deleteResponse.json()) as CreateEventResponseBody;
 
-    if ('error' in deleteEventResponseBody) {
+    if ('errors' in deleteEventResponseBody) {
       setErrors(deleteEventResponseBody.errors);
       return;
     }
-  }
 
+    //  if(typeof deleteEventResponseBody === 'undefined') {
+    //   return;
+
+    // }
+    const newEventList = eventList.filter((event) => {
+      return deleteEventResponseBody.event.id !== event.id;
+    });
+
+    setEventList(newEventList);
+  }
+  async function deleteExpense(id: number) {
+    console.log(id);
+    const deleteResponse = await fetch(`/api/expense`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        expenseId: id,
+      }),
+    });
+    const deleteEventResponseBody =
+      (await deleteResponse.json()) as DeleteExpenseResponseBody;
+
+    if ('errors' in deleteEventResponseBody) {
+      setErrors(deleteEventResponseBody.errors);
+      return;
+    }
+
+    if ('expense' in deleteEventResponseBody) {
+      const newExpenseList = expenseList.filter((expense) => {
+        return deleteEventResponseBody.expense.id !== expense.id;
+      });
+      setExpenseList(newExpenseList);
+      return;
+    }
+  }
+  // select a created person in a dropdown as a template for adding expenses
   function handleSelectPerson(event: React.ChangeEvent<HTMLSelectElement>) {
     const person = event.target.value;
 
     setSelectedPersonId(parseInt(person));
     setSelectedPerson(person);
   }
+
+  // function calculateTotalSumPerEvent(eventId: number) {
+  //   const cost = props.expensesInDb.map((expense) => {
+  //     if (eventId === expense.eventId) {
+  //       return expense.cost;
+  //     } else {
+  //       return console.log('no value passed');
+  //     }
+  //   });
+
+  //   const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+  //   console.log(sum);
+  // }
 
   return (
     <>
@@ -130,9 +214,9 @@ export default function ProtectedUser(props: Props) {
         />
       </Head>
       <main css={mainStyles}>
-        <h2>Welcome {props.user.username}</h2>
-        <h3>This are your events</h3>
-        {props.eventsInDb.map((event: Event) => {
+        {/* Event List */}
+        <h3>Welcome {props.user.username}, this are your events</h3>
+        {eventList.map((event: Event) => {
           return (
             <div
               data-test-id={`product-${event.id}`}
@@ -150,6 +234,7 @@ export default function ProtectedUser(props: Props) {
                 </button>
               </div>
               <div css={smallContainerDivStyles}>
+                {/* Create People List */}
                 <h4>Add People</h4>
 
                 <form
@@ -169,14 +254,17 @@ export default function ProtectedUser(props: Props) {
 
                     const createPersonResponseBody =
                       (await createPersonResponse.json()) as DeletePersonResponseBody;
+                    if ('person' in createPersonResponseBody) {
+                      const createdPeople = [
+                        ...peopleList,
+                        createPersonResponseBody.person,
+                      ];
+                      setPeopleList(createdPeople);
 
-                    const createdPeople = [
-                      ...peopleList,
-                      createPersonResponseBody.person,
-                    ];
-                    setPeopleList(createdPeople);
+                      setPersonName('');
+                      return;
+                    }
 
-                    setPersonName('');
                     if ('errors' in createPersonResponseBody) {
                       setErrors(createPersonResponseBody.errors);
                       return;
@@ -228,124 +316,129 @@ export default function ProtectedUser(props: Props) {
                   })}
                 </div>
 
-                <div>
-                  <div
-                    data-test-id={`product-${event.id}`}
-                    key={`this is ${event.eventname} witdh ${event.id}`}
+                <div css={expenseBigContainerStyles}>
+                  <select
+                    id="dropdown"
+                    onChange={handleSelectPerson}
+                    css={selectStyles}
                   >
-                    <select id="dropdown" onChange={handleSelectPerson}>
-                      <option key="template" value="">
-                        Select Person
-                      </option>
-                      {peopleList.map((person) => {
-                        return person.eventId === event.id ? (
-                          <option
-                            key={`person-${person.name}-${person.id}`}
-                            value={person.id}
-                          >
-                            {person.name}
-                          </option>
-                        ) : (
-                          ''
-                        );
-                      })}
-                    </select>
+                    <option key="template" value="">
+                      Select Person
+                    </option>
+                    {peopleList.map((person) => {
+                      return person.eventId === event.id ? (
+                        <option
+                          key={`person-${person.name}-${person.id}`}
+                          value={person.id}
+                        >
+                          {person.name}
+                        </option>
+                      ) : (
+                        ''
+                      );
+                    })}
+                  </select>
 
-                    <div>
-                      <div>
-                        <form
-                          css={formStyles}
-                          onSubmit={async (e) => {
-                            e.preventDefault();
-                            if (selectedPersonId === 0) {
-                              return;
-                            }
-                            const createPersonResponse = await fetch(
-                              '/api/expense',
-                              {
-                                method: 'POST',
-                                headers: {
-                                  'Content-Type': 'application/json',
-                                },
-                                body: JSON.stringify({
-                                  expensename: expenseName,
-                                  cost: personExpense,
-                                  eventId: event.id,
-                                  paymaster: selectedPersonId,
-                                }),
-                              },
-                            );
+                  {/* Create Expense List */}
+                  <form
+                    css={formStyles}
+                    onSubmit={async (e) => {
+                      e.preventDefault();
+                      if (selectedPersonId === 0) {
+                        setNoSelectError('No Person selected');
+                        return;
+                      }
+                      const createPersonResponse = await fetch('/api/expense', {
+                        method: 'POST',
+                        headers: {
+                          'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                          expensename: expenseName,
+                          cost: personExpense,
+                          eventId: event.id,
+                          paymaster: selectedPersonId,
+                        }),
+                      });
 
-                            const createPersonResponseBody =
-                              (await createPersonResponse.json()) as DeletePersonResponseBody;
-                            console.log(createPersonResponseBody);
-                            // const createdPeople = [
-                            //   ...peopleList,
-                            //   createPersonResponseBody.person,
-                            // ];
-                            // setPeopleList(createdPeople);
+                      const createPersonResponseBody =
+                        (await createPersonResponse.json()) as DeleteExpenseResponseBody;
+                      console.log(createPersonResponseBody);
 
-                            setExpenseName('');
-                            setPersonExpense(0);
-                            if ('errors' in createPersonResponseBody) {
-                              setErrors(createPersonResponseBody.errors);
-                              return;
-                            }
+                      const createdExpenses: Expense[] = [
+                        ...expenseList,
+                        createPersonResponseBody.expense,
+                      ];
+
+                      setExpenseList(createdExpenses);
+                      setExpenseName('');
+                      setPersonExpense(0);
+                      if ('errors' in createPersonResponseBody) {
+                        setErrors(createPersonResponseBody.errors);
+                        return;
+                      }
+                    }}
+                  >
+                    <div css={expenseContainerStyles}>
+                      <label htmlFor="event-person-expense">Cost in €</label>
+                      <input
+                        css={inputExpenseStyles}
+                        value={personExpense}
+                        type="number"
+                        placeholder="Cost"
+                        onChange={(e) => {
+                          setPersonExpense(parseInt(e.currentTarget.value));
+                        }}
+                      />
+                      <label htmlFor="event-person-expense">Expense</label>
+                      <input
+                        css={inputExpenseStyles}
+                        value={expenseName}
+                        placeholder="Expense"
+                        onChange={(e) => {
+                          setExpenseName(e.currentTarget.value);
+                        }}
+                      />
+                      <input
+                        css={inputExpenseSubmitStyles}
+                        type="submit"
+                        value="Add"
+                      />
+                    </div>
+                  </form>
+
+                  <p>{noSelectError}</p>
+                  {expenseList.map((expense) => {
+                    return expense.eventId === event.id ? (
+                      <div key={`expense-${expense.id}`}>
+                        <span>{expense.expensename} </span>
+                        <span>{expense.cost} € </span>
+                        <span>
+                          Paid by
+                          {peopleList.map((person) => {
+                            return person.id === expense.paymaster
+                              ? person.name
+                              : '';
+                          })}
+                        </span>
+
+                        <button
+                          css={removeButtonStyles}
+                          onClick={() => {
+                            deleteExpense(expense.id).catch(() => {});
                           }}
                         >
-                          <span css={spanStyles}>
-                            Person id{selectedPerson}
-                          </span>
-                          <label htmlFor="event-person-expense">€</label>
-                          <input
-                            value={personExpense}
-                            type="number"
-                            placeholder="Value"
-                            onChange={(e) => {
-                              setPersonExpense(parseInt(e.currentTarget.value));
-                            }}
-                          />
-                          <label htmlFor="event-person-expense">Expense</label>
-                          <input
-                            value={expenseName}
-                            placeholder="Name"
-                            onChange={(e) => {
-                              setExpenseName(e.currentTarget.value);
-                            }}
-                          />
-                          <input type="submit" value="Add" />
-                        </form>
+                          X
+                        </button>
                       </div>
-                      {props.expensesInDb.map((expense) => {
-                        return expense.eventId === event.id ? (
-                          <div key={`expense-${expense.id}`}>
-                            <span>{expense.expensename} </span>
-                            <span>{expense.cost} € </span>
-                            <span>
-                              Paid by
-                              {peopleList.map((person) => {
-                                return person.id === expense.paymaster
-                                  ? person.name
-                                  : '';
-                              })}
-                            </span>
-
-                            <button
-                              css={removeButtonStyles}
-                              // onClick={() => {
-                              //   deleteExpense(expense.id).catch(() => {});
-                              // }}
-                            >
-                              X
-                            </button>
-                          </div>
-                        ) : (
-                          ''
-                        );
-                      })}
-                      {/* <span>Total {expensesSum} €</span> */}
-                    </div>
-                  </div>
+                    ) : (
+                      ''
+                    );
+                  })}
+                  {/* <button onClick={calculateTotalSumPerEvent(event.id)}>
+                        Sum
+                      </button> */}
+                  {/* <span>Total {expensesSum} €</span> */}
                 </div>
               </div>
             </div>
