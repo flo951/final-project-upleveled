@@ -5,7 +5,7 @@ import { AnchorHTMLAttributes } from 'react';
 
 const headerStyles = css`
   padding: 12px 12px;
-  margin: 1rem 1rem;
+  margin: 12px 12px;
   border-radius: 8px;
   background-color: #2a6592;
 
