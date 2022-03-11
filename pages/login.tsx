@@ -105,7 +105,7 @@ export default function Login(props: Props) {
             // maybe not necessary with redirect setErrors([]);
             props.refreshUserProfile();
             await router
-              .push(`/users/protected`)
+              .push(`/createevent`)
               .catch((error) => console.log(error));
           }}
         >
