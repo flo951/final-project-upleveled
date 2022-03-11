@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
+import Link from 'next/link';
 import { useState } from 'react';
 import {
   Event,
@@ -27,10 +28,10 @@ export const divGridListStyles = css`
 `;
 export const formStyles = css`
   display: flex;
+
   flex-direction: column;
   gap: 12px;
   margin: 12px;
-  max-width: 342px;
 `;
 
 const mainContainerDivStyles = css`
@@ -56,11 +57,10 @@ export const inputSubmitStyles = css`
   color: white;
   border-radius: 4px;
   cursor: pointer;
-  min-width: 342px;
 `;
 export const nameInputStyles = css`
   font-size: 24px;
-  max-width: 342px;
+
   border-radius: 4px;
   padding: 4px;
   :focus {
@@ -71,7 +71,22 @@ export const nameInputStyles = css`
 export const personStyles = css`
   padding: 12px 0px;
 `;
-
+export const eventListStyles = css`
+  margin: 12px;
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  a {
+    color: black;
+  }
+`;
+const removeButtonStyles = css`
+  color: red;
+  border: none;
+  background-color: white;
+  font-size: 18px;
+  cursor: pointer;
+`;
 type Props = {
   eventsInDb: Event[];
   user?: { id: number; username: string };
@@ -168,16 +183,26 @@ export default function CreateEvent(props: Props) {
           </form>
         </div>
       </div>
-      {eventList.map((event: Event) => {
-        return (
-          <div
-            data-test-id={`product-${event.id}`}
-            key={`this is ${event.eventname} witdh ${event.id}`}
-          >
-            <h2 css={spanStyles}>{event.eventname}</h2>
-          </div>
-        );
-      })}
+      <span css={spanStyles}>Click on your event to edit it</span>
+      <div css={eventListStyles}>
+        {eventList.map((event: Event) => {
+          return (
+            <div
+              data-test-id={`event-${event.id}`}
+              key={`this is ${event.eventname} witdh ${event.id}`}
+            >
+              <Link href={`/users/${event.id}`}>
+                <a>
+                  <div css={personStyles}>
+                    <span css={spanStyles}>{event.eventname}</span>
+                    <button css={removeButtonStyles}>X</button>
+                  </div>
+                </a>
+              </Link>
+            </div>
+          );
+        })}
+      </div>
 
       <div css={errorStyles}>
         {errors !== undefined
