@@ -217,6 +217,7 @@ export async function createEvent(eventName: string, userId: number) {
 
   return camelcaseKeys(event);
 }
+
 export async function deleteEventById(id: number, userId: number) {
   const [event] = await sql<[Event | undefined]>`
     DELETE FROM
@@ -235,6 +236,15 @@ export async function getAllEventsWhereIdMatches(userId: number) {
 
 `;
   return events;
+}
+
+export async function getSingleEvent(eventId: number) {
+  const [event] = await sql<[Event]>`
+
+  SELECT * from events WHERE id = ${eventId}
+  `;
+
+  return camelcaseKeys(event);
 }
 
 export type Expense = {
