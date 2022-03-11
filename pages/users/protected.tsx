@@ -80,15 +80,14 @@ export default function ProtectedUser(props: Props) {
   const [personExpense, setPersonExpense] = useState(0);
   const [expenseName, setExpenseName] = useState('');
   const [personName, setPersonName] = useState('');
-  const [selectedPerson, setSelectedPerson] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
   const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
   const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [noSelectError, setNoSelectError] = useState('');
-  console.log(selectedPerson);
-  console.log(errors);
+  const [sumEventCosts, setSumEventCosts] = useState(0);
+
   if ('errors' in props) {
     return (
       <main>
@@ -185,21 +184,17 @@ export default function ProtectedUser(props: Props) {
     const person = event.target.value;
 
     setSelectedPersonId(parseInt(person));
-    setSelectedPerson(person);
   }
 
-  // function calculateTotalSumPerEvent(eventId: number) {
-  //   const cost = props.expensesInDb.map((expense) => {
-  //     if (eventId === expense.eventId) {
-  //       return expense.cost;
-  //     } else {
-  //       return console.log('no value passed');
-  //     }
-  //   });
+  function calculateTotalSumPerEvent(eventId: number) {
+    const cost: number[] = props.expensesInDb.map((expense) => {
+      return expense.eventId === eventId ? expense.cost : 0;
+    });
 
-  //   const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
-  //   console.log(sum);
-  // }
+    console.log(cost);
+    const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+    setSumEventCosts(sum);
+  }
 
   return (
     <>
@@ -213,6 +208,7 @@ export default function ProtectedUser(props: Props) {
           content="View single product by id"
         />
       </Head>
+      {errors}
       <main css={mainStyles}>
         {/* Event List */}
         <h3>Welcome {props.user.username}, this are your events</h3>
@@ -435,9 +431,16 @@ export default function ProtectedUser(props: Props) {
                       ''
                     );
                   })}
-                  {/* <button onClick={calculateTotalSumPerEvent(event.id)}>
-                        Sum
-                      </button> */}
+
+                  <button
+                    onClick={() => {
+                      calculateTotalSumPerEvent(event.id);
+                    }}
+                  >
+                    Sum
+                  </button>
+                  <h3>{sumEventCosts} €</h3>
+
                   {/* <span>Total {expensesSum} €</span> */}
                 </div>
               </div>
