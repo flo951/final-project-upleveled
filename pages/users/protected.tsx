@@ -16,6 +16,9 @@ import { eventListStyles, personStyles, spanStyles } from '../createevent';
 const mainStyles = css`
   margin: 1rem 1rem;
 `;
+const flexRowStyles = css`
+  display: flex;
+`;
 const removeButtonStyles = css`
   color: red;
   border: none;
@@ -91,6 +94,7 @@ export default function ProtectedUser(props: Props) {
               <div
                 data-test-id={`event-${event.id}`}
                 key={`this is ${event.eventname} witdh ${event.id}`}
+                css={flexRowStyles}
               >
                 <Link href={`/users/${event.id}`}>
                   <a>
