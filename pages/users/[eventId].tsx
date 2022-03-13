@@ -1,12 +1,12 @@
 import { css } from '@emotion/react';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Event,
   Expense,
   getAllExpensesWhereIdMatches,
-  getAllPeopleWhereUserIdMatches,
+  getAllPeopleWhereEventIdMatches,
   getSingleEvent,
   getUserByValidSessionToken,
   Person,
@@ -83,16 +83,36 @@ type Props = {
 export default function UserDetail(props: Props) {
   const [eventList, setEventList] = useState<Event[]>([props.eventInDb]);
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
-  const [personExpense, setPersonExpense] = useState(0);
+  const [personExpense, setPersonExpense] = useState('0');
   const [expenseName, setExpenseName] = useState('');
   const [personName, setPersonName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
-  const [noSelectError, setNoSelectError] = useState('');
-  const [sumEventCosts, setSumEventCosts] = useState(0);
+
+  const [sumEventCosts, setSumEventCosts] = useState('0');
   const [sharedCosts, setSharedCosts] = useState(0);
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
+  useEffect(() => {
+    function calculateTotalSumPerEvent() {
+      console.log(expenseList);
+      const cost: number[] = expenseList.map((expense) => {
+        return expense.cost / 100;
+      });
 
+      const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+      setSumEventCosts(sum.toFixed(2));
+
+      const amountPeople = peopleList.filter((person) => {
+        return person.name;
+      });
+
+      const costPaidByEveryone =
+        Math.round((sum / amountPeople.length) * 100) / 100;
+      console.log(costPaidByEveryone);
+      setSharedCosts(costPaidByEveryone);
+    }
+    calculateTotalSumPerEvent();
+  }, [expenseList, peopleList]);
   if (props.errors) {
     return (
       <>
@@ -155,10 +175,6 @@ export default function UserDetail(props: Props) {
       return;
     }
 
-    //  if(typeof deleteEventResponseBody === 'undefined') {
-    //   return;
-
-    // }
     const newEventList = eventList.filter((event) => {
       return deleteEventResponseBody.event.id !== event.id;
     });
@@ -196,24 +212,6 @@ export default function UserDetail(props: Props) {
     const person = event.target.value;
 
     setSelectedPersonId(parseInt(person));
-  }
-
-  function calculateTotalSumPerEvent(eventId: number) {
-    const cost: number[] = props.expensesInDb.map((expense) => {
-      return expense.eventId === eventId ? expense.cost / 100 : 0;
-    });
-
-    const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
-    setSumEventCosts(sum);
-
-    const amountPeople = peopleList.filter((person) => {
-      return person.eventId === eventId ? person.name : '';
-    });
-
-    const costPaidByEveryone =
-      Math.round((sum / amountPeople.length) * 100) / 100;
-    console.log(costPaidByEveryone);
-    setSharedCosts(costPaidByEveryone);
   }
 
   return (
@@ -330,37 +328,12 @@ export default function UserDetail(props: Props) {
                 </div>
 
                 <div css={expenseBigContainerStyles}>
-                  <select
-                    id="dropdown"
-                    onChange={handleSelectPerson}
-                    css={selectStyles}
-                  >
-                    <option key="template" value="">
-                      Select Person
-                    </option>
-                    {peopleList.map((person) => {
-                      return person.eventId === event.id ? (
-                        <option
-                          key={`person-${person.name}-${person.id}`}
-                          value={person.id}
-                        >
-                          {person.name}
-                        </option>
-                      ) : (
-                        ''
-                      );
-                    })}
-                  </select>
-
                   {/* Create Expense List */}
                   <form
                     css={formStyles}
                     onSubmit={async (e) => {
                       e.preventDefault();
-                      if (selectedPersonId === 0) {
-                        setNoSelectError('No Person selected');
-                        return;
-                      }
+
                       const createPersonResponse = await fetch('/api/expense', {
                         method: 'POST',
                         headers: {
@@ -368,7 +341,7 @@ export default function UserDetail(props: Props) {
                         },
                         body: JSON.stringify({
                           expensename: expenseName,
-                          cost: personExpense * 100,
+                          cost: parseFloat(personExpense) * 100,
                           eventId: event.id,
                           paymaster: selectedPersonId,
                         }),
@@ -376,7 +349,6 @@ export default function UserDetail(props: Props) {
 
                       const createPersonResponseBody =
                         (await createPersonResponse.json()) as DeleteExpenseResponseBody;
-                      console.log(createPersonResponseBody);
 
                       const createdExpenses: Expense[] = [
                         ...expenseList,
@@ -385,7 +357,7 @@ export default function UserDetail(props: Props) {
 
                       setExpenseList(createdExpenses);
                       setExpenseName('');
-                      setPersonExpense(0);
+                      setPersonExpense('0');
                       if ('errors' in createPersonResponseBody) {
                         setErrors(createPersonResponseBody.errors);
                         return;
@@ -393,14 +365,40 @@ export default function UserDetail(props: Props) {
                     }}
                   >
                     <div css={expenseContainerStyles}>
+                      <select
+                        id="dropdown"
+                        onChange={handleSelectPerson}
+                        required
+                        css={selectStyles}
+                      >
+                        <option key="template" value="">
+                          Select Person
+                        </option>
+                        {peopleList.map((person) => {
+                          return person.eventId === event.id ? (
+                            <option
+                              key={`person-${person.name}-${person.id}`}
+                              value={person.id}
+                            >
+                              {person.name}
+                            </option>
+                          ) : (
+                            ''
+                          );
+                        })}
+                      </select>
                       <label htmlFor="event-person-expense">Cost in €</label>
                       <input
                         css={inputExpenseStyles}
                         value={personExpense}
-                        type="number"
                         placeholder="Cost"
+                        required
                         onChange={(e) => {
-                          setPersonExpense(parseFloat(e.currentTarget.value));
+                          e.currentTarget.value = e.currentTarget.value.replace(
+                            /,/g,
+                            '.',
+                          );
+                          setPersonExpense(e.currentTarget.value);
                         }}
                       />
                       <label htmlFor="event-person-expense">Expense</label>
@@ -408,6 +406,7 @@ export default function UserDetail(props: Props) {
                         css={inputExpenseStyles}
                         value={expenseName}
                         placeholder="Expense"
+                        required
                         onChange={(e) => {
                           setExpenseName(e.currentTarget.value);
                         }}
@@ -420,7 +419,6 @@ export default function UserDetail(props: Props) {
                     </div>
                   </form>
 
-                  <p>{noSelectError}</p>
                   {expenseList.map((expense) => {
                     return expense.eventId === event.id ? (
                       <div
@@ -453,15 +451,8 @@ export default function UserDetail(props: Props) {
                     );
                   })}
 
-                  <button
-                    css={inputSubmitStyles}
-                    onClick={() => {
-                      calculateTotalSumPerEvent(event.id);
-                    }}
-                  >
-                    Sum
-                  </button>
-                  <h3>{sumEventCosts} €</h3>
+                  <h3>Participants: {peopleList.length}</h3>
+                  <h3>Total {sumEventCosts} €</h3>
                   <h3>Everyone has to pay {sharedCosts} €</h3>
                 </div>
               </div>
@@ -485,7 +476,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   const token = context.req.cookies.sessionToken;
 
   const user = await getUserByValidSessionToken(token);
-  console.log(user);
+
   if (!user) {
     return {
       redirect: {
@@ -496,7 +487,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   const eventInDb = await getSingleEvent(parseInt(eventId));
-  console.log(eventInDb);
+
   if (typeof eventInDb === 'undefined') {
     return {
       props: {
@@ -513,17 +504,9 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  const peopleInDb = await getAllPeopleWhereUserIdMatches(user.id);
+  const peopleInDb = await getAllPeopleWhereEventIdMatches(parseInt(eventId));
 
-  if (!peopleInDb) {
-    return {
-      props: {
-        errors: 'You are not logged in',
-      },
-    };
-  }
-
-  const expensesInDb = await getAllExpensesWhereIdMatches();
+  const expensesInDb = await getAllExpensesWhereIdMatches(parseInt(eventId));
 
   return {
     props: {
