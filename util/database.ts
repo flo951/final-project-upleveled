@@ -186,14 +186,11 @@ export async function deletePersonById(id: number, userId: number) {
   return person && camelcaseKeys(person);
 }
 
-export async function getAllPeopleWhereUserIdMatches(
-  userId: number | undefined,
-) {
-  if (!userId) return undefined;
+export async function getAllPeopleWhereEventIdMatches(eventId: number) {
   const people = await sql<Person[]>`
   SELECT id, name, event_id
   FROM people
-  WHERE user_id = ${userId}
+  WHERE event_id = ${eventId}
 
 `;
   return people.map((person: Person) => camelcaseKeys(person));
@@ -287,9 +284,13 @@ export async function deleteExpenseById(expenseId: number) {
   return expense && camelcaseKeys(expense);
 }
 
-export async function getAllExpensesWhereIdMatches() {
+export async function getAllExpensesWhereIdMatches(eventId: number) {
   const expenses = await sql<Expense[]>`
-  SELECT * FROM expenses ;
+  SELECT * FROM
+  expenses
+  WHERE
+  event_id = ${eventId}
+
 
 `;
   return expenses.map((expense: Expense) => camelcaseKeys(expense));
