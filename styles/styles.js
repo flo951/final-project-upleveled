@@ -5,14 +5,11 @@ export const formContainerStyles = css`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 80vh;
-  margin: 1rem 1rem;
-  /* border-radius: 8px;
-  border: 2px solid black; */
-  /* background-color: #3d86be; */
+
   h1 {
     text-align: center;
     font-weight: 400;
+    font-size: 20px;
   }
 `;
 
@@ -25,6 +22,6 @@ export const formStyles = css`
   margin: 1rem 1rem;
   border-radius: 8px;
   h4 {
-    font-size: 24px;
+    font-size: 20px;
   }
 `;
