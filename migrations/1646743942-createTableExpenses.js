@@ -5,7 +5,7 @@ exports.up = async (sql) => {
 	 	expensename varchar(30) NOT NULL,
 		cost integer,
 		event_id integer REFERENCES events (id) ON DELETE CASCADE,
-		paymaster integer
+		paymaster integer REFERENCES people (id) ON DELETE CASCADE
 
 		 );
 `;
