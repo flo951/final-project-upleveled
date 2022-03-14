@@ -10,7 +10,7 @@ import { LoginResponseBody } from './api/login';
 
 const nameInputStyles = css`
   padding: 8px 8px;
-  font-size: 24px;
+  font-size: 20px;
 
   border-radius: 4px;
   :focus {
@@ -25,18 +25,18 @@ const inputSubmitStyles = css`
   color: white;
   border: 2px solid black;
   border-radius: 8px;
-  font-size: 24px;
+  font-size: 20px;
   width: 100%;
   cursor: pointer;
 `;
 
 const spanLabelStyles = css`
-  font-size: 24px;
+  font-size: 20px;
   margin-bottom: 12px;
 `;
 const errorStyles = css`
   color: red;
-  font-size: 24px;
+  font-size: 20px;
 `;
 type Errors = { message: string }[];
 
@@ -59,7 +59,6 @@ export default function Login(props: Props) {
       </Head>
 
       <div css={formContainerStyles}>
-        <h1>Welcome</h1>
         <span css={spanLabelStyles}>Login to start your journey</span>
         <form
           css={formStyles}
