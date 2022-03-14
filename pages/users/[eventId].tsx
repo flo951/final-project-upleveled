@@ -12,6 +12,7 @@ import {
   Person,
 } from '../../util/database';
 import { CreateEventResponseBody } from '../api/event';
+
 import { DeleteExpenseResponseBody } from '../api/expense';
 import { DeletePersonResponseBody } from '../api/person';
 import {
@@ -30,8 +31,9 @@ const mainStyles = css`
 const removeButtonStyles = css`
   color: red;
   border: none;
-  background-color: white;
-  font-size: 18px;
+  background-color: transparent;
+  font-size: 20px;
+
   cursor: pointer;
 `;
 const eventNameButtonRowStyles = css`
@@ -43,34 +45,44 @@ const eventNameButtonRowStyles = css`
 `;
 const selectStyles = css`
   padding: 8px;
-  font-size: 22px;
-  width: 249px;
+  font-size: 20px;
 `;
 const inputExpenseStyles = css`
   padding: 8px;
 
-  font-size: 22px;
+  font-size: 20px;
 `;
 const expenseContainerStyles = css`
   display: flex;
   flex-direction: column;
+  gap: 12px;
 `;
 const expenseBigContainerStyles = css`
   display: flex;
   flex-direction: column;
   align-items: center;
+  gap: 12px;
+  border: 2px solid black;
+  border-radius: 8px;
+  padding: 12px 4px;
+  margin: 12px 0px;
+  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
 const inputExpenseSubmitStyles = css`
   background-color: #2a6592;
   margin-top: 12px;
   padding: 4px;
-  font-size: 24px;
+  font-size: 20px;
   color: white;
   border-radius: 4px;
   cursor: pointer;
 `;
 const expenseDetailStyles = css`
+  display: flex;
   font-size: 18px;
+`;
+const redColorCostsStyles = css`
+  color: #db3f2e;
 `;
 type Props = {
   user: { id: number; username: string };
@@ -83,18 +95,26 @@ type Props = {
 export default function UserDetail(props: Props) {
   const [eventList, setEventList] = useState<Event[]>([props.eventInDb]);
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
-  const [personExpense, setPersonExpense] = useState('0');
+  const [personExpense, setPersonExpense] = useState('');
   const [expenseName, setExpenseName] = useState('');
   const [personName, setPersonName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
-
   const [sumEventCosts, setSumEventCosts] = useState('0');
-  const [sharedCosts, setSharedCosts] = useState(0);
+  const [sharedCosts, setSharedCosts] = useState('0');
   const [errors, setErrors] = useState<Errors | undefined>([]);
+  const [expenseError, setExpenseError] = useState('');
   const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
+
   useEffect(() => {
     function calculateTotalSumPerEvent() {
-      console.log(expenseList);
+      if (typeof props.eventInDb === 'undefined') {
+        return {
+          props: {
+            errors: 'This event doesnt exist',
+          },
+        };
+      }
+
       const cost: number[] = expenseList.map((expense) => {
         return expense.cost / 100;
       });
@@ -108,8 +128,8 @@ export default function UserDetail(props: Props) {
 
       const costPaidByEveryone =
         Math.round((sum / amountPeople.length) * 100) / 100;
-      console.log(costPaidByEveryone);
-      setSharedCosts(costPaidByEveryone);
+
+      setSharedCosts(costPaidByEveryone.toFixed(2));
     }
     calculateTotalSumPerEvent();
   }, [expenseList, peopleList]);
@@ -142,7 +162,7 @@ export default function UserDetail(props: Props) {
     });
     const deletePersonResponseBody =
       (await deleteResponse.json()) as DeletePersonResponseBody;
-
+    console.log(deletePersonResponseBody);
     if ('errors' in deletePersonResponseBody) {
       setErrors(deletePersonResponseBody.errors);
       return;
@@ -152,35 +172,15 @@ export default function UserDetail(props: Props) {
         return deletePersonResponseBody.person.id !== person.id;
       });
       setPeopleList(newPeopleList);
+      const newExpenseList = expenseList.filter((expense) => {
+        return deletePersonResponseBody.person.eventId !== expense.eventId;
+      });
+      setExpenseList(newExpenseList);
+
       return;
     }
   }
-  // function to delete created events
-  async function deleteEvent(id: number) {
-    const deleteResponse = await fetch(`/api/event`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        eventId: id,
-        user: props.user,
-      }),
-    });
-    const deleteEventResponseBody =
-      (await deleteResponse.json()) as CreateEventResponseBody;
 
-    if ('errors' in deleteEventResponseBody) {
-      setErrors(deleteEventResponseBody.errors);
-      return;
-    }
-
-    const newEventList = eventList.filter((event) => {
-      return deleteEventResponseBody.event.id !== event.id;
-    });
-
-    setEventList(newEventList);
-  }
   async function deleteExpense(id: number) {
     const deleteResponse = await fetch(`/api/expense`, {
       method: 'DELETE',
@@ -214,6 +214,33 @@ export default function UserDetail(props: Props) {
     setSelectedPersonId(parseInt(person));
   }
 
+  // function to delete created events
+  async function deleteEvent(id: number) {
+    const deleteResponse = await fetch(`/api/event`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventId: id,
+        user: props.user,
+      }),
+    });
+    const deleteEventResponseBody =
+      (await deleteResponse.json()) as CreateEventResponseBody;
+
+    if ('errors' in deleteEventResponseBody) {
+      setErrors(deleteEventResponseBody.errors);
+      return;
+    }
+
+    const newEventList = eventList.filter((event) => {
+      return deleteEventResponseBody.event.id !== event.id;
+    });
+
+    setEventList(newEventList);
+  }
+
   return (
     <>
       <Head>
@@ -233,15 +260,7 @@ export default function UserDetail(props: Props) {
               key={`this is ${event.eventname} witdh ${event.id}`}
             >
               <div css={eventNameButtonRowStyles}>
-                <h2>{event.eventname}</h2>
-                <button
-                  css={removeButtonStyles}
-                  onClick={() => {
-                    deleteEvent(event.id).catch(() => {});
-                  }}
-                >
-                  X
-                </button>
+                <h3> Who is participating at {event.eventname}?</h3>
               </div>
               <div css={smallContainerDivStyles}>
                 {/* Create People List */}
@@ -282,10 +301,7 @@ export default function UserDetail(props: Props) {
                   css={formStyles}
                 >
                   {errors}
-                  <h4>Who is participating at your event?</h4>
-                  <label htmlFor="e-mail">
-                    <span css={spanStyles}>Name</span>
-                  </label>
+
                   <input
                     css={nameInputStyles}
                     data-test-id="create-person"
@@ -329,10 +345,16 @@ export default function UserDetail(props: Props) {
 
                 <div css={expenseBigContainerStyles}>
                   {/* Create Expense List */}
+                  <h4>Who is paying?</h4>
                   <form
                     css={formStyles}
                     onSubmit={async (e) => {
                       e.preventDefault();
+
+                      if (personExpense === '0') {
+                        setExpenseError('Sure its free?');
+                        return;
+                      }
 
                       const createPersonResponse = await fetch('/api/expense', {
                         method: 'POST',
@@ -387,11 +409,11 @@ export default function UserDetail(props: Props) {
                           );
                         })}
                       </select>
-                      <label htmlFor="event-person-expense">Cost in €</label>
+                      <label htmlFor="expense">Cost</label>
                       <input
                         css={inputExpenseStyles}
                         value={personExpense}
-                        placeholder="Cost"
+                        placeholder="0 €"
                         required
                         onChange={(e) => {
                           e.currentTarget.value = e.currentTarget.value.replace(
@@ -401,11 +423,13 @@ export default function UserDetail(props: Props) {
                           setPersonExpense(e.currentTarget.value);
                         }}
                       />
-                      <label htmlFor="event-person-expense">Expense</label>
+                      <label htmlFor="expense-name">
+                        What are you paying for?
+                      </label>
                       <input
                         css={inputExpenseStyles}
                         value={expenseName}
-                        placeholder="Expense"
+                        placeholder="Name of the Expense"
                         required
                         onChange={(e) => {
                           setExpenseName(e.currentTarget.value);
@@ -416,6 +440,11 @@ export default function UserDetail(props: Props) {
                         type="submit"
                         value="Add"
                       />
+                      {expenseError ? (
+                        <span css={spanStyles}> 💸{expenseError}💸</span>
+                      ) : (
+                        ''
+                      )}
                     </div>
                   </form>
 
@@ -425,11 +454,8 @@ export default function UserDetail(props: Props) {
                         css={expenseDetailStyles}
                         key={`expense-${expense.id}`}
                       >
-                        <span>{expense.expensename} </span>
-
-                        <span>{expense.cost / 100} € </span>
-                        <span>Paid by </span>
-                        <span>
+                        <span css={spanStyles}>
+                          {expense.expensename} {expense.cost / 100} € Paid by
                           {peopleList.map((person) => {
                             return person.id === expense.paymaster
                               ? person.name
@@ -451,10 +477,28 @@ export default function UserDetail(props: Props) {
                     );
                   })}
 
-                  <h3>Participants: {peopleList.length}</h3>
-                  <h3>Total {sumEventCosts} €</h3>
-                  <h3>Everyone has to pay {sharedCosts} €</h3>
+                  <span css={spanStyles}>
+                    Participants: {peopleList.length}
+                  </span>
+                  <span css={spanStyles}> Total: {sumEventCosts} €</span>
+
+                  {peopleList.length === 0 ? (
+                    ''
+                  ) : (
+                    <span css={spanStyles}>
+                      Everyone has to pay
+                      <span css={redColorCostsStyles}> {sharedCosts} €</span>
+                    </span>
+                  )}
                 </div>
+                <button
+                  css={removeButtonStyles}
+                  onClick={() => {
+                    deleteEvent(event.id).catch(() => {});
+                  }}
+                >
+                  <span css={spanStyles}>Delete Event</span> X
+                </button>
               </div>
             </div>
           );
