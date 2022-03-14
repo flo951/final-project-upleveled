@@ -51,6 +51,7 @@ export const smallContainerDivStyles = css`
 `;
 export const spanStyles = css`
   font-size: 20px;
+  color: black;
 `;
 export const inputSubmitStyles = css`
   background-color: #2a6592;
