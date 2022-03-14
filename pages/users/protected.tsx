@@ -15,6 +15,9 @@ import { eventListStyles, personStyles, spanStyles } from '../createevent';
 
 const mainStyles = css`
   margin: 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 `;
 const flexRowStyles = css`
   display: flex;
@@ -87,7 +90,11 @@ export default function ProtectedUser(props: Props) {
       {errors}
       <main css={mainStyles}>
         {/* Event List */}
-        <h3>Welcome {props.user.username}, this are your events</h3>
+        <h3>
+          {eventList.length === 0
+            ? ' You have no events yet, click on the Link above to create an event'
+            : `this are your events ${props.user.username}`}
+        </h3>
         <div css={eventListStyles}>
           {eventList.map((event: Event) => {
             return (
