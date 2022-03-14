@@ -13,22 +13,21 @@ import { CreateEventResponseBody } from './api/event';
 
 const errorStyles = css`
   color: red;
-  font-size: 24px;
+  font-size: 20px;
 `;
 export const divGridListStyles = css`
   display: grid;
-  grid-template-columns: 30% 30% 30%;
+  grid-template-columns: auto auto auto;
   grid-template-rows: auto;
-  grid-gap: 8px;
-  justify-items: end;
-  align-items: center;
+  grid-gap: 4px 8px;
+  justify-items: center;
   list-style: none;
   margin: 12px;
   max-width: 342px;
 `;
 export const formStyles = css`
   display: flex;
-
+  width: 300px;
   flex-direction: column;
   gap: 12px;
   margin: 12px;
@@ -42,24 +41,27 @@ const mainContainerDivStyles = css`
 `;
 
 export const smallContainerDivStyles = css`
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
   h1 {
-    font-size: 24px;
-    margin: 12px;
+    font-size: 20px;
   }
 `;
 export const spanStyles = css`
-  font-size: 24px;
+  font-size: 20px;
 `;
 export const inputSubmitStyles = css`
   background-color: #2a6592;
   padding: 4px;
-  font-size: 24px;
+  font-size: 20px;
   color: white;
   border-radius: 4px;
   cursor: pointer;
 `;
 export const nameInputStyles = css`
-  font-size: 24px;
+  font-size: 20px;
 
   border-radius: 4px;
   padding: 4px;
@@ -69,7 +71,8 @@ export const nameInputStyles = css`
 `;
 
 export const personStyles = css`
-  padding: 12px 0px;
+  display: flex;
+  padding: 4px;
 `;
 export const eventListStyles = css`
   margin: 12px;
@@ -84,7 +87,7 @@ const removeButtonStyles = css`
   color: red;
   border: none;
   background-color: white;
-  font-size: 18px;
+  font-size: 20px;
   cursor: pointer;
 `;
 type Props = {
@@ -109,14 +112,6 @@ export default function CreateEvent(props: Props) {
       </main>
     );
   }
-
-  // function handlePersonSelect(e) {
-  //   const person: object = e.target.value;
-  //   console.log(person);
-  //   const addPersonList = [...peopleListCopy, { person }];
-  //   setPeopleListCopy(addPersonList);
-  //   console.log(addPersonList);
-  // }
 
   return (
     <>
@@ -182,26 +177,28 @@ export default function CreateEvent(props: Props) {
             />
           </form>
         </div>
-      </div>
-      <span css={spanStyles}>Click on your event to edit it</span>
-      <div css={eventListStyles}>
-        {eventList.map((event: Event) => {
-          return (
-            <div
-              data-test-id={`event-${event.id}`}
-              key={`this is ${event.eventname} witdh ${event.id}`}
-            >
-              <Link href={`/users/${event.id}`}>
-                <a>
-                  <div css={personStyles}>
+        {eventList.length === 0 ? (
+          ''
+        ) : (
+          <span css={spanStyles}>Click on your event to edit it</span>
+        )}
+        <div css={eventListStyles}>
+          {eventList.map((event: Event) => {
+            return (
+              <div
+                data-test-id={`event-${event.id}`}
+                key={`this is ${event.eventname} witdh ${event.id}`}
+              >
+                <Link href={`/users/${event.id}`}>
+                  <a>
                     <span css={spanStyles}>{event.eventname}</span>
-                    <button css={removeButtonStyles}>X</button>
-                  </div>
-                </a>
-              </Link>
-            </div>
-          );
-        })}
+                  </a>
+                </Link>
+                <button css={removeButtonStyles}>X</button>
+              </div>
+            );
+          })}
+        </div>
       </div>
 
       <div css={errorStyles}>
