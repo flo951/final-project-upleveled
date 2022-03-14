@@ -11,7 +11,7 @@ import { RegisterResponseBody } from './api/register';
 
 const nameInputStyles = css`
   padding: 8px 8px;
-  font-size: 24px;
+  font-size: 20px;
 
   border-radius: 4px;
   :focus {
@@ -28,18 +28,18 @@ const inputSubmitStyles = css`
   color: white;
   border: 2px solid black;
   border-radius: 8px;
-  font-size: 24px;
+  font-size: 20px;
   width: 100%;
   cursor: pointer;
 `;
 
 const spanLabelStyles = css`
-  font-size: 24px;
+  font-size: 20px;
   margin-bottom: 12px;
 `;
 const errorStyles = css`
   color: red;
-  font-size: 24px;
+  font-size: 20px;
 `;
 
 type Errors = { message: string }[];
