@@ -5,25 +5,29 @@ import { AnchorHTMLAttributes } from 'react';
 
 const headerStyles = css`
   padding: 12px 12px;
-  margin: 12px 12px;
+  margin: 12px auto;
   border-radius: 8px;
   background-color: #2a6592;
-
   border: 2px solid black;
   color: white;
-
+  width: 342px;
   h3 {
     margin: 4px;
     padding: 8px;
+    font-size: 20px;
+    max-height: 42px;
+    border: 2px solid #dc8409;
+    border-radius: 8px;
   }
 
   a {
     color: white;
     text-decoration: none;
     margin: 4px;
-    font-size: 24px;
+    font-size: 20px;
     padding: 8px;
     max-height: 42px;
+    max-width: max-content;
     display: inline-block;
     position: relative;
 
@@ -50,6 +54,9 @@ const headerStyles = css`
 const flexContainerStyles = css`
   display: flex;
   flex-direction: column;
+  h3 {
+    font-weight: 400;
+  }
 `;
 const flexRowHeaderStyles = css`
   display: flex;
@@ -79,7 +86,7 @@ export default function Header(props: Props) {
               <a>Dashboard</a>
             </Link>
             <Link href="/createevent">
-              <a>Create Event</a>
+              <a>Create New Event</a>
             </Link>
           </div>
           <div css={flexContainerStyles}>
