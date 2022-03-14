@@ -441,7 +441,7 @@ export default function UserDetail(props: Props) {
                         value="Add"
                       />
                       {expenseError ? (
-                        <span css={spanStyles}> 💸{expenseError}💸</span>
+                        <span css={spanStyles}> {expenseError}</span>
                       ) : (
                         ''
                       )}
