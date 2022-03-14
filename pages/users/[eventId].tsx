@@ -132,7 +132,7 @@ export default function UserDetail(props: Props) {
       setSharedCosts(costPaidByEveryone.toFixed(2));
     }
     calculateTotalSumPerEvent();
-  }, [expenseList, peopleList]);
+  }, [expenseList, peopleList, props.eventInDb]);
   if (props.errors) {
     return (
       <>
