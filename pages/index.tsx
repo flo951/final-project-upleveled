@@ -22,14 +22,7 @@ const imageStyles = css`
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
 
-// type Props = {
-//   refreshUserProfile: () => void;
-//   userObject: { username: string };
-// };
 export default function Home() {
-  // useEffect(() => {
-  //   props.refreshUserProfile();
-  // }, [props]);
   return (
     <>
       <Head>
