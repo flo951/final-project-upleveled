@@ -22,8 +22,7 @@ export const divGridListStyles = css`
   grid-gap: 4px 8px;
   justify-items: center;
   list-style: none;
-  margin: 12px;
-  max-width: 342px;
+  margin: 12px auto;
 `;
 export const formStyles = css`
   display: flex;
@@ -37,7 +36,10 @@ const mainContainerDivStyles = css`
   display: flex;
   flex-direction: column;
   align-items: center;
-  margin: 12px;
+  border: 2px solid black;
+  border-radius: 8px;
+  margin: auto;
+  width: 348px;
 `;
 
 export const smallContainerDivStyles = css`
@@ -78,6 +80,8 @@ export const personStyles = css`
 export const eventListStyles = css`
   margin: 12px;
   display: flex;
+  justify-content: flex-start;
+
   gap: 12px;
   flex-wrap: wrap;
   a {
@@ -120,7 +124,7 @@ export default function CreateEvent(props: Props) {
         <title>Events</title>
         <meta name="Create New Events" content="" />
       </Head>
-      <div css={mainContainerDivStyles}>
+      <main css={mainContainerDivStyles}>
         <div css={smallContainerDivStyles}>
           <h1>Create Event</h1>
 
@@ -165,6 +169,7 @@ export default function CreateEvent(props: Props) {
               css={nameInputStyles}
               data-test-id="create-event"
               placeholder="Event Name"
+              id="event-name"
               value={eventName}
               onChange={(e) => setEventName(e.currentTarget.value)}
               required
@@ -173,6 +178,7 @@ export default function CreateEvent(props: Props) {
             <input
               css={inputSubmitStyles}
               data-test-id="complete-create-event"
+              name="submit"
               type="submit"
               value="Create"
             />
@@ -200,15 +206,17 @@ export default function CreateEvent(props: Props) {
             );
           })}
         </div>
-      </div>
 
-      <div css={errorStyles}>
-        {errors !== undefined
-          ? errors.map((error) => {
-              return <div key={`error-${error.message}`}>{error.message}</div>;
-            })
-          : ''}
-      </div>
+        <div css={errorStyles}>
+          {errors !== undefined
+            ? errors.map((error) => {
+                return (
+                  <div key={`error-${error.message}`}>{error.message}</div>
+                );
+              })
+            : ''}
+        </div>
+      </main>
     </>
   );
 }
