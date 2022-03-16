@@ -72,6 +72,7 @@ const expenseBigContainerStyles = css`
   padding: 12px;
   margin: 12px auto;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  width: 324px;
 `;
 const inputExpenseSubmitStyles = css`
   background-color: #2a6592;
@@ -85,6 +86,11 @@ const inputExpenseSubmitStyles = css`
 const expenseDetailStyles = css`
   display: flex;
   font-size: 18px;
+`;
+const expenseStatisticsStyles = css`
+  border-bottom: 2px solid black;
+  padding: 4px;
+  width: 100%;
 `;
 const redColorCostsStyles = css`
   color: #db3f2e;
@@ -479,31 +485,56 @@ export default function UserDetail(props: Props) {
 
                   {expenseList.map((expense) => {
                     return expense.eventId === event.id ? (
-                      <div
-                        css={expenseDetailStyles}
-                        key={`expense-${expense.id}`}
-                      >
-                        <span css={spanStyles}>
-                          {expense.expensename} {expense.cost / 100}
-                        </span>
-                        <span css={spanStyles}>
-                          {peopleList.map((person) => {
-                            return person.id === expense.paymaster
-                              ? `€ Paid by ${person.name}`
-                              : '';
-                          })}
-                        </span>
-
-                        <button
-                          css={removeButtonStyles}
-                          aria-label={`Delete Button for Expense: ${expense.expensename}`}
-                          onClick={() => {
-                            deleteExpense(expense.id).catch(() => {});
-                          }}
+                      <>
+                        <div
+                          css={expenseDetailStyles}
+                          key={`expense-${expense.id}`}
                         >
-                          X
-                        </button>
-                      </div>
+                          <span css={spanStyles}>
+                            {expense.expensename} {expense.cost / 100}
+                          </span>
+                          <span css={spanStyles}>
+                            {peopleList.map((person) => {
+                              return person.id === expense.paymaster
+                                ? `€ paid by ${person.name}`
+                                : '';
+                            })}
+                          </span>
+
+                          <button
+                            css={removeButtonStyles}
+                            aria-label={`Delete Button for Expense: ${expense.expensename}`}
+                            onClick={() => {
+                              deleteExpense(expense.id).catch(() => {});
+                            }}
+                          >
+                            X
+                          </button>
+                        </div>
+                        <div css={expenseStatisticsStyles}>
+                          {peopleList.map((person) => {
+                            const cost = expense.cost / 100 / peopleList.length;
+
+                            return person.id !== expense.paymaster ? (
+                              <div key={person.id}>
+                                <span css={spanStyles}>
+                                  {person.name} owes
+                                  <span css={redColorCostsStyles}>
+                                    {` ${cost}`}
+                                  </span>
+                                  {peopleList.map((p) => {
+                                    return p.id === expense.paymaster
+                                      ? `€ to ${p.name}`
+                                      : '';
+                                  })}
+                                </span>
+                              </div>
+                            ) : (
+                              ''
+                            );
+                          })}
+                        </div>
+                      </>
                     ) : (
                       ''
                     );
