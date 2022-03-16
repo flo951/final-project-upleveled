@@ -370,10 +370,9 @@ export default function UserDetail(props: Props) {
                         setExpenseError('Sure its free?');
                         return;
                       }
-                      const testNumber: number | undefined =
-                        parseInt(personExpense) / 0;
+                      const testNumber: number = parseInt(personExpense);
 
-                      if (Number.isNaN(testNumber)) {
+                      if (!Number.isInteger(testNumber)) {
                         setExpenseError('Invalid input, please enter a number');
                         return;
                       }
