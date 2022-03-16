@@ -1,6 +1,5 @@
 import Head from 'next/head';
 import { User } from '../util/database';
-
 import Header from './Header';
 type Props = {
   children: object;
