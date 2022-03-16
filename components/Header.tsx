@@ -10,7 +10,7 @@ const headerStyles = css`
   background-color: #2a6592;
   border: 2px solid black;
   color: white;
-  width: 342px;
+  width: 324px;
   h3 {
     margin: 4px;
     padding: 8px;
