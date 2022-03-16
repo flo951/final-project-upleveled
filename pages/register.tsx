@@ -90,7 +90,9 @@ export default function Register(props: Props) {
             }
             props.refreshUserProfile();
 
-            await router.push('./login').catch((error) => console.log(error));
+            await router
+              .push('./createevent')
+              .catch((error) => console.log(error));
           }}
         >
           <label htmlFor="username">
