@@ -14,10 +14,17 @@ import Link from 'next/link';
 import { eventListStyles, personStyles, spanStyles } from '../createevent';
 
 const mainStyles = css`
-  margin: 1rem 1rem;
   display: flex;
   flex-direction: column;
   align-items: center;
+`;
+const borderEventListStyles = css`
+  border: 2px solid black;
+  border-radius: 8px;
+  width: 348px;
+  h3 {
+    text-align: center;
+  }
 `;
 const flexRowStyles = css`
   display: flex;
@@ -90,37 +97,39 @@ export default function ProtectedUser(props: Props) {
       {errors}
       <main css={mainStyles}>
         {/* Event List */}
-        <h3>
-          {eventList.length === 0
-            ? ' You have no events yet, click on the Link above to create an event'
-            : `this are your events ${props.user.username}`}
-        </h3>
-        <div css={eventListStyles}>
-          {eventList.map((event: Event) => {
-            return (
-              <div
-                data-test-id={`event-${event.id}`}
-                key={`this is ${event.eventname} witdh ${event.id}`}
-                css={flexRowStyles}
-              >
-                <Link href={`/users/${event.id}`}>
-                  <a>
-                    <div css={personStyles}>
-                      <span css={spanStyles}>{event.eventname}</span>
-                    </div>
-                  </a>
-                </Link>
-                <button
-                  css={removeButtonStyles}
-                  onClick={() => {
-                    deleteEvent(event.id).catch(() => {});
-                  }}
+        <div css={borderEventListStyles}>
+          <h3>
+            {eventList.length === 0
+              ? ' You have no events yet, click on the Link above to create an event'
+              : `This are your events ${props.user.username}`}
+          </h3>
+          <div css={eventListStyles}>
+            {eventList.map((event: Event) => {
+              return (
+                <div
+                  data-test-id={`event-${event.id}`}
+                  key={`This is ${event.eventname} witdh ${event.id}`}
+                  css={flexRowStyles}
                 >
-                  X
-                </button>
-              </div>
-            );
-          })}
+                  <Link href={`/users/${event.id}`}>
+                    <a>
+                      <div css={personStyles}>
+                        <span css={spanStyles}>{event.eventname}</span>
+                      </div>
+                    </a>
+                  </Link>
+                  <button
+                    css={removeButtonStyles}
+                    onClick={() => {
+                      deleteEvent(event.id).catch(() => {});
+                    }}
+                  >
+                    X
+                  </button>
+                </div>
+              );
+            })}
+          </div>
         </div>
       </main>
     </>
