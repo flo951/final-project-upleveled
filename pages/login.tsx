@@ -108,13 +108,14 @@ export default function Login(props: Props) {
               .catch((error) => console.log(error));
           }}
         >
-          <label htmlFor="e-mail">
+          <label htmlFor="username">
             <span css={spanLabelStyles}>Username</span>
           </label>
           <input
             css={nameInputStyles}
             data-test-id="username-login"
             placeholder="Username"
+            id="username"
             onChange={(e) => setUsername(e.currentTarget.value)}
             required
           />
