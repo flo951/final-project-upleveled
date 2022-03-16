@@ -173,7 +173,7 @@ export default function UserDetail(props: Props) {
     });
     const deletePersonResponseBody =
       (await deleteResponse.json()) as DeletePersonResponseBody;
-    console.log(deletePersonResponseBody);
+
     if ('errors' in deletePersonResponseBody) {
       setErrors(deletePersonResponseBody.errors);
       return;
@@ -329,7 +329,7 @@ export default function UserDetail(props: Props) {
                       css={inputSubmitStyles}
                       data-test-id="complete-create-person"
                       type="submit"
-                      value="Create"
+                      value="Add Person"
                     />
                   </form>
                   <div css={divGridListStyles}>
@@ -358,6 +358,7 @@ export default function UserDetail(props: Props) {
                     })}
                   </div>
                 </div>
+
                 <div css={expenseBigContainerStyles}>
                   {/* Create Expense List */}
 
@@ -470,7 +471,7 @@ export default function UserDetail(props: Props) {
                         css={inputExpenseSubmitStyles}
                         type="submit"
                         name="submit"
-                        value="Add"
+                        value="Add Expense"
                       />
                     </div>
                   </form>
@@ -521,6 +522,36 @@ export default function UserDetail(props: Props) {
                     </span>
                   )}
                 </div>
+
+                {peopleList.map((person) => {
+                  const cost = expenseList.map((expense) => {
+                    return person.id === expense.paymaster
+                      ? expense.cost / 100
+                      : 0;
+                  });
+
+                  const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+                  const personSum =
+                    Math.round((sum - parseFloat(sharedCosts)) * 100) / 100;
+                  return (
+                    <div key={person.id}>
+                      <span css={spanStyles}>
+                        {person.name}
+                        {personSum < 0 ? ' Owes ' : ' Receives '}
+                        <span
+                          css={
+                            personSum >= 0 ? spanStyles : redColorCostsStyles
+                          }
+                        >
+                          {Math.round((sum - parseFloat(sharedCosts)) * 100) /
+                            100}
+                          €
+                        </span>
+                      </span>
+                    </div>
+                  );
+                })}
+
                 <button
                   css={removeButtonStyles}
                   onClick={() => {
