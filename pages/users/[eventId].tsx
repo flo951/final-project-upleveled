@@ -491,12 +491,11 @@ export default function UserDetail(props: Props) {
                           key={`expense-${expense.id}`}
                         >
                           <span css={spanStyles}>
-                            {expense.expensename} {expense.cost / 100}
-                          </span>
-                          <span css={spanStyles}>
                             {peopleList.map((person) => {
                               return person.id === expense.paymaster
-                                ? `€ paid by ${person.name}`
+                                ? `${expense.expensename} ${
+                                    expense.cost / 100
+                                  }€ paid by ${person.name}`
                                 : '';
                             })}
                           </span>
@@ -520,7 +519,7 @@ export default function UserDetail(props: Props) {
                                 <span css={spanStyles}>
                                   {person.name} owes
                                   <span css={redColorCostsStyles}>
-                                    {` ${cost}`}
+                                    {` ${cost.toFixed(2)}`}
                                   </span>
                                   {peopleList.map((p) => {
                                     return p.id === expense.paymaster
