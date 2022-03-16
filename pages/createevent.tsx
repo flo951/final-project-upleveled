@@ -15,12 +15,9 @@ const errorStyles = css`
   color: red;
   font-size: 20px;
 `;
-export const divGridListStyles = css`
-  display: grid;
-  grid-template-columns: auto auto auto;
-  grid-template-rows: auto;
-  grid-gap: 4px 8px;
-  justify-items: center;
+export const divPersonListStyles = css`
+  display: flex;
+  flex-wrap: wrap;
   list-style: none;
   margin: 12px auto;
 `;

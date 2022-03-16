@@ -15,7 +15,7 @@ import { CreateEventResponseBody } from '../api/event';
 import { DeleteExpenseResponseBody } from '../api/expense';
 import { DeletePersonResponseBody } from '../api/person';
 import {
-  divGridListStyles,
+  divPersonListStyles,
   Errors,
   formStyles,
   inputSubmitStyles,
@@ -94,6 +94,7 @@ const borderPeopleListStyles = css`
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   padding: 12px;
+  width: 324px;
 `;
 type Props = {
   user: { id: number; username: string };
@@ -332,7 +333,7 @@ export default function UserDetail(props: Props) {
                       value="Add Person"
                     />
                   </form>
-                  <div css={divGridListStyles}>
+                  <div css={divPersonListStyles}>
                     {peopleList.map((person: Person) => {
                       return person.eventId === event.id ? (
                         <div
