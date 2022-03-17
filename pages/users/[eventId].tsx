@@ -57,8 +57,10 @@ const removeButtonStyles = css`
 const eventNameButtonRowStyles = css`
   display: flex;
   justify-content: center;
-  h4 {
+
+  h3 {
     font-size: 18px;
+    font-weight: 400;
   }
 `;
 const selectStyles = css`
@@ -78,6 +80,7 @@ const expenseContainerStyles = css`
   h3 {
     margin-top: 0;
     text-align: center;
+    font-weight: 400;
   }
 `;
 const spanErrorStyles = css`
