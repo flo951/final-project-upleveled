@@ -148,7 +148,7 @@ export default function CreateEvent(props: Props) {
       </Head>
       <main css={mainContainerDivStyles}>
         <div css={smallContainerDivStyles}>
-          <h1>Create Event</h1>
+          <h1>Create a new Event</h1>
 
           <form
             onSubmit={async (e) => {
