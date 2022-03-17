@@ -35,7 +35,7 @@ const mainContainerDivStyles = css`
   align-items: center;
   border: 2px solid black;
   border-radius: 8px;
-  margin: auto;
+  margin: 0 auto;
   width: 348px;
 `;
 
@@ -113,6 +113,31 @@ export default function CreateEvent(props: Props) {
         <p>{props.errors}</p>
       </main>
     );
+  }
+  async function deleteEvent(id: number) {
+    const deleteResponse = await fetch(`/api/event`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        eventId: id,
+        user: props.user,
+      }),
+    });
+    const deleteEventResponseBody =
+      (await deleteResponse.json()) as CreateEventResponseBody;
+
+    if ('errors' in deleteEventResponseBody) {
+      setErrors(deleteEventResponseBody.errors);
+      return;
+    }
+
+    const newEventList = eventList.filter((event) => {
+      return deleteEventResponseBody.event.id !== event.id;
+    });
+
+    setEventList(newEventList);
   }
 
   return (
@@ -198,7 +223,14 @@ export default function CreateEvent(props: Props) {
                     <span css={spanStyles}>{event.eventname}</span>
                   </a>
                 </Link>
-                <button css={removeButtonStyles}>X</button>
+                <button
+                  css={removeButtonStyles}
+                  onClick={() => {
+                    deleteEvent(event.id).catch(() => {});
+                  }}
+                >
+                  X
+                </button>
               </div>
             );
           })}
