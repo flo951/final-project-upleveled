@@ -40,6 +40,14 @@ export default function DoughnutChart(props) {
       {
         label: '# of Votes',
         data: expensePerPerson,
+        options: {
+          plugins: {
+            subtitle: {
+              display: true,
+              text: 'Title',
+            },
+          },
+        },
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)',
           'rgba(54, 162, 235, 0.2)',
@@ -65,7 +73,40 @@ export default function DoughnutChart(props) {
       <span>Click on labels to remove someone</span>
       <br />
 
-      <Doughnut data={data} />
+      <Doughnut
+        data={data}
+        options={{
+          plugins: {
+            title: {
+              display: true,
+              text: 'Balance of each Participant in €',
+            },
+            legend: {
+              display: true,
+              position: 'bottom',
+            },
+          },
+        }}
+      />
+      {/* <div>
+        {props.people.map((person) => {
+          const cost = expense.cost / 100 / props.people.length;
+
+          return person.id !== expense.paymaster ? (
+            <div key={`person-${person.id} from ${Math.random()} `}>
+              <span>
+                {person.name} owes
+                <span>{` ${cost.toFixed(2)}`}</span>
+                {props.people.map((p) => {
+                  return p.id === expense.paymaster ? `€ to ${p.name}` : '';
+                })}
+              </span>
+            </div>
+          ) : (
+            ''
+          );
+        })}
+      </div> */}
     </div>
   );
 }
