@@ -5,12 +5,12 @@ import { AnchorHTMLAttributes } from 'react';
 
 const headerStyles = css`
   padding: 12px 12px;
-  margin: 12px auto;
+  margin: 12px;
   border-radius: 8px;
   background-color: #2a6592;
   border: 2px solid black;
   color: white;
-  width: 324px;
+
   h3 {
     margin: 4px;
     padding: 8px;
@@ -48,6 +48,10 @@ const headerStyles = css`
       transform: scaleX(1);
       transform-origin: bottom left;
     }
+  }
+  @media only screen and (max-width: 800px) {
+    width: 324px;
+    margin: 12px auto;
   }
 `;
 
