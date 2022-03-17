@@ -1,7 +1,9 @@
 import { css } from '@emotion/react';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
+import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
+import DoughnutChart from '../../components/DoughnutChart';
 import {
   Event,
   Expense,
@@ -21,11 +23,26 @@ import {
   inputSubmitStyles,
   nameInputStyles,
   personStyles,
-  smallContainerDivStyles,
   spanStyles,
 } from '../createevent';
 const mainStyles = css`
-  margin-bottom: 12px;
+  margin: 12px;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  flex-wrap: wrap;
+
+  h1 {
+    font-size: 20px;
+  }
+
+  @media only screen and (max-width: 1124px) {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 0 auto;
+    gap: 12px;
+  }
 `;
 const removeButtonStyles = css`
   color: red;
@@ -46,6 +63,7 @@ const eventNameButtonRowStyles = css`
 `;
 const selectStyles = css`
   padding: 8px;
+
   font-size: 20px;
 `;
 const inputExpenseStyles = css`
@@ -57,6 +75,10 @@ const expenseContainerStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
+  h3 {
+    margin-top: 0;
+    text-align: center;
+  }
 `;
 const spanErrorStyles = css`
   color: red;
@@ -70,7 +92,6 @@ const expenseBigContainerStyles = css`
   border: 2px solid black;
   border-radius: 8px;
   padding: 12px;
-  margin: 12px auto;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   width: 324px;
 `;
@@ -101,6 +122,7 @@ const borderPeopleListStyles = css`
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   padding: 12px;
   width: 324px;
+  height: fit-content;
 `;
 type Props = {
   user: { id: number; username: string };
@@ -122,6 +144,7 @@ export default function UserDetail(props: Props) {
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [expenseError, setExpenseError] = useState('');
   const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
+  const router = useRouter();
 
   useEffect(() => {
     function calculateTotalSumPerEvent() {
@@ -258,6 +281,7 @@ export default function UserDetail(props: Props) {
     });
 
     setEventList(newEventList);
+    await router.push(`/createevent`).catch((err) => console.log(err));
   }
 
   return (
@@ -271,289 +295,306 @@ export default function UserDetail(props: Props) {
         />
       </Head>
 
-      <main css={mainStyles}>
+      <main>
         {eventList.map((event: Event) => {
           return (
             <div
-              data-test-id={`product-${event.id}`}
-              key={`this is ${event.eventname} witdh ${event.id}`}
+              data-test-id={`event-with-id-${event.id}`}
+              key={`this is ${event.eventname} witdh ${event.id} `}
+              css={mainStyles}
             >
-              <div css={smallContainerDivStyles}>
-                {/* Create People List */}
-                <div css={borderPeopleListStyles}>
-                  <div css={eventNameButtonRowStyles}>
-                    <h3> Who is participating at {event.eventname}?</h3>
-                  </div>
-                  <form
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-
-                      const createPersonResponse = await fetch('/api/person', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          name: personName,
-                          user: props.user,
-                          eventId: event.id,
-                        }),
-                      });
-
-                      const createPersonResponseBody =
-                        (await createPersonResponse.json()) as DeletePersonResponseBody;
-                      if ('person' in createPersonResponseBody) {
-                        const createdPeople = [
-                          ...peopleList,
-                          createPersonResponseBody.person,
-                        ];
-                        setPeopleList(createdPeople);
-
-                        setPersonName('');
-                        return;
-                      }
-
-                      if ('errors' in createPersonResponseBody) {
-                        setErrors(createPersonResponseBody.errors);
-                        return;
-                      }
-                    }}
-                    css={formStyles}
-                  >
-                    {errors}
-                    <label htmlFor="person-name">Name of Person</label>
-                    <input
-                      css={nameInputStyles}
-                      data-test-id="create-person"
-                      id="person-name"
-                      placeholder="Name"
-                      value={personName}
-                      onChange={(e) => setPersonName(e.currentTarget.value)}
-                      required
-                    />
-
-                    <input
-                      css={inputSubmitStyles}
-                      data-test-id="complete-create-person"
-                      type="submit"
-                      value="Add Person"
-                    />
-                  </form>
-                  <div css={divPersonListStyles}>
-                    {peopleList.map((person: Person) => {
-                      return person.eventId === event.id ? (
-                        <div
-                          data-test-id={`product-${person.id}`}
-                          key={`this is ${person.name} witdh ${person.id} from event ${event.id}`}
-                        >
-                          <div css={personStyles}>
-                            <span css={spanStyles}>{person.name}</span>
-                            <button
-                              css={removeButtonStyles}
-                              aria-label={`Delete Button for Person: ${person.name}`}
-                              onClick={() => {
-                                deletePerson(person.id).catch(() => {});
-                              }}
-                            >
-                              X
-                            </button>
-                          </div>
-                        </div>
-                      ) : (
-                        ''
-                      );
-                    })}
-                  </div>
+              {/* Create People List */}
+              <div css={borderPeopleListStyles}>
+                <div css={eventNameButtonRowStyles}>
+                  <h3>
+                    {' '}
+                    Who is participating at {event.eventname}?{' '}
+                    <button
+                      onClick={() => {
+                        deleteEvent(event.id).catch(() => {});
+                      }}
+                      css={removeButtonStyles}
+                    >
+                      X
+                    </button>
+                  </h3>
                 </div>
+                <form
+                  onSubmit={async (e) => {
+                    e.preventDefault();
 
-                <div css={expenseBigContainerStyles}>
-                  {/* Create Expense List */}
+                    const createPersonResponse = await fetch('/api/person', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        name: personName,
+                        user: props.user,
+                        eventId: event.id,
+                      }),
+                    });
 
-                  <form
-                    css={formStyles}
-                    onSubmit={async (e) => {
-                      e.preventDefault();
-
-                      if (personExpense === '0') {
-                        setExpenseError('Sure its free?');
-                        return;
-                      }
-                      const testNumber: number = parseInt(personExpense);
-
-                      if (!Number.isInteger(testNumber)) {
-                        setExpenseError('Invalid input, please enter a number');
-                        return;
-                      }
-
-                      const createPersonResponse = await fetch('/api/expense', {
-                        method: 'POST',
-                        headers: {
-                          'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({
-                          expensename: expenseName,
-                          cost: parseFloat(personExpense) * 100,
-                          eventId: event.id,
-                          paymaster: selectedPersonId,
-                        }),
-                      });
-
-                      const createPersonResponseBody =
-                        (await createPersonResponse.json()) as DeleteExpenseResponseBody;
-
-                      const createdExpenses: Expense[] = [
-                        ...expenseList,
-                        createPersonResponseBody.expense,
+                    const createPersonResponseBody =
+                      (await createPersonResponse.json()) as DeletePersonResponseBody;
+                    if ('person' in createPersonResponseBody) {
+                      const createdPeople = [
+                        ...peopleList,
+                        createPersonResponseBody.person,
                       ];
+                      setPeopleList(createdPeople);
 
-                      setExpenseList(createdExpenses);
-                      setExpenseName('');
-                      setPersonExpense('0');
-                      if ('errors' in createPersonResponseBody) {
-                        setErrors(createPersonResponseBody.errors);
-                        return;
-                      }
-                      setErrors([]);
-                      setExpenseError('');
-                    }}
-                  >
-                    <div css={expenseContainerStyles}>
-                      <label htmlFor="person-list">Who is paying?</label>
-                      <select
-                        id="person-list"
-                        onChange={handleSelectPerson}
-                        required
-                        css={selectStyles}
+                      setPersonName('');
+                      return;
+                    }
+
+                    if ('errors' in createPersonResponseBody) {
+                      setErrors(createPersonResponseBody.errors);
+                      return;
+                    }
+                  }}
+                  css={formStyles}
+                >
+                  {errors}
+                  <label htmlFor="person-name">Name of Person</label>
+                  <input
+                    css={nameInputStyles}
+                    data-test-id="create-person"
+                    id="person-name"
+                    placeholder="Name"
+                    value={personName}
+                    onChange={(e) => setPersonName(e.currentTarget.value)}
+                    required
+                  />
+
+                  <input
+                    css={inputSubmitStyles}
+                    data-test-id="complete-create-person"
+                    type="submit"
+                    value="Add Person"
+                  />
+                </form>
+                <div css={divPersonListStyles}>
+                  {peopleList.map((person: Person) => {
+                    return person.eventId === event.id ? (
+                      <div
+                        data-test-id={`person-width-id-${person.id}`}
+                        key={`this is ${person.name} witdh ${person.id} from event ${event.id}`}
                       >
-                        <option key="template" value="">
-                          Select Person
-                        </option>
-                        {peopleList.map((person) => {
-                          return person.eventId === event.id ? (
-                            <option
-                              key={`person-${person.name}-${person.id}`}
-                              value={person.id}
-                            >
-                              {person.name}
-                            </option>
-                          ) : (
-                            ''
-                          );
-                        })}
-                      </select>
-                      <label htmlFor="expense">Cost</label>
-                      <input
-                        css={inputExpenseStyles}
-                        id="expense"
-                        value={personExpense}
-                        placeholder="0 €"
-                        required
-                        onChange={(e) => {
-                          e.currentTarget.value = e.currentTarget.value.replace(
-                            /,/g,
-                            '.',
-                          );
-                          setPersonExpense(e.currentTarget.value);
-                        }}
-                      />
-                      {expenseError ? (
-                        <span css={spanErrorStyles}> {expenseError}</span>
-                      ) : (
-                        ''
-                      )}
-                      <label htmlFor="expense-name">
-                        What are you paying for?
-                      </label>
-                      <input
-                        css={inputExpenseStyles}
-                        id="expense-name"
-                        value={expenseName}
-                        placeholder="Name of the Expense"
-                        required
-                        onChange={(e) => {
-                          setExpenseName(e.currentTarget.value);
-                        }}
-                      />
-                      <input
-                        css={inputExpenseSubmitStyles}
-                        type="submit"
-                        name="submit"
-                        value="Add Expense"
-                      />
-                    </div>
-                  </form>
-
-                  {expenseList.map((expense) => {
-                    return expense.eventId === event.id ? (
-                      <>
-                        <div
-                          css={expenseDetailStyles}
-                          key={`expense-${expense.id}`}
-                        >
-                          <span css={spanStyles}>
-                            {peopleList.map((person) => {
-                              return person.id === expense.paymaster
-                                ? `${expense.expensename} ${
-                                    expense.cost / 100
-                                  }€ paid by ${person.name}`
-                                : '';
-                            })}
-                          </span>
-
+                        <div css={personStyles}>
+                          <span css={spanStyles}>{person.name}</span>
                           <button
                             css={removeButtonStyles}
-                            aria-label={`Delete Button for Expense: ${expense.expensename}`}
+                            aria-label={`Delete Button for Person: ${person.name}`}
                             onClick={() => {
-                              deleteExpense(expense.id).catch(() => {});
+                              deletePerson(person.id).catch(() => {});
                             }}
                           >
                             X
                           </button>
                         </div>
-                        <div css={expenseStatisticsStyles}>
-                          {peopleList.map((person) => {
-                            const cost = expense.cost / 100 / peopleList.length;
-
-                            return person.id !== expense.paymaster ? (
-                              <div key={person.id}>
-                                <span css={spanStyles}>
-                                  {person.name} owes
-                                  <span css={redColorCostsStyles}>
-                                    {` ${cost.toFixed(2)}`}
-                                  </span>
-                                  {peopleList.map((p) => {
-                                    return p.id === expense.paymaster
-                                      ? `€ to ${p.name}`
-                                      : '';
-                                  })}
-                                </span>
-                              </div>
-                            ) : (
-                              ''
-                            );
-                          })}
-                        </div>
-                      </>
+                      </div>
                     ) : (
                       ''
                     );
                   })}
-
-                  <span css={spanStyles}>
-                    Participants: {peopleList.length}
-                  </span>
-                  <span css={spanStyles}> Total: {sumEventCosts} €</span>
-
-                  {peopleList.length === 0 ? (
-                    ''
-                  ) : (
-                    <span css={spanStyles}>
-                      Everyone has to pay
-                      <span css={redColorCostsStyles}> {sharedCosts} €</span>
-                    </span>
-                  )}
                 </div>
+              </div>
 
+              <div css={expenseBigContainerStyles}>
+                {/* Create Expense List */}
+
+                <form
+                  css={formStyles}
+                  onSubmit={async (e) => {
+                    e.preventDefault();
+
+                    if (personExpense === '0') {
+                      setExpenseError('Sure its free?');
+                      return;
+                    }
+                    const testNumber: number = parseInt(personExpense);
+
+                    if (!Number.isInteger(testNumber)) {
+                      setExpenseError('Invalid input, please enter a number');
+                      return;
+                    }
+
+                    const createPersonResponse = await fetch('/api/expense', {
+                      method: 'POST',
+                      headers: {
+                        'Content-Type': 'application/json',
+                      },
+                      body: JSON.stringify({
+                        expensename: expenseName,
+                        cost: parseFloat(personExpense) * 100,
+                        eventId: event.id,
+                        paymaster: selectedPersonId,
+                      }),
+                    });
+
+                    const createPersonResponseBody =
+                      (await createPersonResponse.json()) as DeleteExpenseResponseBody;
+
+                    const createdExpenses: Expense[] = [
+                      ...expenseList,
+                      createPersonResponseBody.expense,
+                    ];
+
+                    setExpenseList(createdExpenses);
+                    setExpenseName('');
+                    setPersonExpense('0');
+                    if ('errors' in createPersonResponseBody) {
+                      setErrors(createPersonResponseBody.errors);
+                      return;
+                    }
+                    setErrors([]);
+                    setExpenseError('');
+                  }}
+                >
+                  <div css={expenseContainerStyles}>
+                    <h3>Expense List</h3>
+                    <label htmlFor="person-list">Who is paying?</label>
+                    <select
+                      id="person-list"
+                      onChange={handleSelectPerson}
+                      required
+                      css={selectStyles}
+                    >
+                      <option key="template" value="">
+                        Select Person
+                      </option>
+                      {peopleList.map((person) => {
+                        return person.eventId === event.id ? (
+                          <option
+                            key={`person-${person.name}-${person.id}`}
+                            value={person.id}
+                          >
+                            {person.name}
+                          </option>
+                        ) : (
+                          ''
+                        );
+                      })}
+                    </select>
+                    <label htmlFor="expense">Cost</label>
+                    <input
+                      css={inputExpenseStyles}
+                      id="expense"
+                      value={personExpense}
+                      placeholder="0 €"
+                      required
+                      onChange={(e) => {
+                        e.currentTarget.value = e.currentTarget.value.replace(
+                          /,/g,
+                          '.',
+                        );
+                        setPersonExpense(e.currentTarget.value);
+                      }}
+                    />
+                    {expenseError ? (
+                      <span css={spanErrorStyles}> {expenseError}</span>
+                    ) : (
+                      ''
+                    )}
+                    <label htmlFor="expense-name">
+                      What are you paying for?
+                    </label>
+                    <input
+                      css={inputExpenseStyles}
+                      id="expense-name"
+                      value={expenseName}
+                      placeholder="Name of the Expense"
+                      required
+                      onChange={(e) => {
+                        setExpenseName(e.currentTarget.value);
+                      }}
+                    />
+                    <input
+                      css={inputExpenseSubmitStyles}
+                      type="submit"
+                      name="submit"
+                      value="Add Expense"
+                    />
+                  </div>
+                </form>
+                {/* Somewhere in expenseList map is an error, no unique key prop apparently */}
+                {expenseList.map((expense) => {
+                  return expense.eventId === event.id ? (
+                    <>
+                      <div
+                        css={expenseDetailStyles}
+                        key={`expense-${expense.id}}`}
+                      >
+                        <span css={spanStyles}>
+                          {peopleList.map((person) => {
+                            return person.id === expense.paymaster
+                              ? `${expense.expensename} ${expense.cost / 100}€
+                                paid by ${person.name}`
+                              : '';
+                          })}
+                        </span>
+
+                        <button
+                          css={removeButtonStyles}
+                          aria-label={`Delete Button for Expense: ${expense.expensename}`}
+                          onClick={() => {
+                            deleteExpense(expense.id).catch(() => {});
+                          }}
+                        >
+                          X
+                        </button>
+                      </div>
+                      <div css={expenseStatisticsStyles}>
+                        {peopleList.map((person) => {
+                          const cost = expense.cost / 100 / peopleList.length;
+
+                          return person.id !== expense.paymaster ? (
+                            <div
+                              key={`person-${person.id} from ${Math.random()} `}
+                            >
+                              <span css={spanStyles}>
+                                {person.name} owes
+                                <span css={redColorCostsStyles}>
+                                  {` ${cost.toFixed(2)}`}
+                                </span>
+                                {peopleList.map((p) => {
+                                  return p.id === expense.paymaster
+                                    ? `€ to ${p.name}`
+                                    : '';
+                                })}
+                              </span>
+                            </div>
+                          ) : (
+                            ''
+                          );
+                        })}
+                      </div>
+                    </>
+                  ) : (
+                    ''
+                  );
+                })}
+
+                <span css={spanStyles}>Participants: {peopleList.length}</span>
+                <span css={spanStyles}> Total: {sumEventCosts} €</span>
+
+                {peopleList.length === 0 ? (
+                  ''
+                ) : (
+                  <span css={spanStyles}>
+                    Everyone has to pay
+                    <span css={redColorCostsStyles}> {sharedCosts} €</span>
+                  </span>
+                )}
+              </div>
+              <div>
+                <DoughnutChart
+                  people={peopleList}
+                  expenses={expenseList}
+                  sharedCosts={sharedCosts}
+                  sumEventCosts={sumEventCosts}
+                />
                 {peopleList.map((person) => {
                   const cost = expenseList.map((expense) => {
                     return person.id === expense.paymaster
@@ -565,32 +606,22 @@ export default function UserDetail(props: Props) {
                   const personSum =
                     Math.round((sum - parseFloat(sharedCosts)) * 100) / 100;
                   return (
-                    <div key={person.id}>
-                      <span css={spanStyles}>
+                    <div key={`person-${person.id} owes money `}>
+                      <span css={spanStyles} key={Math.random()}>
                         {person.name}
                         {personSum < 0 ? ' Owes ' : ' Receives '}
                         <span
+                          key={Math.random()}
                           css={
                             personSum >= 0 ? spanStyles : redColorCostsStyles
                           }
                         >
-                          {Math.round((sum - parseFloat(sharedCosts)) * 100) /
-                            100}
-                          €
+                          {personSum.toFixed(2)}€
                         </span>
                       </span>
                     </div>
                   );
                 })}
-
-                <button
-                  css={removeButtonStyles}
-                  onClick={() => {
-                    deleteEvent(event.id).catch(() => {});
-                  }}
-                >
-                  <span css={spanStyles}>Delete Event</span> X
-                </button>
               </div>
             </div>
           );

@@ -5,7 +5,6 @@ export const formContainerStyles = css`
   flex-direction: column;
   justify-content: center;
   align-items: center;
-
   h1 {
     text-align: center;
     font-weight: 400;
