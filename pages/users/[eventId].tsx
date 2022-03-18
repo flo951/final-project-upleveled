@@ -142,8 +142,6 @@ const buttonFileUploadStyles = css`
   padding: 6px;
 `;
 const inputFileUploadStyles = css`
-  color: white;
-
   margin: 2px;
   border-radius: 8px;
   border: 2px solid #dc8409;
