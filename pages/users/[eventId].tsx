@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import { GetServerSidePropsContext } from 'next';
 import Head from 'next/head';
+import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import DoughnutChart from '../../components/DoughnutChart';
@@ -9,11 +10,12 @@ import {
   Expense,
   getAllExpensesWhereIdMatches,
   getAllPeopleWhereEventIdMatches,
+  getProfileImageEvent,
   getSingleEvent,
   getUserByValidSessionToken,
   Person,
 } from '../../util/database';
-import { CreateEventResponseBody } from '../api/event';
+import { CreateEventResponseBody, DeleteEventResponseBody } from '../api/event';
 import { DeleteExpenseResponseBody } from '../api/expense';
 import { DeletePersonResponseBody } from '../api/person';
 import {
@@ -25,6 +27,7 @@ import {
   personStyles,
   spanStyles,
 } from '../createevent';
+
 const mainStyles = css`
   margin: 12px;
   display: flex;
@@ -119,6 +122,10 @@ const expenseStatisticsStyles = css`
 const redColorCostsStyles = css`
   color: #db3f2e;
 `;
+const eventProfilePicStyles = css`
+  border: 2px solid black;
+  border-radius: 50%;
+`;
 const borderPeopleListStyles = css`
   border: 2px solid black;
   border-radius: 8px;
@@ -127,12 +134,32 @@ const borderPeopleListStyles = css`
   width: 324px;
   height: fit-content;
 `;
+const buttonFileUploadStyles = css`
+  color: white;
+  background-color: #2a6592;
+
+  border-radius: 8px;
+  padding: 6px;
+`;
+const inputFileUploadStyles = css`
+  color: white;
+
+  margin: 2px;
+  border-radius: 8px;
+  border: 2px solid #dc8409;
+  padding: 2px;
+`;
+
+type ImageUrl = {
+  imageurl: string;
+};
 type Props = {
   user: { id: number; username: string };
   eventInDb: Event;
   errors: string;
   peopleInDb: Person[];
   expensesInDb: Expense[];
+  profileImageInDb: ImageUrl;
 };
 
 export default function UserDetail(props: Props) {
@@ -147,6 +174,9 @@ export default function UserDetail(props: Props) {
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [expenseError, setExpenseError] = useState('');
   const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
+  const [uploadImage, setUploadImage] = useState<FileList>();
+  const [imageUrl, setImageUrl] = useState(props.profileImageInDb.imageurl);
+
   const router = useRouter();
 
   useEffect(() => {
@@ -272,8 +302,8 @@ export default function UserDetail(props: Props) {
       }),
     });
     const deleteEventResponseBody =
-      (await deleteResponse.json()) as CreateEventResponseBody;
-
+      (await deleteResponse.json()) as DeleteEventResponseBody;
+    console.log(deleteEventResponseBody);
     if ('errors' in deleteEventResponseBody) {
       setErrors(deleteEventResponseBody.errors);
       return;
@@ -285,6 +315,63 @@ export default function UserDetail(props: Props) {
 
     setEventList(newEventList);
     await router.push(`/createevent`).catch((err) => console.log(err));
+  }
+
+  const cloudName = 'deqc9xffd';
+  // function to upload event images
+  async function handleUploadImage(eventId: number) {
+    if (typeof uploadImage === 'undefined') {
+      console.log('file is undefined');
+      return;
+    }
+
+    const formData = new FormData();
+    formData.append('file', uploadImage[0]);
+    formData.append('upload_preset', 'ss9wihgz');
+
+    const uploadResponse = await fetch(
+      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      {
+        method: 'POST',
+
+        body: formData,
+      },
+    );
+    type CreateImageUploadResponseBody = {
+      url: string;
+      errors: { message: string }[];
+    };
+
+    const uploadImageEventResponseBody =
+      (await uploadResponse.json()) as CreateImageUploadResponseBody;
+
+    const uploadUrl = uploadImageEventResponseBody.url;
+    setImageUrl(uploadUrl);
+    if ('errors' in uploadImageEventResponseBody) {
+      setErrors(uploadImageEventResponseBody.errors);
+      return;
+    }
+
+    const createEventResponse = await fetch('/api/event', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        uploadUrl: uploadUrl,
+        eventId: eventId,
+      }),
+    });
+
+    const createEventResponseBody =
+      (await createEventResponse.json()) as CreateEventResponseBody;
+
+    console.log(createEventResponseBody);
+
+    // if ('errors' in createEventResponseBody) {
+    //   setErrors(createEventResponseBody.errors);
+    //   return;
+    // }
   }
 
   return (
@@ -308,10 +395,19 @@ export default function UserDetail(props: Props) {
             >
               {/* Create People List */}
               <div css={borderPeopleListStyles}>
+                <Image
+                  css={eventProfilePicStyles}
+                  src={
+                    !imageUrl ? '/images/maldives-1993704_640.jpg' : imageUrl
+                  }
+                  alt={`Profile Picture of ${event.eventname}`}
+                  width={50}
+                  height={50}
+                />
+
                 <div css={eventNameButtonRowStyles}>
                   <h3>
-                    {' '}
-                    Who is participating at {event.eventname}?{' '}
+                    Who is participating at {event.eventname}?
                     <button
                       onClick={() => {
                         deleteEvent(event.id).catch(() => {});
@@ -322,6 +418,25 @@ export default function UserDetail(props: Props) {
                     </button>
                   </h3>
                 </div>
+                <span>Edit your Event Picture</span>
+                <input
+                  css={inputFileUploadStyles}
+                  type="file"
+                  onChange={(e) => {
+                    e.currentTarget.files === null
+                      ? setUploadImage(undefined)
+                      : setUploadImage(e.currentTarget.files);
+                  }}
+                />
+                <button
+                  css={buttonFileUploadStyles}
+                  onClick={() => {
+                    handleUploadImage(event.id).catch(() => {});
+                  }}
+                >
+                  Upload
+                </button>
+
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
@@ -678,12 +793,15 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const expensesInDb = await getAllExpensesWhereIdMatches(parseInt(eventId));
 
+  const profileImageInDb = await getProfileImageEvent(parseInt(eventId));
+
   return {
     props: {
       user: user,
       eventInDb: eventInDb,
       peopleInDb: peopleInDb,
       expensesInDb: expensesInDb,
+      profileImageInDb: profileImageInDb,
     },
   };
 }
