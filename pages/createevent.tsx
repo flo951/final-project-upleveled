@@ -9,7 +9,7 @@ import {
   getUserByValidSessionToken,
   getValidSessionByToken,
 } from '../util/database';
-import { CreateEventResponseBody } from './api/event';
+import { CreateEventResponseBody, DeleteEventResponseBody } from './api/event';
 
 const errorStyles = css`
   color: red;
@@ -126,7 +126,7 @@ export default function CreateEvent(props: Props) {
       }),
     });
     const deleteEventResponseBody =
-      (await deleteResponse.json()) as CreateEventResponseBody;
+      (await deleteResponse.json()) as DeleteEventResponseBody;
 
     if ('errors' in deleteEventResponseBody) {
       setErrors(deleteEventResponseBody.errors);

@@ -8,7 +8,7 @@ import { css } from '@emotion/react';
 import Head from 'next/head';
 import { useState } from 'react';
 
-import { CreateEventResponseBody } from '../api/event';
+import { DeleteEventResponseBody } from '../api/event';
 
 import Link from 'next/link';
 import { eventListStyles, personStyles, spanStyles } from '../createevent';
@@ -61,7 +61,7 @@ export default function ProtectedUser(props: Props) {
       }),
     });
     const deleteEventResponseBody =
-      (await deleteResponse.json()) as CreateEventResponseBody;
+      (await deleteResponse.json()) as DeleteEventResponseBody;
 
     if ('errors' in deleteEventResponseBody) {
       setErrors(deleteEventResponseBody.errors);
