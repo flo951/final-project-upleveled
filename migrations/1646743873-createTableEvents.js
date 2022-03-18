@@ -3,7 +3,8 @@ exports.up = async (sql) => {
 	 CREATE TABLE events (
 	 	id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
 	 	eventname varchar(30) NOT NULL,
-		 user_id integer REFERENCES users (id) ON DELETE CASCADE
+		 imageurl varchar(120),
+		user_id integer REFERENCES users (id) ON DELETE CASCADE
 		 );
 `;
 };
