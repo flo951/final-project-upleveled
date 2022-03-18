@@ -200,6 +200,7 @@ export type Event = {
   id: number;
   eventname: string;
   userId: number;
+  imageurl: string;
 };
 
 export async function createEvent(eventName: string, userId: number) {
@@ -210,6 +211,30 @@ export async function createEvent(eventName: string, userId: number) {
   VALUES
   (${eventName}, ${userId})
   RETURNING *
+  `;
+
+  return camelcaseKeys(event);
+}
+export async function insertImageUrlEvent(imageUrl: string, eventId: number) {
+  const [event] = await sql<[Event]>`
+
+  UPDATE
+      events
+    SET
+      imageurl = ${imageUrl}
+
+    WHERE
+      id = ${eventId}
+    RETURNING *
+  `;
+
+  return camelcaseKeys(event);
+}
+
+export async function getProfileImageEvent(eventId: number) {
+  const [event] = await sql<[Event]>`
+
+  SELECT imageurl from events WHERE id = ${eventId}
   `;
 
   return camelcaseKeys(event);
