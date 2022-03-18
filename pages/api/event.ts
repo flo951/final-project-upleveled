@@ -1,14 +1,33 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createEvent, deleteEventById, Event, User } from '../../util/database';
+import {
+  createEvent,
+  deleteEventById,
+  Event,
+  insertImageUrlEvent,
+  User,
+} from '../../util/database';
+
+type Url = {
+  eventname: string;
+  id: number;
+  imageurl: string;
+  userId: number;
+};
 
 export type CreateEventResponseBody =
+  | { errors: { message: string }[] }
   | { event: Event }
-  | { errors: { message: string }[] };
+  | { imageurl: Url };
+
+export type DeleteEventResponseBody =
+  | { errors: { message: string }[] }
+  | { event: Event };
 
 type CreateEventRequestBody = {
   eventname: string;
   user: User;
   eventId?: number;
+  uploadUrl: string;
 };
 
 type CreateEventNextApiRequest = Omit<NextApiRequest, 'body'> & {
@@ -20,6 +39,25 @@ export default async function createEventHandler(
   response: NextApiResponse<CreateEventResponseBody>,
 ) {
   if (request.method === 'POST') {
+    console.log(request.body);
+    if (typeof request.body.uploadUrl !== 'undefined') {
+      if (typeof request.body.eventId !== 'number' || !request.body.eventId) {
+        // 400 bad request
+        response.status(400).json({
+          errors: [{ message: 'Oops something went wrong' }],
+        });
+        return; // Important, prevents error for multiple requests
+      }
+
+      const imgUrl: Url = await insertImageUrlEvent(
+        request.body.uploadUrl,
+        request.body.eventId,
+      );
+
+      console.log(imgUrl);
+      response.status(201).json({ imageurl: imgUrl });
+      return;
+    }
     if (
       typeof request.body.eventname !== 'string' ||
       !request.body.eventname ||
