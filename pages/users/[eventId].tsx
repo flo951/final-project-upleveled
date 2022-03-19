@@ -129,6 +129,9 @@ const eventProfilePicStyles = css`
 const borderPeopleListStyles = css`
   border: 2px solid black;
   border-radius: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   padding: 12px;
   width: 324px;
@@ -158,6 +161,8 @@ type Props = {
   peopleInDb: Person[];
   expensesInDb: Expense[];
   profileImageInDb: ImageUrl;
+  cloudName: string;
+  uploadPreset: string;
 };
 
 export default function UserDetail(props: Props) {
@@ -315,7 +320,8 @@ export default function UserDetail(props: Props) {
     await router.push(`/createevent`).catch((err) => console.log(err));
   }
 
-  const cloudName = 'deqc9xffd';
+  // cloudname for cloudinary
+
   // function to upload event images
   async function handleUploadImage(eventId: number) {
     if (typeof uploadImage === 'undefined') {
@@ -325,10 +331,10 @@ export default function UserDetail(props: Props) {
 
     const formData = new FormData();
     formData.append('file', uploadImage[0]);
-    formData.append('upload_preset', 'ss9wihgz');
+    formData.append('upload_preset', props.uploadPreset);
 
     const uploadResponse = await fetch(
-      `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,
+      `https://api.cloudinary.com/v1_1/${props.cloudName}/image/upload`,
       {
         method: 'POST',
 
@@ -399,10 +405,29 @@ export default function UserDetail(props: Props) {
                     !imageUrl ? '/images/maldives-1993704_640.jpg' : imageUrl
                   }
                   alt={`Profile Picture of ${event.eventname}`}
-                  width={50}
-                  height={50}
+                  width={150}
+                  height={150}
                 />
-
+                <div>
+                  <span>Edit your Event Picture</span>
+                  <input
+                    css={inputFileUploadStyles}
+                    type="file"
+                    onChange={(e) => {
+                      e.currentTarget.files === null
+                        ? setUploadImage(undefined)
+                        : setUploadImage(e.currentTarget.files);
+                    }}
+                  />
+                  <button
+                    css={buttonFileUploadStyles}
+                    onClick={() => {
+                      handleUploadImage(event.id).catch(() => {});
+                    }}
+                  >
+                    Upload
+                  </button>
+                </div>
                 <div css={eventNameButtonRowStyles}>
                   <h3>
                     Who is participating at {event.eventname}?
@@ -416,24 +441,6 @@ export default function UserDetail(props: Props) {
                     </button>
                   </h3>
                 </div>
-                <span>Edit your Event Picture</span>
-                <input
-                  css={inputFileUploadStyles}
-                  type="file"
-                  onChange={(e) => {
-                    e.currentTarget.files === null
-                      ? setUploadImage(undefined)
-                      : setUploadImage(e.currentTarget.files);
-                  }}
-                />
-                <button
-                  css={buttonFileUploadStyles}
-                  onClick={() => {
-                    handleUploadImage(event.id).catch(() => {});
-                  }}
-                >
-                  Upload
-                </button>
 
                 <form
                   onSubmit={async (e) => {
@@ -793,6 +800,23 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const profileImageInDb = await getProfileImageEvent(parseInt(eventId));
 
+  const cloudName = process.env.CLOUD_NAME;
+  if (typeof cloudName === 'undefined') {
+    return {
+      props: {
+        errors: 'cloudName is undefined',
+      },
+    };
+  }
+  const uploadPreset = process.env.UPLOAD_PRESET;
+  if (typeof uploadPreset === 'undefined') {
+    return {
+      props: {
+        errors: 'uploadPreset is undefined',
+      },
+    };
+  }
+
   return {
     props: {
       user: user,
@@ -800,6 +824,8 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       peopleInDb: peopleInDb,
       expensesInDb: expensesInDb,
       profileImageInDb: profileImageInDb,
+      cloudName: cloudName,
+      uploadPreset: uploadPreset,
     },
   };
 }
