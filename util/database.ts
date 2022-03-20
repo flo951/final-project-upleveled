@@ -253,7 +253,7 @@ export async function deleteEventById(id: number, userId: number) {
 export async function getAllEventsWhereIdMatches(userId: number) {
   if (!userId) return undefined;
   const events = await sql<[Event][]>`
-  SELECT id, eventname FROM events WHERE user_id = ${userId};
+  SELECT id, eventname, imageurl FROM events WHERE user_id = ${userId};
 
 
 `;
