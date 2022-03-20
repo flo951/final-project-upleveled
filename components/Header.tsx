@@ -39,7 +39,7 @@ const headerStyles = css`
       height: 2px;
       bottom: 0;
       left: 0;
-      background-color: white;
+      background-color: #dc8409;
       transform-origin: bottom right;
       transition: transform 0.3s ease-out;
     }
