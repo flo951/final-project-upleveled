@@ -12,6 +12,8 @@ import { DeleteEventResponseBody } from '../api/event';
 
 import Link from 'next/link';
 import { eventListStyles, personStyles, spanStyles } from '../createevent';
+import Image from 'next/image';
+import { eventProfilePicStyles } from './[eventId]';
 
 const mainStyles = css`
   display: flex;
@@ -28,6 +30,14 @@ const borderEventListStyles = css`
 `;
 const flexRowStyles = css`
   display: flex;
+  align-items: flex-start;
+
+  a {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
 `;
 const removeButtonStyles = css`
   color: red;
@@ -47,7 +57,6 @@ type Errors = { message: string }[];
 export default function ProtectedUser(props: Props) {
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
-
   // function to delete created events
   async function deleteEvent(id: number) {
     const deleteResponse = await fetch(`/api/event`, {
@@ -113,6 +122,17 @@ export default function ProtectedUser(props: Props) {
                 >
                   <Link href={`/users/${event.id}`}>
                     <a>
+                      <Image
+                        css={eventProfilePicStyles}
+                        src={
+                          event.imageurl
+                            ? event.imageurl
+                            : '/images/maldives-1993704_640.jpg'
+                        }
+                        alt={`Profile Picture of ${event.eventname}`}
+                        width={50}
+                        height={50}
+                      />
                       <div css={personStyles}>
                         <span css={spanStyles}>{event.eventname}</span>
                       </div>
