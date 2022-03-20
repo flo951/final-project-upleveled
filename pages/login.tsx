@@ -18,8 +18,7 @@ const nameInputStyles = css`
   }
 `;
 
-const inputSubmitStyles = css`
-  margin-top: 48px;
+export const inputSubmitStyles = css`
   padding: 8px 8px;
   background-color: #2a6592;
   color: white;
