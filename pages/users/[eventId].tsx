@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import DoughnutChart from '../../components/DoughnutChart';
+
 import {
   Event,
   Expense,
@@ -119,10 +120,10 @@ const expenseStatisticsStyles = css`
   padding: 4px;
   width: 100%;
 `;
-const redColorCostsStyles = css`
+export const redColorCostsStyles = css`
   color: #db3f2e;
 `;
-const eventProfilePicStyles = css`
+export const eventProfilePicStyles = css`
   border: 2px solid black;
   border-radius: 50%;
 `;
@@ -140,7 +141,7 @@ const borderPeopleListStyles = css`
 const buttonFileUploadStyles = css`
   color: white;
   background-color: #2a6592;
-
+  font-size: 16px;
   border-radius: 8px;
   padding: 6px;
 `;
@@ -148,10 +149,45 @@ const inputFileUploadStyles = css`
   margin: 2px;
   border-radius: 8px;
   border: 2px solid #dc8409;
-  padding: 2px;
+  padding: 4px;
+  width: 235px;
+  margin-right: 6px;
+`;
+const loadingFlexBox = css`
+  display: flex;
+  align-items: center;
+`;
+const loadingCircleStyles = css`
+  border-radius: 50%;
+  border-top: 2px solid #2a6592;
+  border-right: 2px solid #2a6592;
+  border-bottom: 2px solid #dc8409;
+  border-left: 2px solid #dc8409;
+  width: 20px;
+  height: 20px;
+  -webkit-animation: spin 2s linear infinite;
+  animation: spin 2s linear infinite;
+
+  @-webkit-keyframes spin {
+    0% {
+      -webkit-transform: rotate(0deg);
+    }
+    100% {
+      -webkit-transform: rotate(360deg);
+    }
+  }
+
+  @keyframes spin {
+    0% {
+      transform: rotate(0deg);
+    }
+    100% {
+      transform: rotate(360deg);
+    }
+  }
 `;
 
-type ImageUrl = {
+export type ImageUrl = {
   imageurl: string;
 };
 type Props = {
@@ -176,9 +212,11 @@ export default function UserDetail(props: Props) {
   const [sharedCosts, setSharedCosts] = useState('0');
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [expenseError, setExpenseError] = useState('');
+  const [uploadError, setUploadError] = useState('');
   const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
   const [uploadImage, setUploadImage] = useState<FileList>();
   const [imageUrl, setImageUrl] = useState(props.profileImageInDb.imageurl);
+  const [isLoading, setIsLoading] = useState<Boolean>();
 
   const router = useRouter();
 
@@ -320,15 +358,15 @@ export default function UserDetail(props: Props) {
     await router.push(`/createevent`).catch((err) => console.log(err));
   }
 
-  // cloudname for cloudinary
-
   // function to upload event images
   async function handleUploadImage(eventId: number) {
-    if (typeof uploadImage === 'undefined') {
-      console.log('file is undefined');
+    if (!uploadImage) {
+      setUploadError('No Image selected');
       return;
     }
+    setUploadError('');
 
+    setIsLoading(true);
     const formData = new FormData();
     formData.append('file', uploadImage[0]);
     formData.append('upload_preset', props.uploadPreset);
@@ -337,7 +375,6 @@ export default function UserDetail(props: Props) {
       `https://api.cloudinary.com/v1_1/${props.cloudName}/image/upload`,
       {
         method: 'POST',
-
         body: formData,
       },
     );
@@ -350,7 +387,13 @@ export default function UserDetail(props: Props) {
       (await uploadResponse.json()) as CreateImageUploadResponseBody;
 
     const uploadUrl = uploadImageEventResponseBody.url;
+    if (typeof uploadUrl === 'undefined') {
+      setUploadError('Something went wrong, please try again');
+      setIsLoading(false);
+      return;
+    }
     setImageUrl(uploadUrl);
+
     if ('errors' in uploadImageEventResponseBody) {
       setErrors(uploadImageEventResponseBody.errors);
       return;
@@ -370,12 +413,12 @@ export default function UserDetail(props: Props) {
     const createEventResponseBody =
       (await createEventResponse.json()) as CreateEventResponseBody;
 
-    console.log(createEventResponseBody);
+    if ('errors' in createEventResponseBody) {
+      setErrors(createEventResponseBody.errors);
+      return;
+    }
 
-    // if ('errors' in createEventResponseBody) {
-    //   setErrors(createEventResponseBody.errors);
-    //   return;
-    // }
+    setIsLoading(false);
   }
 
   return (
@@ -427,6 +470,17 @@ export default function UserDetail(props: Props) {
                   >
                     Upload
                   </button>
+                  <span css={spanErrorStyles}>{uploadError}</span>
+                  <span>
+                    {isLoading ? (
+                      <div css={loadingFlexBox}>
+                        <span css={spanStyles}>Uploading image...</span>
+                        <div css={loadingCircleStyles} />
+                      </div>
+                    ) : (
+                      ''
+                    )}
+                  </span>
                 </div>
                 <div css={eventNameButtonRowStyles}>
                   <h3>
@@ -641,14 +695,10 @@ export default function UserDetail(props: Props) {
                     />
                   </div>
                 </form>
-                {/* Somewhere in expenseList map is an error, no unique key prop apparently */}
                 {expenseList.map((expense) => {
-                  return expense.eventId === event.id ? (
-                    <>
-                      <div
-                        css={expenseDetailStyles}
-                        key={`expense-${expense.id}}`}
-                      >
+                  return (
+                    <div key={`expense-${expense.id}}`}>
+                      <div css={expenseDetailStyles}>
                         <span css={spanStyles}>
                           {peopleList.map((person) => {
                             return person.id === expense.paymaster
@@ -693,9 +743,7 @@ export default function UserDetail(props: Props) {
                           );
                         })}
                       </div>
-                    </>
-                  ) : (
-                    ''
+                    </div>
                   );
                 })}
 
@@ -711,41 +759,12 @@ export default function UserDetail(props: Props) {
                   </span>
                 )}
               </div>
-              <div>
-                <DoughnutChart
-                  people={peopleList}
-                  expenses={expenseList}
-                  sharedCosts={sharedCosts}
-                  sumEventCosts={sumEventCosts}
-                />
-                {peopleList.map((person) => {
-                  const cost = expenseList.map((expense) => {
-                    return person.id === expense.paymaster
-                      ? expense.cost / 100
-                      : 0;
-                  });
 
-                  const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
-                  const personSum =
-                    Math.round((sum - parseFloat(sharedCosts)) * 100) / 100;
-                  return (
-                    <div key={`person-${person.id} owes money `}>
-                      <span css={spanStyles} key={Math.random()}>
-                        {person.name}
-                        {personSum < 0 ? ' Owes ' : ' Receives '}
-                        <span
-                          key={Math.random()}
-                          css={
-                            personSum >= 0 ? spanStyles : redColorCostsStyles
-                          }
-                        >
-                          {personSum.toFixed(2)}€
-                        </span>
-                      </span>
-                    </div>
-                  );
-                })}
-              </div>
+              <DoughnutChart
+                people={peopleList}
+                expenses={expenseList}
+                sharedCosts={sharedCosts}
+              />
             </div>
           );
         })}
