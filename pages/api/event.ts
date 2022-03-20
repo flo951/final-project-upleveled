@@ -39,7 +39,6 @@ export default async function createEventHandler(
   response: NextApiResponse<CreateEventResponseBody>,
 ) {
   if (request.method === 'POST') {
-    console.log(request.body);
     if (typeof request.body.uploadUrl !== 'undefined') {
       if (typeof request.body.eventId !== 'number' || !request.body.eventId) {
         // 400 bad request
@@ -54,7 +53,6 @@ export default async function createEventHandler(
         request.body.eventId,
       );
 
-      console.log(imgUrl);
       response.status(201).json({ imageurl: imgUrl });
       return;
     }
