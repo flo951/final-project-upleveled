@@ -8,6 +8,7 @@ import { createCsrfToken } from '../util/auth';
 
 import { getValidSessionByToken } from '../util/database';
 import { RegisterResponseBody } from './api/register';
+import { inputSubmitStyles } from './login';
 
 const nameInputStyles = css`
   padding: 8px 8px;
@@ -19,18 +20,6 @@ const nameInputStyles = css`
     outline-width: 2px;
     outline-style: solid;
   }
-`;
-
-const inputSubmitStyles = css`
-  margin-top: 48px;
-  padding: 8px 8px;
-  background-color: #2a6592;
-  color: white;
-  border: 2px solid black;
-  border-radius: 8px;
-  font-size: 20px;
-  width: 100%;
-  cursor: pointer;
 `;
 
 const spanLabelStyles = css`
