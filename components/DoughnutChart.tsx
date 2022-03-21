@@ -1,4 +1,4 @@
-import { Doughnut } from 'react-chartjs-2';
+import { Bar } from 'react-chartjs-2';
 import { ArcElement } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { css } from '@emotion/react';
@@ -7,7 +7,7 @@ import { redColorCostsStyles } from '../pages/users/[eventId]';
 import { Expense, Person } from '../util/database';
 Chart.register(ArcElement);
 
-const doughnutStyles = css`
+const barChartStyles = css`
   width: 350px;
   height: fit-content;
   padding: 12px 0;
@@ -24,10 +24,9 @@ type Props = {
 };
 
 export default function DoughnutChart(props: Props) {
-  console.log(props);
   if (props.people.length === 0) {
     return (
-      <div css={doughnutStyles}>
+      <div css={barChartStyles}>
         <h3>Add People and Expenses to see more</h3>
       </div>
     );
@@ -46,12 +45,32 @@ export default function DoughnutChart(props: Props) {
     return personSum;
   });
 
+  // const test = props.people.map((person) => {
+  //   const copyPeople = [...props.people];
+
+  //   const cost = props.expenses.map((expense) => {
+  //     return person.id === expense.paymaster ? expense.cost / 100 : 0;
+  //   });
+
+  //   const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+  //   const personSum =
+  //     Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
+
+  //   const balancePerson = { personSum };
+
+  //   return copyPeople.push(balancePerson);
+  // });
+
+  // console.log(test);
+
   const data = {
     labels: peopleNameArray,
     datasets: [
       {
-        label: '# of Votes',
-        data: expensePerPerson,
+        label: 'Positive Balance in €',
+        data: expensePerPerson.map((expense) => {
+          return expense > 0 ? expense : 0;
+        }),
         options: {
           plugins: {
             subtitle: {
@@ -60,38 +79,46 @@ export default function DoughnutChart(props: Props) {
             },
           },
         },
-        backgroundColor: [
-          'rgba(255, 99, 132, 0.2)',
-          'rgba(54, 162, 235, 0.2)',
-          'rgba(255, 206, 86, 0.2)',
-          'rgba(75, 192, 192, 0.2)',
-          'rgba(153, 102, 255, 0.2)',
-          'rgba(255, 159, 64, 0.2)',
-        ],
-        borderColor: [
-          'rgba(255, 99, 132, 1)',
-          'rgba(54, 162, 235, 1)',
-          'rgba(255, 206, 86, 1)',
-          'rgba(75, 192, 192, 1)',
-          'rgba(153, 102, 255, 1)',
-          'rgba(255, 159, 64, 1)',
-        ],
+        backgroundColor: ['rgba(75, 192, 192, 0.2)'],
+        borderColor: ['rgba(75, 192, 192, 1)'],
+        borderWidth: 1,
+      },
+      {
+        label: 'Negative Balance in €',
+        data: expensePerPerson.map((expense) => {
+          return expense < 0 ? expense : 0;
+        }),
+        options: {
+          plugins: {
+            subtitle: {
+              display: true,
+              text: 'Title',
+            },
+          },
+        },
+        backgroundColor: ['rgba(255, 99, 132, 0.2)'],
+        borderColor: ['rgba(255, 99, 132, 1)'],
         borderWidth: 1,
       },
     ],
   };
   return (
-    <div css={doughnutStyles}>
-      <span>Click on labels to remove someone</span>
-      <br />
-
-      <Doughnut
+    <div css={barChartStyles}>
+      <Bar
         data={data}
+        height={300}
         options={{
+          indexAxis: 'x' as const,
+          elements: {
+            bar: {
+              borderWidth: 2,
+            },
+          },
+          responsive: true,
           plugins: {
             title: {
               display: true,
-              text: 'Balance of each Participant in €',
+              text: 'Total Balance of each Participant in €',
             },
             legend: {
               display: true,
