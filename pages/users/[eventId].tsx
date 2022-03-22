@@ -483,13 +483,17 @@ export default function UserDetail(props: Props) {
                   </span>
                 </div>
                 <div css={eventNameButtonRowStyles}>
-                  <h3 data-test-id={`event-${event.eventname}`}>
+                  <h3
+                    data-test-id={`event-${event.eventname}`}
+                    data-id={event.id}
+                  >
                     Who is participating at {event.eventname}?
                     <button
                       onClick={() => {
                         deleteEvent(event.id).catch(() => {});
                       }}
                       css={removeButtonStyles}
+                      data-test-id="delete-event"
                     >
                       X
                     </button>
@@ -562,6 +566,7 @@ export default function UserDetail(props: Props) {
                           <span
                             css={spanStyles}
                             data-test-id={`name-${person.name}`}
+                            data-id={person.id}
                           >
                             {person.name}
                           </span>
