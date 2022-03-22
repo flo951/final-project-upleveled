@@ -13,6 +13,9 @@ jobs:
       PGDATABASE: final_project_db
       PGUSERNAME: final_project_db
       PGPASSWORD: final_project_db
+      CSRF_SECRET_SALT: ${{ secrets.CSRF_SECRET_SALT }}
+      CLOUD_NAME: ${{ secrets.CLOUD_NAME }}
+      UPLOAD_PRESET: ${{ secrets.UPLOAD_PRESET }}
     steps:
       - name: Start preinstalled PostgreSQL on Ubuntu
         run: |
