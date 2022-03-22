@@ -94,8 +94,15 @@ export default function Header(props: Props) {
             </Link>
           </div>
           <div css={flexContainerStyles}>
-            <h3>Hi {props.userObject.username}</h3>
-            <Anchor href="/logout">Logout</Anchor>
+            <h3>
+              Hi{' '}
+              <span data-test-id="logged-in-user">
+                {props.userObject.username}
+              </span>
+            </h3>
+            <Anchor data-test-id="logout" href="/logout">
+              Logout
+            </Anchor>
           </div>
         </div>
       ) : (
@@ -104,10 +111,10 @@ export default function Header(props: Props) {
             <a>Splitify</a>
           </Link>
           <Link href="/register">
-            <a>Sign Up</a>
+            <a data-test-id="sign-up">Sign Up</a>
           </Link>
           <Link href="/login">
-            <a>Login</a>
+            <a data-test-id="login">Login</a>
           </Link>
         </div>
       )}

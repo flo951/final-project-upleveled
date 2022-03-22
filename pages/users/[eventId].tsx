@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import DoughnutChart from '../../components/DoughnutChart';
+import DoughnutChart from '../../components/BarChart';
 
 import {
   Event,
@@ -483,7 +483,7 @@ export default function UserDetail(props: Props) {
                   </span>
                 </div>
                 <div css={eventNameButtonRowStyles}>
-                  <h3>
+                  <h3 data-test-id={`event-${event.eventname}`}>
                     Who is participating at {event.eventname}?
                     <button
                       onClick={() => {
@@ -559,7 +559,12 @@ export default function UserDetail(props: Props) {
                         key={`this is ${person.name} witdh ${person.id} from event ${event.id}`}
                       >
                         <div css={personStyles}>
-                          <span css={spanStyles}>{person.name}</span>
+                          <span
+                            css={spanStyles}
+                            data-test-id={`name-${person.name}`}
+                          >
+                            {person.name}
+                          </span>
                           <button
                             css={removeButtonStyles}
                             aria-label={`Delete Button for Person: ${person.name}`}
@@ -633,6 +638,7 @@ export default function UserDetail(props: Props) {
                     <h3>Expense List</h3>
                     <label htmlFor="person-list">Who is paying?</label>
                     <select
+                      data-test-id="select-person"
                       id="person-list"
                       onChange={handleSelectPerson}
                       required
@@ -656,6 +662,7 @@ export default function UserDetail(props: Props) {
                     </select>
                     <label htmlFor="expense">Cost</label>
                     <input
+                      data-test-id="expense-value"
                       css={inputExpenseStyles}
                       id="expense"
                       value={personExpense}
@@ -679,6 +686,7 @@ export default function UserDetail(props: Props) {
                     </label>
                     <input
                       css={inputExpenseStyles}
+                      data-test-id="expense-name"
                       id="expense-name"
                       value={expenseName}
                       placeholder="Name of the Expense"
@@ -688,6 +696,7 @@ export default function UserDetail(props: Props) {
                       }}
                     />
                     <input
+                      data-test-id="complete-expense"
                       css={inputExpenseSubmitStyles}
                       type="submit"
                       name="submit"
@@ -699,12 +708,19 @@ export default function UserDetail(props: Props) {
                   return (
                     <div key={`expense-${expense.id}}`}>
                       <div css={expenseDetailStyles}>
-                        <span css={spanStyles}>
+                        <span
+                          data-test-id="expense-value-name"
+                          css={spanStyles}
+                        >
                           {peopleList.map((person) => {
-                            return person.id === expense.paymaster
-                              ? `${expense.expensename} ${expense.cost / 100}€
-                                paid by ${person.name}`
-                              : '';
+                            return person.id === expense.paymaster ? (
+                              <span>
+                                {expense.expensename} {expense.cost / 100}€ paid
+                                by {person.name}
+                              </span>
+                            ) : (
+                              ''
+                            );
                           })}
                         </span>
 

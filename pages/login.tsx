@@ -112,7 +112,7 @@ export default function Login(props: Props) {
           </label>
           <input
             css={nameInputStyles}
-            data-test-id="username-login"
+            data-test-id="login-username"
             placeholder="Username"
             id="username"
             onChange={(e) => setUsername(e.currentTarget.value)}

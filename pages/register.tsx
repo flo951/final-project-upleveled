@@ -89,7 +89,7 @@ export default function Register(props: Props) {
           </label>
           <input
             css={nameInputStyles}
-            data-test-id="signup-username"
+            data-test-id="sign-up-username"
             id="username"
             value={username}
             onChange={(e) => setUsername(e.currentTarget.value)}
@@ -101,7 +101,7 @@ export default function Register(props: Props) {
           </label>
           <input
             css={nameInputStyles}
-            data-test-id="login-password"
+            data-test-id="sign-up-password"
             type="password"
             id="password"
             value={password}

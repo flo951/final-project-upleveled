@@ -220,7 +220,12 @@ export default function CreateEvent(props: Props) {
               >
                 <Link href={`/users/${event.id}`}>
                   <a>
-                    <span css={spanStyles}>{event.eventname}</span>
+                    <span
+                      css={spanStyles}
+                      data-test-id={`event-${event.eventname}`}
+                    >
+                      {event.eventname}
+                    </span>
                   </a>
                 </Link>
                 <button
