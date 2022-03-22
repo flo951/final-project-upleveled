@@ -11,6 +11,7 @@ test('Login, create event, create Mario and Luigi, create Expenses for both, del
   await expect(page).toFill('[data-test-id="login-username"]', 'e2etest');
   await expect(page).toFill('[data-test-id="login-password"]', '1234');
   await expect(page).toClick('[data-test-id="complete-login"]');
+  await page.waitForNavigation();
   await expect(page).toMatchElement('[data-test-id="logged-in-user"]', {
     text: 'e2etest',
   });
