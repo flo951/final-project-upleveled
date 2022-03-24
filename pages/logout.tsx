@@ -7,7 +7,7 @@ export default function Logout() {
   return (
     <>
       <Head>
-        <title>Login</title>
+        <title>Logout</title>
         <meta name="login" content="" />
       </Head>
 
