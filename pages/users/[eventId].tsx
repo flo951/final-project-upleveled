@@ -4,7 +4,7 @@ import Head from 'next/head';
 import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
-import DoughnutChart from '../../components/BarChart';
+import BarChart from '../../components/BarChart';
 
 import {
   Event,
@@ -781,7 +781,7 @@ export default function UserDetail(props: Props) {
                 )}
               </div>
 
-              <DoughnutChart
+              <BarChart
                 people={peopleList}
                 expenses={expenseList}
                 sharedCosts={sharedCosts}
