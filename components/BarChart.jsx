@@ -20,10 +20,11 @@ const resultStyles = css`
   display: flex;
   flex-direction: column;
   gap: 6px;
+  margin-bottom: 6px;
 `;
 
 export default function BarChart(props) {
-  if (props.people.length === 0) {
+  if (props.expenses.length === 0) {
     return (
       <div css={barChartStyles}>
         <h3>Add People and Expenses to see more</h3>
@@ -72,12 +73,12 @@ export default function BarChart(props) {
     // sharedAmount is the amount everyone that participates in an event has to pay
     const sharedAmount = totalSum / people.length;
 
-    // Sort people Array from lowest to highest
+    // Sort people names Array from lowest to highest balance
     const sortedPeople = people.sort(
       (personA, personB) => object[personA] - object[personB],
     );
 
-    // Sort values from lowest to highest
+    // Sort values array from lowest to highest balanc after deducting sharedamount
     const sortedValuesPaid = sortedPeople.map(
       (person) => object[person] - sharedAmount,
     );
@@ -90,12 +91,14 @@ export default function BarChart(props) {
       debt = Math.min(-sortedValuesPaid[i], sortedValuesPaid[j]);
       sortedValuesPaid[i] += debt;
       sortedValuesPaid[j] -= debt;
-      resultArray.push(`${sortedPeople[i]} owes ${sortedPeople[j]} €${debt}`);
-
+      resultArray.push(
+        `${sortedPeople[i]} owes ${sortedPeople[j]} €${debt.toFixed(2)}`,
+      );
+      // check if balance is 0, then go to next
       if (sortedValuesPaid[i] === 0) {
         i++;
       }
-
+      // check if balance is 0, then go to next
       if (sortedValuesPaid[j] === 0) {
         j--;
       }
@@ -171,28 +174,36 @@ export default function BarChart(props) {
         }}
       />
       <div css={resultStyles}>
+        <span css={spanStyles}>Result</span>
         {balanceMessages.map((item) => {
-          return <span key={Math.random()}>{item}</span>;
+          return (
+            <span key={`id ${Math.random()}`} css={spanStyles}>
+              {item}
+            </span>
+          );
         })}
       </div>
-      {props.people.map((person) => {
-        const cost = props.expenses.map((expense) => {
-          return person.id === expense.paymaster ? expense.cost / 100 : 0;
-        });
+      <div css={resultStyles}>
+        {props.people.map((person) => {
+          const cost = props.expenses.map((expense) => {
+            return person.id === expense.paymaster ? expense.cost / 100 : 0;
+          });
 
-        const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
-        const personSum =
-          Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
-        return (
-          <div key={`person-${person.id} owes money `}>
-            <span css={spanStyles} key={Math.random()}>
-              {personSum > 0
-                ? ` ${person.name} Receives ${personSum.toFixed(2)}€`
-                : ''}
-            </span>
-          </div>
-        );
-      })}
+          const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+          const personSum =
+            Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
+
+          return (
+            <div key={`person-${person.id} receives money `}>
+              <span css={spanStyles} key={Math.random()}>
+                {personSum > 0
+                  ? ` ${person.name} receives ${personSum.toFixed(2)}€`
+                  : ''}
+              </span>
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
