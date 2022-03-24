@@ -596,8 +596,10 @@ export default function UserDetail(props: Props) {
                   onSubmit={async (e) => {
                     e.preventDefault();
 
-                    if (personExpense === '0') {
-                      setExpenseError('Sure its free?');
+                    if (parseFloat(personExpense) <= 0) {
+                      setExpenseError(
+                        'Invalid input, please enter a positive value',
+                      );
                       return;
                     }
                     const testNumber: number = parseInt(personExpense);
