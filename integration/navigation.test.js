@@ -1,7 +1,6 @@
 const baseUrl = 'http://localhost:3000';
 
 // E2E Test Login, Create Event, Create 2 People, Create 2 Expenses
-jest.setTimeout(30000);
 test('Login, create event, create Mario and Luigi, create Expenses for both, delete event, logout', async () => {
   await page.goto(`${baseUrl}/`);
   await expect(page).toMatch('Welcome to Splitify');
