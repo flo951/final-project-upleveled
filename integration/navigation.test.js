@@ -2,8 +2,6 @@ const baseUrl = 'http://localhost:3000';
 
 // E2E Test Login, Create Event, Create 2 People, Create 2 Expenses
 
-jest.setTimeout(30000);
-
 test('Login, create event, create Mario and Luigi, create Expenses for both, delete event, logout', async () => {
   await page.goto(`${baseUrl}/`);
   await expect(page).toMatch('Welcome to Splitify');
@@ -64,47 +62,4 @@ test('Login, create event, create Mario and Luigi, create Expenses for both, del
   });
   await expect(page).toClick('[data-test-id="delete-event"]');
   await expect(page).toClick('[data-test-id="logout"]');
-  // await expect(page).toClick('[data-test-id="cart-link"]');
-  // await page.waitForNavigation();
-  // // go to cart page
-  // expect(page.url()).toBe(`${baseUrl}/cart`);
-  // await expect(page).toClick('[data-test-id="cart-product-remove-1"]');
-  // await expect(page).toMatchElement('[data-test-id="cart-count"]', {
-  //   text: '0',
-  // });
 });
-
-// test('Checkout flow', async () => {
-//   await page.goto(`${baseUrl}/`);
-//   await expect(page).toMatch('Available Pokemon Cards');
-//   expect(page.url()).toBe(`${baseUrl}/`);
-//   await expect(page).toClick('[data-test-id="cart-link"]');
-//   await page.waitForNavigation();
-//   expect(page.url()).toBe(`${baseUrl}/cart`);
-//   await expect(page).toClick('[data-test-id="cart-checkout"]');
-//   await page.waitForNavigation();
-//   expect(page.url()).toBe(`${baseUrl}/checkout`);
-//   await expect(page).toFill('[data-test-id="checkout-first-name"]', 'Flo');
-//   await expect(page).toFill('[data-test-id="checkout-last-name"]', 'Görlich');
-//   await expect(page).toFill(
-//     '[data-test-id="checkout-email"]',
-//     'flo@upleveled.com',
-//   );
-//   await expect(page).toFill('[data-test-id="checkout-address"]', 'Wald');
-//   await expect(page).toFill('[data-test-id="checkout-city"]', 'Vienna');
-//   await expect(page).toFill('[data-test-id="checkout-postal-code"]', '1140');
-//   await expect(page).toFill('[data-test-id="checkout-country"]', 'Austria');
-//   await expect(page).toFill(
-//     '[data-test-id="checkout-credit-card"]',
-//     '1234567891234567',
-//   );
-//   await expect(page).toFill(
-//     '[data-test-id="checkout-expiration-date"]',
-//     '02/22',
-//   );
-//   await expect(page).toFill('[data-test-id="checkout-security-code"]', '123');
-//   await expect(page).toClick('[data-test-id="checkout-confirm-order"]');
-//   await page.waitForNavigation();
-//   expect(page.url()).toBe(`${baseUrl}/thanks`);
-//   await expect(page).toMatch('Thank you for your order');
-// });
