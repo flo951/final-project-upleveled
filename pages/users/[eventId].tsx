@@ -116,7 +116,7 @@ const expenseDetailStyles = css`
   font-size: 18px;
 `;
 const expenseStatisticsStyles = css`
-  border-bottom: 2px solid black;
+  /* border-bottom: 2px solid black; */
   padding: 4px;
   width: 100%;
 `;
@@ -719,7 +719,9 @@ export default function UserDetail(props: Props) {
                         >
                           {peopleList.map((person) => {
                             return person.id === expense.paymaster ? (
-                              <span>
+                              <span
+                                key={`expense from person with id ${person.id}`}
+                              >
                                 {expense.expensename} {expense.cost / 100}€ paid
                                 by {person.name}
                               </span>
@@ -740,7 +742,7 @@ export default function UserDetail(props: Props) {
                         </button>
                       </div>
                       <div css={expenseStatisticsStyles}>
-                        {peopleList.map((person) => {
+                        {/* {peopleList.map((person) => {
                           const cost = expense.cost / 100 / peopleList.length;
 
                           return person.id !== expense.paymaster ? (
@@ -762,7 +764,7 @@ export default function UserDetail(props: Props) {
                           ) : (
                             ''
                           );
-                        })}
+                        })} */}
                       </div>
                     </div>
                   );
