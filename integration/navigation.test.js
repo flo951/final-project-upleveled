@@ -62,4 +62,4 @@ test('Login, create event, create Mario and Luigi, create Expenses for both, del
   });
   await expect(page).toClick('[data-test-id="delete-event"]');
   await expect(page).toClick('[data-test-id="logout"]');
-}, 30000);
+});
