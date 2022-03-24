@@ -2,7 +2,7 @@ module.exports = {
   launch: {
     // headless: false,
   },
-  testTimeout: 30000,
+  testTimeout: 20000,
   server: {
     command: 'yarn start',
   },
