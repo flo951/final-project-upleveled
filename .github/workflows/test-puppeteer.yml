@@ -43,5 +43,4 @@ jobs:
       # Build the Next.js application
       - run: yarn build
       # Run the Jest unit tests
-      - run: yarn start
       - run: yarn jest --config integration/jest.config.mjs
