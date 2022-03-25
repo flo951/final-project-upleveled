@@ -4,7 +4,7 @@ const baseUrl = 'http://localhost:3000';
 test('Login, create event', async () => {
   await page.goto(`${baseUrl}/`);
   await expect(page).toMatch('Welcome to Splitify');
-  await expect(page).toClick('[data-test-id="register"]');
+  await expect(page).toClick('[data-test-id="sign-up"]');
   await page.waitForNavigation();
   expect(page.url()).toBe(`${baseUrl}/register`);
   await expect(page).toFill('[data-test-id="sign-up-username"]', 'e2etest');
