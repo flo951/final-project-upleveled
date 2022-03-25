@@ -56,6 +56,7 @@ const removeButtonStyles = css`
   margin: 0px 2px;
   border: 2px solid black;
   border-radius: 8px;
+  max-height: 25px;
   cursor: pointer;
 `;
 const eventNameButtonRowStyles = css`
@@ -113,6 +114,8 @@ const inputExpenseSubmitStyles = css`
 `;
 const expenseDetailStyles = css`
   display: flex;
+  align-items: center;
+  gap: 6px;
   font-size: 18px;
 `;
 const expenseStatisticsStyles = css`
@@ -144,6 +147,7 @@ const buttonFileUploadStyles = css`
   font-size: 16px;
   border-radius: 8px;
   padding: 6px;
+  margin-top: 6px;
 `;
 const inputFileUploadStyles = css`
   margin: 2px;
@@ -217,6 +221,8 @@ export default function UserDetail(props: Props) {
   const [uploadImage, setUploadImage] = useState<FileList>();
   const [imageUrl, setImageUrl] = useState(props.profileImageInDb.imageurl);
   const [isLoading, setIsLoading] = useState<Boolean>();
+  const [editButtonImageUpload, setEditButtonImageUpload] =
+    useState<Boolean>(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -418,6 +424,7 @@ export default function UserDetail(props: Props) {
     }
 
     setIsLoading(false);
+    setEditButtonImageUpload(false);
   }
 
   return (
@@ -441,6 +448,18 @@ export default function UserDetail(props: Props) {
             >
               {/* Create People List */}
               <div css={borderPeopleListStyles}>
+                <div css={expenseDetailStyles}>
+                  <h3>{event.eventname}</h3>
+                  <button
+                    onClick={() => {
+                      deleteEvent(event.id).catch(() => {});
+                    }}
+                    css={removeButtonStyles}
+                    data-test-id="delete-event"
+                  >
+                    X
+                  </button>
+                </div>
                 <Image
                   css={eventProfilePicStyles}
                   src={
@@ -450,52 +469,56 @@ export default function UserDetail(props: Props) {
                   width={150}
                   height={150}
                 />
-                <div>
-                  <span>Edit your Event Picture</span>
-                  <input
-                    css={inputFileUploadStyles}
-                    type="file"
-                    onChange={(e) => {
-                      e.currentTarget.files === null
-                        ? setUploadImage(undefined)
-                        : setUploadImage(e.currentTarget.files);
-                    }}
-                  />
+
+                {editButtonImageUpload === true ? (
+                  <div>
+                    <span>Edit your Event Picture</span>
+                    <input
+                      css={inputFileUploadStyles}
+                      type="file"
+                      onChange={(e) => {
+                        e.currentTarget.files === null
+                          ? setUploadImage(undefined)
+                          : setUploadImage(e.currentTarget.files);
+                      }}
+                    />
+                    <button
+                      css={buttonFileUploadStyles}
+                      onClick={() => {
+                        handleUploadImage(event.id).catch(() => {});
+                      }}
+                    >
+                      Upload
+                    </button>
+                    <span css={spanErrorStyles}>{uploadError}</span>
+                    <span>
+                      {isLoading ? (
+                        <div css={loadingFlexBox}>
+                          <span css={spanStyles}>Uploading image...</span>
+                          <div css={loadingCircleStyles} />
+                        </div>
+                      ) : (
+                        ''
+                      )}
+                    </span>
+                  </div>
+                ) : (
                   <button
                     css={buttonFileUploadStyles}
                     onClick={() => {
-                      handleUploadImage(event.id).catch(() => {});
+                      setEditButtonImageUpload(true);
                     }}
                   >
-                    Upload
+                    Edit event picture
                   </button>
-                  <span css={spanErrorStyles}>{uploadError}</span>
-                  <span>
-                    {isLoading ? (
-                      <div css={loadingFlexBox}>
-                        <span css={spanStyles}>Uploading image...</span>
-                        <div css={loadingCircleStyles} />
-                      </div>
-                    ) : (
-                      ''
-                    )}
-                  </span>
-                </div>
+                )}
+
                 <div css={eventNameButtonRowStyles}>
                   <h3
                     data-test-id={`event-${event.eventname}`}
                     data-id={event.id}
                   >
                     Who is participating at {event.eventname}?
-                    <button
-                      onClick={() => {
-                        deleteEvent(event.id).catch(() => {});
-                      }}
-                      css={removeButtonStyles}
-                      data-test-id="delete-event"
-                    >
-                      X
-                    </button>
                   </h3>
                 </div>
 
@@ -650,7 +673,7 @@ export default function UserDetail(props: Props) {
                       required
                       css={selectStyles}
                     >
-                      <option key="template" value="">
+                      <option key="template" value={0}>
                         Select Person
                       </option>
                       {peopleList.map((person) => {
