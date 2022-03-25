@@ -217,7 +217,6 @@ export default function UserDetail(props: Props) {
   const [uploadImage, setUploadImage] = useState<FileList>();
   const [imageUrl, setImageUrl] = useState(props.profileImageInDb.imageurl);
   const [isLoading, setIsLoading] = useState<Boolean>();
-
   const router = useRouter();
 
   useEffect(() => {
