@@ -4,12 +4,12 @@ const baseUrl = 'http://localhost:3000';
 test('Login, create event', async () => {
   await page.goto(`${baseUrl}/`);
   await expect(page).toMatch('Welcome to Splitify');
-  await expect(page).toClick('[data-test-id="login"]');
+  await expect(page).toClick('[data-test-id="register"]');
   await page.waitForNavigation();
-  expect(page.url()).toBe(`${baseUrl}/login`);
-  await expect(page).toFill('[data-test-id="login-username"]', 'e2etest');
-  await expect(page).toFill('[data-test-id="login-password"]', '1234');
-  await expect(page).toClick('[data-test-id="complete-login"]');
+  expect(page.url()).toBe(`${baseUrl}/register`);
+  await expect(page).toFill('[data-test-id="sign-up-username"]', 'e2etest');
+  await expect(page).toFill('[data-test-id="sign-up-password"]', '1234');
+  await expect(page).toClick('[data-test-id="complete-signup"]');
   await page.waitForNavigation();
   await expect(page).toMatchElement('[data-test-id="logged-in-user"]', {
     text: 'e2etest',
