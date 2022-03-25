@@ -1,9 +1,9 @@
 module.exports = {
   launch: {
-    headless: false,
+    headless: true,
   },
 
-  // server: {
-  //   command: 'yarn start',
-  // },
+  server: {
+    command: 'yarn start',
+  },
 };
