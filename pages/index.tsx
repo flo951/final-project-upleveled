@@ -1,5 +1,6 @@
 import { css } from '@emotion/react';
 import Head from 'next/head';
+import Image from 'next/image';
 
 const mainStyles = css`
   display: flex;
@@ -32,13 +33,29 @@ export default function Home() {
       <main css={mainStyles}>
         <h1>Welcome to Splitify</h1>
         <span css={spanStyles}>Take a sneak peek how the app works</span>
-        <img
-          css={imageStyles}
-          src="/images/example_result.png"
-          alt="example calculation"
-          height="367.75px"
-          width="304.5px"
-        />
+        <div>
+          {/* <Image
+            css={imageStyles}
+            src="/images/eventpic1.png"
+            alt=" Picture of event page"
+            height="572px"
+            width="379,5px"
+          />
+          <Image
+            css={imageStyles}
+            src="/images/eventpic2.png"
+            alt="Picture of Expense List"
+            height="711px"
+            width="375px"
+          /> */}
+          <Image
+            css={imageStyles}
+            src="/images/eventpic3.png"
+            alt="Picture of Result calculation"
+            height="586px"
+            width="382px"
+          />
+        </div>
         <span css={spanStyles}>
           <a href="./register">Create an Account</a> to use our Service
         </span>
