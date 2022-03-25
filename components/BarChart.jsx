@@ -3,6 +3,7 @@ import { ArcElement } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { css } from '@emotion/react';
 import { spanStyles } from '../pages/createevent';
+import { splitPayments } from '../util/splitPayments';
 
 Chart.register(ArcElement);
 
@@ -20,7 +21,6 @@ const resultStyles = css`
   display: flex;
   flex-direction: column;
   gap: 6px;
-  margin-bottom: 6px;
 `;
 
 export default function BarChart(props) {
@@ -61,52 +61,10 @@ export default function BarChart(props) {
     (obj, item) => Object.assign(obj, { [item.personName]: item.sum }),
     {},
   );
-
-  // Algorithm to calculate who owes how much to hwom
-  function splitPayments(object) {
-    const people = Object.keys(object);
-    const valuesPaid = Object.values(object);
-
-    // totalSum of all expenses
-    const totalSum = valuesPaid.reduce((acc, curr) => curr + acc);
-
-    // sharedAmount is the amount everyone that participates in an event has to pay
-    const sharedAmount = totalSum / people.length;
-
-    // Sort people names Array from lowest to highest balance
-    const sortedPeople = people.sort(
-      (personA, personB) => object[personA] - object[personB],
-    );
-
-    // Sort values array from lowest to highest balanc after deducting sharedamount
-    const sortedValuesPaid = sortedPeople.map(
-      (person) => object[person] - sharedAmount,
-    );
-
-    let i = 0;
-    let j = sortedPeople.length - 1;
-    let debt;
-    const resultArray = [];
-    while (i < j) {
-      debt = Math.min(-sortedValuesPaid[i], sortedValuesPaid[j]);
-      sortedValuesPaid[i] += debt;
-      sortedValuesPaid[j] -= debt;
-      resultArray.push(
-        `${sortedPeople[i]} owes ${sortedPeople[j]} €${debt.toFixed(2)}`,
-      );
-      // check if balance is 0, then go to next
-      if (sortedValuesPaid[i] === 0) {
-        i++;
-      }
-      // check if balance is 0, then go to next
-      if (sortedValuesPaid[j] === 0) {
-        j--;
-      }
-    }
-    return resultArray;
-  }
+  console.log(payments);
 
   const balanceMessages = splitPayments(payments);
+  console.log(balanceMessages);
 
   const peopleNameArray = props.people.map((person) => person.name);
   const data = {
@@ -182,8 +140,7 @@ export default function BarChart(props) {
             </span>
           );
         })}
-      </div>
-      <div css={resultStyles}>
+
         {props.people.map((person) => {
           const cost = props.expenses.map((expense) => {
             return person.id === expense.paymaster ? expense.cost / 100 : 0;
@@ -194,13 +151,11 @@ export default function BarChart(props) {
             Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
 
           return (
-            <div key={`person-${person.id} receives money `}>
-              <span css={spanStyles} key={Math.random()}>
-                {personSum > 0
-                  ? ` ${person.name} receives ${personSum.toFixed(2)}€`
-                  : ''}
-              </span>
-            </div>
+            <span key={`person-${person.id} receives money `} css={spanStyles}>
+              {personSum > 0
+                ? ` ${person.name} receives ${personSum.toFixed(2)}€`
+                : ''}
+            </span>
           );
         })}
       </div>
