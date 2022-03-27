@@ -35,6 +35,7 @@ const mainStyles = css`
   flex-direction: row;
   justify-content: space-between;
   flex-wrap: wrap;
+  gap: 12px;
 
   h1 {
     font-size: 20px;
@@ -73,9 +74,10 @@ const selectStyles = css`
 
   font-size: 20px;
 `;
-const inputExpenseStyles = css`
+export const inputExpenseStyles = css`
   padding: 8px;
-
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen,
+    Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 20px;
 `;
 const expenseContainerStyles = css`
@@ -102,6 +104,7 @@ const expenseBigContainerStyles = css`
   padding: 12px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
   width: 324px;
+  height: max-content;
 `;
 const inputExpenseSubmitStyles = css`
   background-color: #2a6592;
@@ -118,11 +121,7 @@ const expenseDetailStyles = css`
   gap: 6px;
   font-size: 18px;
 `;
-const expenseStatisticsStyles = css`
-  /* border-bottom: 2px solid black; */
-  padding: 4px;
-  width: 100%;
-`;
+
 export const redColorCostsStyles = css`
   color: #db3f2e;
 `;
@@ -157,11 +156,11 @@ const inputFileUploadStyles = css`
   width: 235px;
   margin-right: 6px;
 `;
-const loadingFlexBox = css`
+export const loadingFlexBox = css`
   display: flex;
   align-items: center;
 `;
-const loadingCircleStyles = css`
+export const loadingCircleStyles = css`
   border-radius: 50%;
   border-top: 2px solid #2a6592;
   border-right: 2px solid #2a6592;
@@ -764,31 +763,6 @@ export default function UserDetail(props: Props) {
                         >
                           X
                         </button>
-                      </div>
-                      <div css={expenseStatisticsStyles}>
-                        {/* {peopleList.map((person) => {
-                          const cost = expense.cost / 100 / peopleList.length;
-
-                          return person.id !== expense.paymaster ? (
-                            <div
-                              key={`person-${person.id} from ${Math.random()} `}
-                            >
-                              <span css={spanStyles}>
-                                {person.name} owes
-                                <span css={redColorCostsStyles}>
-                                  {` ${cost.toFixed(2)}`}
-                                </span>
-                                {peopleList.map((p) => {
-                                  return p.id === expense.paymaster
-                                    ? `€ to ${p.name}`
-                                    : '';
-                                })}
-                              </span>
-                            </div>
-                          ) : (
-                            ''
-                          );
-                        })} */}
                       </div>
                     </div>
                   );
