@@ -16,6 +16,9 @@ jobs:
       CSRF_SECRET_SALT: ${{ secrets.CSRF_SECRET_SALT }}
       CLOUD_NAME: ${{ secrets.CLOUD_NAME }}
       UPLOAD_PRESET: ${{ secrets.UPLOAD_PRESET }}
+      CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      REFRESH_TOKEN: ${{ secrets.REFRESH_TOKEN }}
     steps:
       - name: Start preinstalled PostgreSQL on Ubuntu
         run: |
