@@ -1,52 +1,52 @@
 import { config } from 'dotenv-safe';
-import { GetAccessTokenResponse } from 'google-auth-library/build/src/auth/oauth2client';
 import { google } from 'googleapis';
-import { NextApiRequest, NextApiResponse } from 'next';
-import nodemailer, { SentMessageInfo } from 'nodemailer';
+import nodemailer from 'nodemailer';
+
 config();
-type CreateEmailRequestBody = {
-  name: string;
-  message: string;
-  result: string[];
-  email: string;
-  expenseList: string[];
-  mailData: {
-    from: string;
-    to: string;
-    subject: string;
-    text: string;
-    html: string;
-  };
-};
+// type CreateEmailRequestBody = {
+//   name: string;
+//   message: string;
+//   result: string[];
+//   email: string;
+//   expenseList: string[];
+//   mailData: {
+//     from: string;
+//     to: string;
+//     subject: string;
+//     text: string;
+//     html: string;
+//   };
+// };
 
-type SentEmail = {
-  from: string;
-  to: string;
-  subject: string;
-  text: string;
-  html: string;
-  myAccessToken: Promise<GetAccessTokenResponse>;
-  user: string;
-  refreshToken: string;
-};
+// type SentEmail = {
+//   from?: string;
+//   to?: string;
+//   subject?: string;
+//   text?: string;
+//   html?: string;
+//   myAccessToken?: Promise<GetAccessTokenResponse>;
+//   user?: string;
+//   auth?: {
+//     user: string;
+//     refreshToken: string | undefined;
+//     accessToken: Promise<GetAccessTokenResponse> | undefined;
+//   };
+// };
 
-export type CreateEmailResponseBody = {
-  errors?: { message: string }[];
-  name?: string;
-  message?: string;
-  result?: string[];
-  email?: string;
-  mailData?: SentEmail;
-};
+// export type CreateEmailResponseBody = {
+//   errors?: { message: string }[];
+//   name?: string;
+//   message?: string;
+//   result?: string[];
+//   email?: string;
+//   mailData?: SentEmail;
+// };
 
-type CreateEventNextApiRequest = Omit<NextApiRequest, 'body'> & {
-  body: CreateEmailRequestBody;
-};
+// type CreateEventNextApiRequest = Omit<NextApiRequest, 'body'> & {
+//   body: CreateEmailRequestBody;
+// };
 
-export default async function createEmailHandler(
-  request: CreateEventNextApiRequest,
-  response: NextApiResponse<CreateEmailResponseBody>,
-) {
+export default async function createEmailHandler(request, response) {
   if (request.method === 'POST') {
     if (
       typeof request.body.name !== 'string' ||
@@ -90,7 +90,7 @@ export default async function createEmailHandler(
       },
     });
     // SentMessageInfo is type directly from nodemailer dependency
-    const mailData: SentMessageInfo = await transporter.sendMail({
+    const mailData = await transporter.sendMail({
       from: 'expensesplitterbot@gmail.com',
       to: request.body.email,
       subject: `Message From ${request.body.name} regarding an Expense on Splitify`,
