@@ -11,6 +11,7 @@ import {
   loadingCircleStyles,
   loadingFlexBox,
 } from '../pages/users/[eventId]';
+import { Expense, Person } from '../util/database';
 
 Chart.register(ArcElement);
 
@@ -30,13 +31,19 @@ const resultStyles = css`
   gap: 6px;
 `;
 
-export default function BarChart(props) {
+type Props = {
+  people: Person[];
+  expenses: Expense[];
+  sharedCosts: string;
+};
+
+export default function BarChart(props: Props) {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [emailResponse, setEmailResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
-  const sendList = [];
+  const sendList: string[] = [];
   props.expenses.map((expense) => {
     return props.people.map((person) => {
       return person.id === expense.paymaster
