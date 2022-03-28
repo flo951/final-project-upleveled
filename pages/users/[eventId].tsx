@@ -49,14 +49,14 @@ const mainStyles = css`
     gap: 12px;
   }
 `;
-const removeButtonStyles = css`
-  color: red;
+export const removeButtonStyles = css`
+  color: white;
   border: none;
-  background-color: transparent;
+  background-color: red;
   font-size: 16px;
   margin: 0px 2px;
-  border: 2px solid black;
-  border-radius: 8px;
+  border: 2px solid red;
+  border-radius: 50%;
   max-height: 25px;
   cursor: pointer;
 `;
@@ -810,6 +810,8 @@ export default function UserDetail(props: Props) {
                 people={peopleList}
                 expenses={expenseList}
                 sharedCosts={sharedCosts}
+                user={props.user}
+                event={props.eventInDb}
               />
             </div>
           );
