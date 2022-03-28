@@ -20,7 +20,14 @@ const nameInputStyles = css`
 
 export const inputSubmitStyles = css`
   padding: 8px 8px;
-  background-color: #2a6592;
+  background-image: linear-gradient(
+    to right top,
+    #006e5f,
+    #007372,
+    #007884,
+    #007c95,
+    #007fa4
+  );
   color: white;
   border: 2px solid black;
   border-radius: 8px;
