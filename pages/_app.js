@@ -1,4 +1,5 @@
 import { css, Global } from '@emotion/react';
+import Head from 'next/head';
 import { useCallback, useEffect, useState } from 'react';
 import Layout from '../components/Layout';
 
@@ -35,6 +36,16 @@ function MyApp({ Component, pageProps }) {
           }
         `}
       />
+      <Head>
+        <meta charset="utf-8" />
+
+        <link rel="manifest" href="/manifest.json" />
+        <link
+          rel="apple-touch-icon"
+          href="%PUBLIC_URL%/images/icon-apple-touch.png"
+        />
+        <link rel="icon" href="images/favicon.svg" type="image/svg+xml" />
+      </Head>
       <Layout userObject={user} refreshUserProfile={refreshUserProfile}>
         <Component {...pageProps} refreshUserProfile={refreshUserProfile} />
       </Layout>
