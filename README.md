@@ -3,9 +3,6 @@
 
 Responsive Web Application to split up expenses from different events equally among all participants. The App calculates who owes how much to whom, and shows statistics who paid for what. In the end you can send the results with a form to an E-Mail recipient. The App has a full Authentication and Authorization process, a user only has access after registering and logging in with an account.
 
-Technologies used: Next.js, React.js, TypeScript, PostgreSQL, css/emotion,  Cloudinary to upload profile images, Chart.js Library to display charts, bcrypt Library for hashing data, nodemailer & GMAIL-API (0Auth2), Jest for Unit tests, Jest-Puppeteer for E2E Tests
-
-
 
 ## Dependencies
 
