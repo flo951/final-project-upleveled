@@ -84,6 +84,7 @@ const expenseContainerStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
+
   h3 {
     margin-top: 0;
     text-align: center;
@@ -107,13 +108,25 @@ const expenseBigContainerStyles = css`
   height: max-content;
 `;
 const inputExpenseSubmitStyles = css`
-  background-color: #2a6592;
+  // background-color: #006e5f;
+  background-image: linear-gradient(
+    to right top,
+    #006e5f,
+    #007372,
+    #007884,
+    #007c95,
+    #007fa4
+  );
   margin-top: 12px;
   padding: 4px;
   font-size: 20px;
   color: white;
   border-radius: 4px;
   cursor: pointer;
+  :hover {
+    border: 2px solid #dc8409;
+    transition: 0.3s ease-out;
+  }
 `;
 const expenseDetailStyles = css`
   display: flex;
@@ -142,11 +155,23 @@ const borderPeopleListStyles = css`
 `;
 const buttonFileUploadStyles = css`
   color: white;
-  background-color: #2a6592;
+  background-image: linear-gradient(
+    to right top,
+    #006e5f,
+    #007372,
+    #007884,
+    #007c95,
+    #007fa4
+  );
   font-size: 16px;
   border-radius: 8px;
   padding: 6px;
   margin-top: 6px;
+  cursor: pointer;
+  :hover {
+    border: 2px solid #dc8409;
+    transition: 0.3s ease-out;
+  }
 `;
 const inputFileUploadStyles = css`
   margin: 2px;
