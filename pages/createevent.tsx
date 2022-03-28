@@ -53,12 +53,23 @@ export const spanStyles = css`
   color: black;
 `;
 export const inputSubmitStyles = css`
-  background-color: #2a6592;
+  background-image: linear-gradient(
+    to right top,
+    #006e5f,
+    #007372,
+    #007884,
+    #007c95,
+    #007fa4
+  );
   padding: 4px;
   font-size: 20px;
   color: white;
   border-radius: 4px;
   cursor: pointer;
+  :hover {
+    border: 2px solid #dc8409;
+    transition: 0.3s ease-out;
+  }
 `;
 export const nameInputStyles = css`
   font-size: 20px;
@@ -83,6 +94,7 @@ export const eventListStyles = css`
   flex-wrap: wrap;
   a {
     color: black;
+    text-decoration: none;
   }
 `;
 const removeButtonStyles = css`
@@ -104,7 +116,6 @@ export type Errors = { message: string }[];
 export default function CreateEvent(props: Props) {
   const [eventName, setEventName] = useState('');
   const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
-
   const [errors, setErrors] = useState<Errors | undefined>([]);
 
   if ('errors' in props) {
@@ -166,7 +177,7 @@ export default function CreateEvent(props: Props) {
 
               const createEventResponseBody =
                 (await createPersonResponse.json()) as CreateEventResponseBody;
-
+              console.log(createEventResponseBody);
               if ('event' in createEventResponseBody) {
                 const createdEvents: Event[] = [
                   ...eventList,
