@@ -37,6 +37,7 @@ const flexRowStyles = css`
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    text-decoration: none;
   }
 `;
 const removeButtonStyles = css`
