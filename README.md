@@ -1,34 +1,77 @@
-This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+# Splitify - Expense Splitter Responsive Web App build with Next.Js
 
-## Getting Started
 
-First, run the development server:
+Responsive Web Application to split up expenses from different events equally among all participants. The App calculates who owes how much to whom, and shows statistics who paid for what. In the end you can send the results with a form to a E-Mail recipient. The App has a full Authentication and Authorization process, a user only has access after registering and logging in with an account.
 
-```bash
-npm run dev
-# or
+Technologies used: Next.js, React.js, TypeScript, PostgreSQL, css/emotion,  Cloudinary to upload profile images, Chart.js Library to display charts, bcrypt Library for hashing data, nodemailer & GMAIL-API (0Auth2) to send data via E-Mail, Jest for Unit tests, Jest-Puppeteer for E2E Tests
+
+
+
+## Dependencies
+
+Next
+Typescript
+PostgreSQL
+Postgres.js
+@emotion/css
+JS Cookie
+dotenv-safe
+ley
+bcrypt
+cloudinary
+chart.js
+nodemailer
+googleapis
+Jest
+Jest-Puppeteer
+
+
+## Setup
+
+Clone the repo from GitHub and then install the dependencies:
+```
+git clone https://github.com/flo951/final-project-upleveled
+cd final-project-upleveled
+yarn
+```
+Setup a database with postgres on your computer:
+```
+psql <login>
+CREATE DATABASE <database name>;
+CREATE USER <username> WITH ENCRYPTED PASSWORD '<pw>';
+GRANT ALL PRIVILEGES ON DATABASE <database name> TO <user name>;
+```
+Create a .env file with the userinfo for the database and create .env.example as a template file for userinfo
+
+Use migrations:
+```
+yarn migrate up
+```
+To delete data from database run:
+```
+yarn migrate down
+```
+To run the development server:
+```
 yarn dev
 ```
-
 Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
 
-You can start editing the page by modifying `pages/index.js`. The page auto-updates as you edit the file.
+To create the production build of the project run:
+```
+yarn build
+yarn start
+```
+## Deployment
 
-[API routes](https://nextjs.org/docs/api-routes/introduction) can be accessed on [http://localhost:3000/api/hello](http://localhost:3000/api/hello). This endpoint can be edited in `pages/api/hello.js`.
+To deploy this project, create a [Heroku Account](https://signup.heroku.com/) and follow the instructions
 
-The `pages/api` directory is mapped to `/api/*`. Files in this directory are treated as [API routes](https://nextjs.org/docs/api-routes/introduction) instead of React pages.
+## Project Preview
 
-## Learn More
+![Example Image 1](/public/images/eventpic1.png)
+![Example Image 2](/public/images/eventpic2.png)
+![Example Image 3](/public/images/eventpic3.png)
 
-To learn more about Next.js, take a look at the following resources:
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js/) - your feedback and contributions are welcome!
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/deployment) for more details.
