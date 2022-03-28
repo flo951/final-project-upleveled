@@ -13,7 +13,7 @@ import { DeleteEventResponseBody } from '../api/event';
 import Link from 'next/link';
 import { eventListStyles, personStyles, spanStyles } from '../createevent';
 import Image from 'next/image';
-import { eventProfilePicStyles } from './[eventId]';
+import { eventProfilePicStyles, removeButtonStyles } from './[eventId]';
 
 const mainStyles = css`
   display: flex;
@@ -39,13 +39,6 @@ const flexRowStyles = css`
     align-items: center;
     text-decoration: none;
   }
-`;
-const removeButtonStyles = css`
-  color: red;
-  border: none;
-  background-color: white;
-  font-size: 18px;
-  cursor: pointer;
 `;
 
 type Props = {
