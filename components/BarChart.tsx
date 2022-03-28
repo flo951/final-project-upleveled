@@ -11,7 +11,7 @@ import {
   loadingCircleStyles,
   loadingFlexBox,
 } from '../pages/users/[eventId]';
-import { Expense, Person } from '../util/database';
+import { Event, Expense, Person, User } from '../util/database';
 
 Chart.register(ArcElement);
 
@@ -35,10 +35,12 @@ type Props = {
   people: Person[];
   expenses: Expense[];
   sharedCosts: string;
+  user: User;
+  event: Event;
 };
 
 export default function BarChart(props: Props) {
-  const [name, setName] = useState('');
+  const [name, setName] = useState(props.user.username);
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [emailResponse, setEmailResponse] = useState('');
@@ -214,6 +216,7 @@ export default function BarChart(props: Props) {
                 message: message,
                 expenseList: sendList,
                 result: balanceMessages,
+                event: props.event,
               }),
             });
             const createEmailResponseBody = await createEmailResponse.json();
@@ -227,7 +230,7 @@ export default function BarChart(props: Props) {
             );
           }}
         >
-          <label htmlFor="name">Name</label>
+          <label htmlFor="name">Your Name</label>
           <input
             css={inputExpenseStyles}
             value={name}
