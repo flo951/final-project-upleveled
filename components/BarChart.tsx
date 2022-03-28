@@ -201,6 +201,7 @@ export default function BarChart(props: Props) {
           css={formStyles}
           onSubmit={async (e) => {
             e.preventDefault();
+            setEmailResponse('');
             setIsLoading(true);
             const createEmailResponse = await fetch('/api/email', {
               method: 'POST',
@@ -216,13 +217,14 @@ export default function BarChart(props: Props) {
               }),
             });
             const createEmailResponseBody = await createEmailResponse.json();
-            console.log(createEmailResponseBody);
 
             setName('');
             setEmail('');
             setMessage('');
             setIsLoading(false);
-            setEmailResponse(`E-Mail send successfully to ${email}`);
+            setEmailResponse(
+              `E-Mail send successfully to ${createEmailResponseBody.mailData.accepted}`,
+            );
           }}
         >
           <label htmlFor="name">Name</label>
@@ -273,7 +275,8 @@ export default function BarChart(props: Props) {
               ''
             )}
           </span>
-          {emailResponse}
+
+          <span>{emailResponse}</span>
         </form>
       </div>
     </>
