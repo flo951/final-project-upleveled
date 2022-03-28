@@ -7,7 +7,15 @@ const headerStyles = css`
   padding: 12px 12px;
   margin: 12px;
   border-radius: 8px;
-  background-color: #2a6592;
+  background-image: linear-gradient(
+    to right top,
+    #006e5f,
+    #007372,
+    #007884,
+    #007c95,
+    #007fa4
+  );
+
   border: 2px solid black;
   color: white;
 
