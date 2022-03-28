@@ -1,4 +1,4 @@
-# Splitify - Expense Splitter Responsive Web App build with Next.Js
+# Splitify - Expense Splitting Responsive Web App build with Next.Js
 
 
 Responsive Web Application to split up expenses from different events equally among all participants. The App calculates who owes how much to whom, and shows statistics who paid for what. In the end you can send the results with a form to an E-Mail recipient. The App has a full Authentication and Authorization process, a user only has access after registering and logging in with an account.
