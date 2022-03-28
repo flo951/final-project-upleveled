@@ -10,6 +10,7 @@ import {
   getValidSessionByToken,
 } from '../util/database';
 import { CreateEventResponseBody, DeleteEventResponseBody } from './api/event';
+import { removeButtonStyles } from './users/[eventId]';
 
 const errorStyles = css`
   color: red;
@@ -97,13 +98,7 @@ export const eventListStyles = css`
     text-decoration: none;
   }
 `;
-const removeButtonStyles = css`
-  color: red;
-  border: none;
-  background-color: white;
-  font-size: 20px;
-  cursor: pointer;
-`;
+
 type Props = {
   eventsInDb: Event[];
   user?: { id: number; username: string };
