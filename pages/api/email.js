@@ -95,12 +95,17 @@ export default async function createEmailHandler(request, response) {
       to: request.body.email,
       subject: `Message From ${request.body.name} regarding an Expense on Splitify`,
       text: request.body.message,
-      html: `<div>${request.body.message}</div> Expense List: <p>${request.body.expenseList}</p> Result: <p>${request.body.result}</p>
-      <p>Sent from:
-      ${request.body.name}</p>
+      html: `<h3>New Message from Splitify was sent from: ${request.body.name} to you</h3>
+      <div>${request.body.message}</div>
+      <div>
+      <h3>Results for Event ${request.body.event.eventname} </h3>
+      Expense List: <p>${request.body.expenseList}</p>
+      Result: <p>${request.body.result}</p>
+
       <a href="https://splitify-final-project.herokuapp.com/">
             Create your own Account on Splitify
-          </a> `,
+          </a>
+          </div>`,
       auth: {
         user: 'expensesplitterbot@gmail.com',
         refreshToken: refreshToken,
