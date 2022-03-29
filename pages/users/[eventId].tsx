@@ -675,14 +675,15 @@ export default function UserDetail(props: Props) {
                       ...expenseList,
                       createPersonResponseBody.expense,
                     ];
-
-                    setExpenseList(createdExpenses);
-                    setExpenseName('');
-                    setPersonExpense('0');
                     if ('errors' in createPersonResponseBody) {
                       setErrors(createPersonResponseBody.errors);
                       return;
                     }
+
+                    setExpenseList(createdExpenses);
+                    setExpenseName('');
+                    setPersonExpense('0');
+
                     setErrors([]);
                     setExpenseError('');
                   }}
