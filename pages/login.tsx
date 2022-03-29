@@ -93,7 +93,6 @@ export default function Login(props: Props) {
 
             // get the query paramaeter from next.js router
             const returnTo = router.query.returnTo;
-            console.log('returnTo', returnTo);
 
             if (
               returnTo &&
@@ -106,8 +105,6 @@ export default function Login(props: Props) {
               return;
             }
 
-            // clear errors
-            // maybe not necessary with redirect setErrors([]);
             props.refreshUserProfile();
             await router
               .push(`/createevent`)
