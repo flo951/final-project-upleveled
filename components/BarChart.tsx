@@ -48,15 +48,17 @@ export default function BarChart(props: Props) {
   const sendList: string[] = [];
   props.expenses.map((expense) => {
     return props.people.map((person) => {
-      return person.id === expense.paymaster
-        ? sendList.push(
-            ` ${expense.expensename} ${expense.cost / 100}€ paid by ${
-              person.name
-            }`,
-          )
-        : '';
+      return (
+        person.id === expense.paymaster &&
+        sendList.push(
+          ` ${expense.expensename} ${expense.cost / 100}€ paid by ${
+            person.name
+          }`,
+        )
+      );
     });
   });
+  console.log(sendList);
 
   if (props.expenses.length === 0) {
     return (
@@ -188,9 +190,8 @@ export default function BarChart(props: Props) {
                 key={`person-${person.id} receives money `}
                 css={spanStyles}
               >
-                {personSum > 0
-                  ? ` ${person.name} receives ${personSum.toFixed(2)}€`
-                  : ''}
+                {personSum > 0 &&
+                  ` ${person.name} receives ${personSum.toFixed(2)}€`}
               </span>
             );
           })}
@@ -269,13 +270,11 @@ export default function BarChart(props: Props) {
 
           <input type="submit" value="Send E-Mail" css={inputSubmitStyles} />
           <span>
-            {isLoading ? (
+            {isLoading && (
               <div css={loadingFlexBox}>
                 <span css={spanStyles}>Sending E-Mail...</span>
                 <div css={loadingCircleStyles} />
               </div>
-            ) : (
-              ''
             )}
           </span>
 
