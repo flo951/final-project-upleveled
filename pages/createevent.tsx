@@ -149,7 +149,7 @@ export default function CreateEvent(props: Props) {
   return (
     <>
       <Head>
-        <title>Events</title>
+        <title>Create a new Event</title>
         <meta name="Create New Events" content="" />
       </Head>
       <main css={mainContainerDivStyles}>
