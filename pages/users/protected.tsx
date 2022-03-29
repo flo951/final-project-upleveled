@@ -88,9 +88,7 @@ export default function ProtectedUser(props: Props) {
   return (
     <>
       <Head>
-        <title>
-          User #{props.user.id} {props.user.username}
-        </title>
+        <title>Event List from {props.user.username}</title>
 
         <meta
           name={`User page from ${props.user.username}`}
