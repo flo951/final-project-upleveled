@@ -58,7 +58,6 @@ export default function BarChart(props: Props) {
       );
     });
   });
-  console.log(sendList);
 
   if (props.expenses.length === 0) {
     return (
@@ -105,7 +104,7 @@ export default function BarChart(props: Props) {
     labels: peopleNameArray,
     datasets: [
       {
-        label: 'Positive Balance in €',
+        label: 'Positive Balances in €',
         data: expensePerPerson.map((expense) => {
           return expense.personSum.sum > 0 ? expense.personSum.sum : 0;
         }),
@@ -122,7 +121,7 @@ export default function BarChart(props: Props) {
         borderWidth: 1,
       },
       {
-        label: 'Negative Balance in €',
+        label: 'Negative Balances in €',
         data: expensePerPerson.map((expense) => {
           return expense.personSum.sum < 0 ? expense.personSum.sum : 0;
         }),
