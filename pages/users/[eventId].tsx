@@ -52,10 +52,10 @@ const mainStyles = css`
 export const removeButtonStyles = css`
   color: white;
   border: none;
-  background-color: #ad1120;
+  background-color: rgb(206, 25, 13);
   font-size: 16px;
   margin: 0px 2px;
-  border: 2px solid #ad1120;
+  border: 2px solid rgb(206, 25, 13);
   border-radius: 50%;
   max-height: 25px;
   cursor: pointer;
@@ -92,7 +92,7 @@ const expenseContainerStyles = css`
   }
 `;
 const spanErrorStyles = css`
-  color: #ad1120;
+  color: rgb(206, 25, 13);
   font-size: 20px;
 `;
 const expenseBigContainerStyles = css`
@@ -128,7 +128,7 @@ const expenseDetailStyles = css`
 `;
 
 export const redColorCostsStyles = css`
-  color: #ad1120;
+  color: rgb(206, 25, 13);
 `;
 export const eventProfilePicStyles = css`
   border: 2px solid black;
