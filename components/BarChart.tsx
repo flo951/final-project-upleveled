@@ -45,6 +45,7 @@ export default function BarChart(props: Props) {
   const [message, setMessage] = useState('');
   const [emailResponse, setEmailResponse] = useState('');
   const [isLoading, setIsLoading] = useState(false);
+
   const sendList: string[] = [];
   props.expenses.map((expense) => {
     return props.people.map((person) => {
@@ -100,6 +101,7 @@ export default function BarChart(props: Props) {
   const balanceMessages = splitPayments(payments);
 
   const peopleNameArray = props.people.map((person) => person.name);
+
   const data = {
     labels: peopleNameArray,
     datasets: [
@@ -217,6 +219,7 @@ export default function BarChart(props: Props) {
                 expenseList: sendList,
                 result: balanceMessages,
                 event: props.event,
+                participants: peopleNameArray,
               }),
             });
             const createEmailResponseBody = await createEmailResponse.json();
