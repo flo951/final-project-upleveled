@@ -96,7 +96,7 @@ export default function Header(props: Props) {
         <div css={flexRowHeaderStyles}>
           <div css={flexContainerStyles}>
             <Link href="/users/protected">
-              <a>Dashboard</a>
+              <a>Overview</a>
             </Link>
             <Link href="/createevent">
               <a>Create New Event</a>
@@ -120,7 +120,7 @@ export default function Header(props: Props) {
             <a>Splitify</a>
           </Link>
           <Link href="/register">
-            <a data-test-id="sign-up">Sign Up</a>
+            <a data-test-id="sign-up">Register</a>
           </Link>
           <Link href="/login">
             <a data-test-id="login">Login</a>
