@@ -54,14 +54,7 @@ export const spanStyles = css`
   color: black;
 `;
 export const inputSubmitStyles = css`
-  background-image: linear-gradient(
-    to right top,
-    #006e5f,
-    #007372,
-    #007884,
-    #007c95,
-    #007fa4
-  );
+  background-image: linear-gradient(to right top, #043159, #10528e, #2a689f);
   padding: 4px;
   font-size: 20px;
   color: white;
