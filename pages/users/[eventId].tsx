@@ -52,10 +52,10 @@ const mainStyles = css`
 export const removeButtonStyles = css`
   color: white;
   border: none;
-  background-color: red;
+  background-color: #ad1120;
   font-size: 16px;
   margin: 0px 2px;
-  border: 2px solid red;
+  border: 2px solid #ad1120;
   border-radius: 50%;
   max-height: 25px;
   cursor: pointer;
@@ -92,7 +92,7 @@ const expenseContainerStyles = css`
   }
 `;
 const spanErrorStyles = css`
-  color: red;
+  color: #ad1120;
   font-size: 20px;
 `;
 const expenseBigContainerStyles = css`
@@ -108,15 +108,7 @@ const expenseBigContainerStyles = css`
   height: max-content;
 `;
 const inputExpenseSubmitStyles = css`
-  // background-color: #006e5f;
-  background-image: linear-gradient(
-    to right top,
-    #006e5f,
-    #007372,
-    #007884,
-    #007c95,
-    #007fa4
-  );
+  background-image: linear-gradient(to right top, #043159, #10528e, #2a689f);
   margin-top: 12px;
   padding: 4px;
   font-size: 20px;
@@ -136,7 +128,7 @@ const expenseDetailStyles = css`
 `;
 
 export const redColorCostsStyles = css`
-  color: #db3f2e;
+  color: #ad1120;
 `;
 export const eventProfilePicStyles = css`
   border: 2px solid black;
@@ -155,14 +147,7 @@ const borderPeopleListStyles = css`
 `;
 const buttonFileUploadStyles = css`
   color: white;
-  background-image: linear-gradient(
-    to right top,
-    #006e5f,
-    #007372,
-    #007884,
-    #007c95,
-    #007fa4
-  );
+  background-image: linear-gradient(to right top, #043159, #10528e, #2a689f);
   font-size: 16px;
   border-radius: 8px;
   padding: 6px;
@@ -180,6 +165,8 @@ const inputFileUploadStyles = css`
   padding: 4px;
   width: 235px;
   margin-right: 6px;
+  background-image: linear-gradient(to right top, #043159, #10528e, #2a689f);
+  color: white;
 `;
 export const loadingFlexBox = css`
   display: flex;
@@ -355,7 +342,6 @@ export default function UserDetail(props: Props) {
   // select a created person in a dropdown as a template for adding expenses
   function handleSelectPerson(event: React.ChangeEvent<HTMLSelectElement>) {
     const person = event.target.value;
-
     setSelectedPersonId(parseInt(person));
   }
 
@@ -473,7 +459,7 @@ export default function UserDetail(props: Props) {
               {/* Create People List */}
               <div css={borderPeopleListStyles}>
                 <div css={expenseDetailStyles}>
-                  <h3>{event.eventname}</h3>
+                  <h3>Event: {event.eventname}</h3>
                   <button
                     onClick={() => {
                       deleteEvent(event.id).catch(() => {});
@@ -516,13 +502,11 @@ export default function UserDetail(props: Props) {
                     </button>
                     <span css={spanErrorStyles}>{uploadError}</span>
                     <span>
-                      {isLoading ? (
+                      {isLoading && (
                         <div css={loadingFlexBox}>
                           <span css={spanStyles}>Uploading image...</span>
                           <div css={loadingCircleStyles} />
                         </div>
-                      ) : (
-                        ''
                       )}
                     </span>
                   </div>
@@ -603,32 +587,32 @@ export default function UserDetail(props: Props) {
                 </form>
                 <div css={divPersonListStyles}>
                   {peopleList.map((person: Person) => {
-                    return person.eventId === event.id ? (
-                      <div
-                        data-test-id={`person-width-id-${person.id}`}
-                        key={`this is ${person.name} witdh ${person.id} from event ${event.id}`}
-                      >
-                        <div css={personStyles}>
-                          <span
-                            css={spanStyles}
-                            data-test-id={`name-${person.name}`}
-                            data-id={person.id}
-                          >
-                            {person.name}
-                          </span>
-                          <button
-                            css={removeButtonStyles}
-                            aria-label={`Delete Button for Person: ${person.name}`}
-                            onClick={() => {
-                              deletePerson(person.id).catch(() => {});
-                            }}
-                          >
-                            X
-                          </button>
+                    return (
+                      person.eventId === event.id && (
+                        <div
+                          data-test-id={`person-width-id-${person.id}`}
+                          key={`this is ${person.name} witdh ${person.id} from event ${event.id}`}
+                        >
+                          <div css={personStyles}>
+                            <span
+                              css={spanStyles}
+                              data-test-id={`name-${person.name}`}
+                              data-id={person.id}
+                            >
+                              {person.name}
+                            </span>
+                            <button
+                              css={removeButtonStyles}
+                              aria-label={`Delete Button for Person: ${person.name}`}
+                              onClick={() => {
+                                deletePerson(person.id).catch(() => {});
+                              }}
+                            >
+                              X
+                            </button>
+                          </div>
                         </div>
-                      </div>
-                    ) : (
-                      ''
+                      )
                     );
                   })}
                 </div>
@@ -652,6 +636,11 @@ export default function UserDetail(props: Props) {
 
                     if (!Number.isInteger(testNumber)) {
                       setExpenseError('Invalid input, please enter a number');
+                      return;
+                    }
+
+                    if (selectedPersonId === 0) {
+                      setExpenseError('Please select a person');
                       return;
                     }
 
@@ -702,15 +691,15 @@ export default function UserDetail(props: Props) {
                         Select Person
                       </option>
                       {peopleList.map((person) => {
-                        return person.eventId === event.id ? (
-                          <option
-                            key={`person-${person.name}-${person.id}`}
-                            value={person.id}
-                          >
-                            {person.name}
-                          </option>
-                        ) : (
-                          ''
+                        return (
+                          person.eventId === event.id && (
+                            <option
+                              key={`person-${person.name}-${person.id}`}
+                              value={person.id}
+                            >
+                              {person.name}
+                            </option>
+                          )
                         );
                       })}
                     </select>
@@ -730,11 +719,7 @@ export default function UserDetail(props: Props) {
                         setPersonExpense(e.currentTarget.value);
                       }}
                     />
-                    {expenseError ? (
-                      <span css={spanErrorStyles}> {expenseError}</span>
-                    ) : (
-                      ''
-                    )}
+
                     <label htmlFor="expense-name">
                       What are you paying for?
                     </label>
@@ -749,6 +734,9 @@ export default function UserDetail(props: Props) {
                         setExpenseName(e.currentTarget.value);
                       }}
                     />
+                    {expenseError && (
+                      <span css={spanErrorStyles}> {expenseError}</span>
+                    )}
                     <input
                       data-test-id="complete-expense"
                       css={inputExpenseSubmitStyles}
@@ -767,15 +755,15 @@ export default function UserDetail(props: Props) {
                           css={spanStyles}
                         >
                           {peopleList.map((person) => {
-                            return person.id === expense.paymaster ? (
-                              <span
-                                key={`expense from person with id ${person.id}`}
-                              >
-                                {expense.expensename} {expense.cost / 100}€ paid
-                                by {person.name}
-                              </span>
-                            ) : (
-                              ''
+                            return (
+                              person.id === expense.paymaster && (
+                                <span
+                                  key={`expense from person with id ${person.id}`}
+                                >
+                                  {expense.expensename} {expense.cost / 100}€
+                                  paid by {person.name}
+                                </span>
+                              )
                             );
                           })}
                         </span>
@@ -797,9 +785,7 @@ export default function UserDetail(props: Props) {
                 <span css={spanStyles}>Participants: {peopleList.length}</span>
                 <span css={spanStyles}> Total: {sumEventCosts} €</span>
 
-                {peopleList.length === 0 ? (
-                  ''
-                ) : (
+                {peopleList.length !== 0 && (
                   <span css={spanStyles}>
                     Everyone has to pay
                     <span css={redColorCostsStyles}> {sharedCosts} €</span>
