@@ -30,6 +30,9 @@ const resultStyles = css`
   flex-direction: column;
   gap: 6px;
 `;
+const emailFeedbackStyles = css`
+  color: green;
+`;
 
 type Props = {
   people: Person[];
@@ -223,7 +226,7 @@ export default function BarChart(props: Props) {
               }),
             });
             const createEmailResponseBody = await createEmailResponse.json();
-
+            console.log(createEmailResponseBody);
             setName('');
             setEmail('');
             setMessage('');
@@ -231,6 +234,7 @@ export default function BarChart(props: Props) {
             setEmailResponse(
               `E-Mail send successfully to ${createEmailResponseBody.mailData.accepted}`,
             );
+            setTimeout(() => setEmailResponse(''), 5000);
           }}
         >
           <label htmlFor="name">Your Name</label>
@@ -280,7 +284,7 @@ export default function BarChart(props: Props) {
             )}
           </span>
 
-          <span>{emailResponse}</span>
+          <span css={emailFeedbackStyles}>{emailResponse}</span>
         </form>
       </div>
     </>
