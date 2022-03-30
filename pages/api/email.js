@@ -93,12 +93,13 @@ export default async function createEmailHandler(request, response) {
     const mailData = await transporter.sendMail({
       from: 'expensesplitterbot@gmail.com',
       to: request.body.email,
-      subject: `Message From ${request.body.name} regarding an Expense on Splitify`,
+      subject: `Message from ${request.body.name} regarding an event on Splitify`,
       text: request.body.message,
-      html: `<h3>New Message from Splitify was sent from: ${request.body.name} to you</h3>
+      html: `<h4>New message from Splitify was sent from ${request.body.name} to you</h4>
       <div>${request.body.message}</div>
       <div>
-      <h3>Results for Event ${request.body.event.eventname} </h3>
+      <h4>Results for Event ${request.body.event.eventname} </h4>
+      Participants: <p>${request.body.participants}</p>
       Expense List: <p>${request.body.expenseList}</p>
       Result: <p>${request.body.result}</p>
 
