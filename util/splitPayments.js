@@ -25,8 +25,10 @@ export function splitPayments(object) {
   const resultArray = [];
   while (i < j) {
     debt = Math.min(-sortedValuesPaid[i], sortedValuesPaid[j]);
+
     sortedValuesPaid[i] += debt;
     sortedValuesPaid[j] -= debt;
+
     resultArray.push(
       ` ${sortedPeople[i]} owes ${sortedPeople[j]} €${debt.toFixed(2)}`,
     );
