@@ -9,6 +9,7 @@ config();
 //   result: string[];
 //   email: string;
 //   expenseList: string[];
+//   event: Event;
 //   mailData: {
 //     from: string;
 //     to: string;
@@ -18,20 +19,20 @@ config();
 //   };
 // };
 
-// type SentEmail = {
-//   from?: string;
-//   to?: string;
-//   subject?: string;
-//   text?: string;
-//   html?: string;
-//   myAccessToken?: Promise<GetAccessTokenResponse>;
-//   user?: string;
-//   auth?: {
-//     user: string;
-//     refreshToken: string | undefined;
-//     accessToken: Promise<GetAccessTokenResponse> | undefined;
-//   };
-// };
+// // type SentEmail = {
+// //   from?: string;
+// //   to?: string;
+// //   subject?: string;
+// //   text?: string;
+// //   html?: string;
+// //   myAccessToken?: Promise<GetAccessTokenResponse>;
+// //   user?: string;
+// //   auth?: {
+// //     user: string;
+// //     refreshToken: string | undefined;
+// //     accessToken: Promise<GetAccessTokenResponse> | undefined;
+// //   };
+// // };
 
 // export type CreateEmailResponseBody = {
 //   errors?: { message: string }[];
@@ -39,10 +40,10 @@ config();
 //   message?: string;
 //   result?: string[];
 //   email?: string;
-//   mailData?: SentEmail;
+//   mailData?: void & Promise<SMTPTransport.SentMessageInfo>;
 // };
 
-// type CreateEventNextApiRequest = Omit<NextApiRequest, 'body'> & {
+// type CreateEmailNextApiRequest = Omit<NextApiRequest, 'body'> & {
 //   body: CreateEmailRequestBody;
 // };
 
@@ -80,7 +81,6 @@ export default async function createEmailHandler(request, response) {
 
     const transporter = nodemailer.createTransport({
       host: 'smtp.gmail.com',
-
       port: 465,
       secure: true,
       auth: {
