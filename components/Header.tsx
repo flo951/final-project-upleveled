@@ -95,7 +95,7 @@ export default function Header(props: Props) {
       {props.userObject ? (
         <div css={flexRowHeaderStyles}>
           <div css={flexContainerStyles}>
-            <Link href="/users/protected">
+            <Link href="/users/overview">
               <a>Overview</a>
             </Link>
             <Link href="/createevent">
