@@ -263,7 +263,7 @@ export async function getAllEventsWhereIdMatches(userId: number) {
 export async function getSingleEvent(eventId: number) {
   const [event] = await sql<[Event]>`
 
-  SELECT * from events WHERE id = ${eventId}
+  SELECT * from events WHERE id = ${eventId};
   `;
 
   return camelcaseKeys(event);
