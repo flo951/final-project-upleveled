@@ -1,5 +1,10 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { createExpense, deleteExpenseById, Expense } from '../../util/database';
+import {
+  createExpense,
+  deleteExpenseById,
+  Expense,
+  getUserByValidSessionToken,
+} from '../../util/database';
 
 export type CreateExpenseResponseBody =
   | { errors: { message: string }[] }
@@ -59,7 +64,6 @@ export default async function createEventHandler(
     response.status(201).json({ expense: expense });
     return;
   } else if (request.method === 'DELETE') {
-    console.log(request.body);
     if (typeof request.body.expenseId !== 'number' || !request.body.expenseId) {
       // 400 bad request
       response.status(400).json({
@@ -67,7 +71,15 @@ export default async function createEventHandler(
       });
       return; // Important, prevents error for multiple requests
     }
-    // if the method is DELETE delete the person matching the id and user_id
+    const user = await getUserByValidSessionToken(request.cookies.sessionToken);
+    console.log(user);
+    if (!user) {
+      response.status(401).json({
+        errors: [{ message: 'Unothorized' }],
+      });
+      return;
+    }
+
     const deletedExpense = await deleteExpenseById(request.body.expenseId);
 
     if (!deletedExpense) {
