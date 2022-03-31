@@ -83,6 +83,7 @@ To deploy this project, create a [Heroku Account](https://signup.heroku.com/) an
 <img src="/public/images/eventpic3.png" width="382" height="586">
 <img src="/public/images/email_form.png" width="382" height="586">
 </div>
+
 ### E-Mail
 
 <img src="/public/images/email.png">
