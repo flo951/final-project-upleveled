@@ -2,20 +2,15 @@ import { Bar } from 'react-chartjs-2';
 import { ArcElement } from 'chart.js';
 import Chart from 'chart.js/auto';
 import { css } from '@emotion/react';
-import { inputSubmitStyles, spanStyles } from '../pages/createevent';
+import { spanStyles } from '../pages/createevent';
 import { splitPayments } from '../util/splitPayments';
-import { formStyles } from '../styles/styles';
-import { useState } from 'react';
-import {
-  inputExpenseStyles,
-  loadingCircleStyles,
-  loadingFlexBox,
-} from '../pages/users/[eventId]';
+
 import { Event, Expense, Person, User } from '../util/database';
+import SendEmail from './SendEmail';
 
 Chart.register(ArcElement);
 
-const barChartStyles = css`
+export const barChartStyles = css`
   width: 350px;
   height: fit-content;
   padding: 12px 0;
@@ -30,9 +25,6 @@ const resultStyles = css`
   flex-direction: column;
   gap: 6px;
 `;
-const emailFeedbackStyles = css`
-  color: green;
-`;
 
 type Props = {
   people: Person[];
@@ -43,18 +35,12 @@ type Props = {
 };
 
 export default function BarChart(props: Props) {
-  const [name, setName] = useState(props.user.username);
-  const [email, setEmail] = useState('');
-  const [message, setMessage] = useState('');
-  const [emailResponse, setEmailResponse] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
-
-  const sendList: string[] = [];
+  const sendExpenseList: string[] = [];
   props.expenses.map((expense) => {
     return props.people.map((person) => {
       return (
         person.id === expense.paymaster &&
-        sendList.push(
+        sendExpenseList.push(
           ` ${expense.expensename} ${expense.cost / 100}€ paid by ${
             person.name
           }`,
@@ -201,92 +187,13 @@ export default function BarChart(props: Props) {
           })}
         </div>
       </div>
-
-      <div css={barChartStyles}>
-        <h3>Send the result to your friends</h3>
-        <form
-          css={formStyles}
-          onSubmit={async (e) => {
-            e.preventDefault();
-            setEmailResponse('');
-            setIsLoading(true);
-            const createEmailResponse = await fetch('/api/email', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-              },
-              body: JSON.stringify({
-                name: name,
-                email: email,
-                message: message,
-                expenseList: sendList,
-                result: balanceMessages,
-                event: props.event,
-                participants: peopleNameArray,
-              }),
-            });
-            const createEmailResponseBody = await createEmailResponse.json();
-            console.log(createEmailResponseBody);
-            setName('');
-            setEmail('');
-            setMessage('');
-            setIsLoading(false);
-            setEmailResponse(
-              `E-Mail send successfully to ${createEmailResponseBody.mailData.accepted}`,
-            );
-            setTimeout(() => setEmailResponse(''), 5000);
-          }}
-        >
-          <label htmlFor="name">Your Name</label>
-          <input
-            css={inputExpenseStyles}
-            value={name}
-            name="name"
-            required
-            onChange={(e) => {
-              setName(e.target.value);
-            }}
-            placeholder="Name"
-          />
-
-          <label htmlFor="email">Who is receiving your E-Mail?</label>
-          <input
-            css={inputExpenseStyles}
-            value={email}
-            type="email"
-            name="email"
-            required
-            onChange={(e) => {
-              setEmail(e.target.value);
-            }}
-            placeholder="E-Mail"
-          />
-
-          <label htmlFor="message">Message</label>
-          <textarea
-            css={inputExpenseStyles}
-            value={message}
-            required
-            name="message"
-            onChange={(e) => {
-              setMessage(e.target.value);
-            }}
-            placeholder="Message"
-          />
-
-          <input type="submit" value="Send E-Mail" css={inputSubmitStyles} />
-          <span>
-            {isLoading && (
-              <div css={loadingFlexBox}>
-                <span css={spanStyles}>Sending E-Mail...</span>
-                <div css={loadingCircleStyles} />
-              </div>
-            )}
-          </span>
-
-          <span css={emailFeedbackStyles}>{emailResponse}</span>
-        </form>
-      </div>
+      <SendEmail
+        user={props.user.username}
+        expenseList={sendExpenseList}
+        balanceMessages={balanceMessages}
+        event={props.event}
+        participants={peopleNameArray}
+      />
     </>
   );
 }
