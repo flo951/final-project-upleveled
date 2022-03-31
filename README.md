@@ -86,6 +86,6 @@ To deploy this project, create a [Heroku Account](https://signup.heroku.com/) an
 
 <img src="/public/images/email.png">
 
-### DrawSQL Databse Schema
+### DrawSQL Database Schema
 
-<img src="/public/images/drawsql.png">
+<img src="/public/images/drawsql.png" width="700" height="350>
