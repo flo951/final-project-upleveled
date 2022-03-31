@@ -323,17 +323,16 @@ export default function UserDetail(props: Props) {
         expenseId: id,
       }),
     });
-    const deleteEventResponseBody =
+    const deleteExpenseResponseBody =
       (await deleteResponse.json()) as DeleteExpenseResponseBody;
-
-    if ('errors' in deleteEventResponseBody) {
-      setErrors(deleteEventResponseBody.errors);
+    if ('errors' in deleteExpenseResponseBody) {
+      setErrors(deleteExpenseResponseBody.errors);
       return;
     }
 
-    if ('expense' in deleteEventResponseBody) {
+    if ('expense' in deleteExpenseResponseBody) {
       const newExpenseList = expenseList.filter((expense) => {
-        return deleteEventResponseBody.expense.id !== expense.id;
+        return deleteExpenseResponseBody.expense.id !== expense.id;
       });
       setExpenseList(newExpenseList);
       return;
@@ -809,13 +808,6 @@ export default function UserDetail(props: Props) {
 }
 export async function getServerSideProps(context: GetServerSidePropsContext) {
   const eventId = context.query.eventId as string;
-  if (typeof eventId === 'undefined') {
-    return {
-      props: {
-        errors: 'This event doesnt exist',
-      },
-    };
-  }
 
   const token = context.req.cookies.sessionToken;
 
@@ -829,6 +821,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
       },
     };
   }
+  const profileImageInDb = await getProfileImageEvent(parseInt(eventId));
 
   const eventInDb = await getSingleEvent(parseInt(eventId));
 
@@ -852,7 +845,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const expensesInDb = await getAllExpensesWhereIdMatches(parseInt(eventId));
 
-  const profileImageInDb = await getProfileImageEvent(parseInt(eventId));
+  // const profileImageInDb = await getProfileImageEvent(parseInt(eventId));
 
   const cloudName = process.env.CLOUD_NAME;
   if (typeof cloudName === 'undefined') {
