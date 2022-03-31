@@ -7,6 +7,7 @@ const mainStyles = css`
   flex-direction: column;
   align-items: center;
   justify-content: center;
+
   h1 {
     font-weight: 400;
   }
@@ -32,22 +33,12 @@ export default function Home() {
       </Head>
       <main css={mainStyles}>
         <h1>Welcome to Splitify</h1>
+        <p css={spanStyles}>
+          Splitify allows you to split up expenses fast and easy.
+        </p>
+
         <span css={spanStyles}>Take a sneak peek how the app works</span>
         <div>
-          {/* <Image
-            css={imageStyles}
-            src="/images/eventpic1.png"
-            alt=" Picture of event page"
-            height="572px"
-            width="379,5px"
-          />
-          <Image
-            css={imageStyles}
-            src="/images/eventpic2.png"
-            alt="Picture of Expense List"
-            height="711px"
-            width="375px"
-          /> */}
           <Image
             css={imageStyles}
             src="/images/eventpic3.png"
