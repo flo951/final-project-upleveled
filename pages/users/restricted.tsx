@@ -10,7 +10,6 @@ const mainStyles = css`
   margin: 1rem 1rem;
 `;
 
-// tells typescript that props can have user and or error, its called a union in ts
 type Props =
   | {
       user: User;
