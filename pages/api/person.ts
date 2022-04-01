@@ -2,6 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {
   createPerson,
   deletePersonById,
+  getUserByValidSessionToken,
   Person,
   User,
 } from '../../util/database';
@@ -32,6 +33,15 @@ export default async function createPersonHandler(
   request: CreatePersonNextApiRequest,
   response: NextApiResponse<CreatePersonResponseBody>,
 ) {
+  // Check if user is logged in and allowed to create or delete
+  const user = await getUserByValidSessionToken(request.cookies.sessionToken);
+
+  if (!user) {
+    response.status(401).json({
+      errors: [{ message: 'Unothorized' }],
+    });
+    return;
+  }
   if (request.method === 'POST') {
     if (
       typeof request.body.name !== 'string' ||

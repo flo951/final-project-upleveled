@@ -39,6 +39,15 @@ export default async function createEventHandler(
   request: CreateEventNextApiRequest,
   response: NextApiResponse<CreateEventResponseBody>,
 ) {
+  // Check if user is logged in and allowed to create or delete
+  const user = await getUserByValidSessionToken(request.cookies.sessionToken);
+
+  if (!user) {
+    response.status(401).json({
+      errors: [{ message: 'Unothorized' }],
+    });
+    return;
+  }
   if (request.method === 'POST') {
     if (typeof request.body.uploadUrl !== 'undefined') {
       if (typeof request.body.eventId !== 'number' || !request.body.eventId) {
@@ -71,15 +80,6 @@ export default async function createEventHandler(
       });
       return; // Important, prevents error for multiple requests
     }
-    // Check if user is logged in and allowed to create or delete
-    const user = await getUserByValidSessionToken(request.cookies.sessionToken);
-
-    if (!user) {
-      response.status(401).json({
-        errors: [{ message: 'Unothorized' }],
-      });
-      return;
-    }
 
     // Create event in DB
 
@@ -102,15 +102,6 @@ export default async function createEventHandler(
         errors: [{ message: 'id or event name not provided' }],
       });
       return; // Important, prevents error for multiple requests
-    }
-    // Check if user is logged in and allowed to create or delete
-    const user = await getUserByValidSessionToken(request.cookies.sessionToken);
-
-    if (!user) {
-      response.status(401).json({
-        errors: [{ message: 'Unothorized' }],
-      });
-      return;
     }
     // if the method is DELETE delete the person matching the id and user_id
     const deletedEvent = await deleteEventById(

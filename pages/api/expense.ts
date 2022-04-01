@@ -31,6 +31,17 @@ export default async function createEventHandler(
   request: CreateEventNextApiRequest,
   response: NextApiResponse<CreateExpenseResponseBody>,
 ) {
+  // Create event in DB
+  // Check if user is logged in and allowed to create or delete
+  const user = await getUserByValidSessionToken(request.cookies.sessionToken);
+
+  if (!user) {
+    response.status(401).json({
+      errors: [{ message: 'Unothorized' }],
+    });
+    return;
+  }
+
   if (request.method === 'POST') {
     if (
       typeof request.body.expensename !== 'string' ||
@@ -52,8 +63,6 @@ export default async function createEventHandler(
       return; // Important, prevents error for multiple requests
     }
 
-    // Create event in DB
-
     const expense = await createExpense(
       request.body.expensename,
       request.body.cost,
@@ -67,17 +76,9 @@ export default async function createEventHandler(
     if (typeof request.body.expenseId !== 'number' || !request.body.expenseId) {
       // 400 bad request
       response.status(400).json({
-        errors: [{ message: 'id or event name not provided' }],
+        errors: [{ message: 'expense not provided' }],
       });
       return; // Important, prevents error for multiple requests
-    }
-    const user = await getUserByValidSessionToken(request.cookies.sessionToken);
-    console.log(user);
-    if (!user) {
-      response.status(401).json({
-        errors: [{ message: 'Unothorized' }],
-      });
-      return;
     }
 
     const deletedExpense = await deleteExpenseById(request.body.expenseId);
