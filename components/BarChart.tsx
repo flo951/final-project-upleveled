@@ -176,13 +176,14 @@ export default function BarChart(props: Props) {
               Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
 
             return (
-              <span
-                key={`person-${person.id} receives money `}
-                css={spanStyles}
-              >
-                {personSum > 0 &&
-                  ` ${person.name} receives ${personSum.toFixed(2)}€`}
-              </span>
+              personSum > 0 && (
+                <span
+                  key={`person-${person.id} receives money `}
+                  css={spanStyles}
+                >
+                  {` ${person.name} receives ${personSum.toFixed(2)}€`}
+                </span>
+              )
             );
           })}
         </div>
