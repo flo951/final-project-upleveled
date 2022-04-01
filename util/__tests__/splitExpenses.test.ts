@@ -8,9 +8,9 @@ const testObjectPayments = {
 };
 
 const testResultPayments = [
-  ' Tobi owes Flo €306.75',
-  ' Tobi owes Antje €197.75',
-  ' Tobi owes Jose €97.75',
+  ' Tobi owes Flo 306.75€',
+  ' Tobi owes Antje 197.75€',
+  ' Tobi owes Jose 97.75€',
 ];
 
 test('Calculate payments that are owed', () => {
