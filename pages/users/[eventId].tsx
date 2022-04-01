@@ -615,16 +615,18 @@ export default function UserDetail(props: Props) {
                     );
                   })}
                 </div>
+                {errors && (
+                  <div css={errorStyles}>
+                    {errors.map((error) => {
+                      return (
+                        <div key={`error-${error.message}`}>
+                          {error.message}
+                        </div>
+                      );
+                    })}
+                  </div>
+                )}
               </div>
-              {errors && (
-                <div css={errorStyles}>
-                  {errors.map((error) => {
-                    return (
-                      <div key={`error-${error.message}`}>{error.message}</div>
-                    );
-                  })}
-                </div>
-              )}
 
               <div css={expenseBigContainerStyles}>
                 {/* Create Expense List */}
