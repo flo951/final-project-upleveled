@@ -33,7 +33,7 @@ const spanLabelStyles = css`
   font-size: 20px;
   margin-bottom: 12px;
 `;
-const errorStyles = css`
+export const errorStyles = css`
   color: red;
   font-size: 20px;
 `;
