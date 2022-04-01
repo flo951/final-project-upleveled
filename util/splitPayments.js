@@ -18,8 +18,9 @@ export function splitPayments(object) {
   const sortedValuesPaid = sortedPeople.map(
     (person) => object[person] - sharedAmount,
   );
-
+  // i is start of the array
   let i = 0;
+  // j begins at the end of array
   let j = sortedPeople.length - 1;
   let debt;
   const resultArray = [];
