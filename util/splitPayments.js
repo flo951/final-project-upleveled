@@ -30,7 +30,7 @@ export function splitPayments(object) {
     sortedValuesPaid[j] -= debt;
 
     resultArray.push(
-      ` ${sortedPeople[i]} owes ${sortedPeople[j]} €${debt.toFixed(2)}`,
+      ` ${sortedPeople[i]} owes ${sortedPeople[j]} ${debt.toFixed(2)}€`,
     );
     // check if balance is 0, then go to next
     if (sortedValuesPaid[i] === 0) {
