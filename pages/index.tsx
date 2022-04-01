@@ -1,6 +1,7 @@
 import { css } from '@emotion/react';
 import Head from 'next/head';
 import Image from 'next/image';
+import { useState } from 'react';
 
 const mainStyles = css`
   display: flex;
@@ -23,8 +24,29 @@ const imageStyles = css`
   border-radius: 8px;
   box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
 `;
+const exampleImageContainer = css`
+  display: flex;
+  @media only screen and (max-width: 800px) {
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+  }
+`;
+const viewMoreButtonStyles = css`
+  padding: 8px;
+
+  border: 2px solid black;
+  border-radius: 8px;
+  font-size: 20px;
+  color: white;
+
+  background: linear-gradient(to right top, #043159, #10528e, #2a689f);
+  cursor: pointer;
+`;
 
 export default function Home() {
+  const [viewMoreImages, setViewMoreImages] = useState(false);
+
   return (
     <>
       <Head>
@@ -47,6 +69,43 @@ export default function Home() {
             width="382px"
           />
         </div>
+        {viewMoreImages ? (
+          <>
+            <div css={exampleImageContainer}>
+              <Image
+                css={imageStyles}
+                src="/images/eventpic4.png"
+                alt="Picture of an example expense list"
+                height="586px"
+                width="400px"
+              />
+              <Image
+                css={imageStyles}
+                src="/images/eventpic1.png"
+                alt="Picture of Example Event"
+                height="586px"
+                width="382px"
+              />
+            </div>
+            <button
+              css={viewMoreButtonStyles}
+              onClick={() => {
+                setViewMoreImages(false);
+              }}
+            >
+              Close
+            </button>
+          </>
+        ) : (
+          <button
+            css={viewMoreButtonStyles}
+            onClick={() => {
+              setViewMoreImages(true);
+            }}
+          >
+            See more
+          </button>
+        )}
         <span css={spanStyles}>
           <a href="./register">Create an Account</a> to use our Service
         </span>
