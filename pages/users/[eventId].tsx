@@ -856,8 +856,6 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const expensesInDb = await getAllExpensesWhereIdMatches(parseInt(eventId));
 
-  // const profileImageInDb = await getProfileImageEvent(parseInt(eventId));
-
   const cloudName = process.env.CLOUD_NAME;
   if (typeof cloudName === 'undefined') {
     return {
