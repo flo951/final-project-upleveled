@@ -28,6 +28,7 @@ import {
   personStyles,
   spanStyles,
 } from '../createevent';
+import { errorStyles } from '../login';
 
 const mainStyles = css`
   margin: 12px;
@@ -565,7 +566,6 @@ export default function UserDetail(props: Props) {
                   }}
                   css={formStyles}
                 >
-                  {errors}
                   <label htmlFor="person-name">Name of Person</label>
                   <input
                     css={nameInputStyles}
@@ -616,6 +616,15 @@ export default function UserDetail(props: Props) {
                   })}
                 </div>
               </div>
+              {errors && (
+                <div css={errorStyles}>
+                  {errors.map((error) => {
+                    return (
+                      <div key={`error-${error.message}`}>{error.message}</div>
+                    );
+                  })}
+                </div>
+              )}
 
               <div css={expenseBigContainerStyles}>
                 {/* Create Expense List */}
