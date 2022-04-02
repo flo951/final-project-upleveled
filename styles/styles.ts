@@ -8,7 +8,6 @@ export const formContainerStyles = css`
   h1 {
     text-align: center;
     font-weight: 400;
-    font-size: 20px;
   }
 `;
 
