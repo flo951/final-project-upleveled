@@ -58,7 +58,7 @@ export default function Login(props: Props) {
       </Head>
 
       <div css={formContainerStyles}>
-        <span css={spanLabelStyles}>Login to start your journey</span>
+        <h1>Login to start your journey</h1>
         <form
           css={formStyles}
           onSubmit={async (e) => {
