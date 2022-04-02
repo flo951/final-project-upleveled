@@ -76,15 +76,15 @@ export default function Home() {
                 css={imageStyles}
                 src="/images/eventpic4.png"
                 alt="Picture of an example expense list"
-                height="586px"
-                width="400px"
+                height="700px"
+                width="382px"
               />
               <Image
                 css={imageStyles}
                 src="/images/eventpic1.png"
                 alt="Picture of Example Event"
-                height="586px"
-                width="382px"
+                height={586}
+                width={382}
               />
             </div>
             <button
