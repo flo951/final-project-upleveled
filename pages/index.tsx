@@ -1,7 +1,5 @@
 import { css } from '@emotion/react';
 import Head from 'next/head';
-import Image from 'next/image';
-import { useState } from 'react';
 
 const mainStyles = css`
   display: flex;
@@ -18,35 +16,25 @@ const spanStyles = css`
   font-size: 24px;
   text-align: center;
 `;
-const imageStyles = css`
-  margin: 1rem 0;
+
+const videoStyles = css`
+  height: 600px;
+  width: auto;
   border: 2px solid black;
-  border-radius: 8px;
-  box-shadow: rgba(0, 0, 0, 0.24) 0px 3px 8px;
+  border-radius: 12px;
 `;
-const exampleImageContainer = css`
+
+const videoContainerStyles = css`
   display: flex;
+  gap: 12px;
   @media only screen and (max-width: 800px) {
     flex-direction: column;
     justify-content: center;
     align-items: center;
   }
 `;
-const viewMoreButtonStyles = css`
-  padding: 8px;
-
-  border: 2px solid black;
-  border-radius: 8px;
-  font-size: 20px;
-  color: white;
-
-  background: linear-gradient(to right top, #043159, #10528e, #2a689f);
-  cursor: pointer;
-`;
 
 export default function Home() {
-  const [viewMoreImages, setViewMoreImages] = useState(false);
-
   return (
     <>
       <Head>
@@ -55,57 +43,19 @@ export default function Home() {
       </Head>
       <main css={mainStyles}>
         <h1>Welcome to Splitify</h1>
+
+        <div css={videoContainerStyles}>
+          <video css={videoStyles} autoPlay loop muted src="/videos/clip4.mov">
+            <track kind="captions" />
+          </video>
+          <video css={videoStyles} autoPlay loop muted src="/videos/clip5.mov">
+            <track kind="captions" />
+          </video>
+        </div>
         <p css={spanStyles}>
           Splitify allows you to split up expenses fast and easy.
         </p>
 
-        <span css={spanStyles}>Take a sneak peek how the app works</span>
-        <div>
-          <Image
-            css={imageStyles}
-            src="/images/eventpic3.png"
-            alt="Picture of Result calculation"
-            height="586px"
-            width="382px"
-          />
-        </div>
-        {viewMoreImages ? (
-          <>
-            <div css={exampleImageContainer}>
-              <Image
-                css={imageStyles}
-                src="/images/eventpic4.png"
-                alt="Picture of an example expense list"
-                height="700px"
-                width="382px"
-              />
-              <Image
-                css={imageStyles}
-                src="/images/eventpic1.png"
-                alt="Picture of Example Event"
-                height={586}
-                width={382}
-              />
-            </div>
-            <button
-              css={viewMoreButtonStyles}
-              onClick={() => {
-                setViewMoreImages(false);
-              }}
-            >
-              Close
-            </button>
-          </>
-        ) : (
-          <button
-            css={viewMoreButtonStyles}
-            onClick={() => {
-              setViewMoreImages(true);
-            }}
-          >
-            See more
-          </button>
-        )}
         <span css={spanStyles}>
           <a href="./register">Create an Account</a> to use our Service
         </span>
