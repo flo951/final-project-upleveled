@@ -55,7 +55,7 @@ export default function SendEmail(props: Props) {
           setMessage('');
           setIsLoading(false);
           setEmailResponse(
-            `E-Mail send successfully to ${createEmailResponseBody.mailData.accepted}`,
+            `E-Mail sent successfully to ${createEmailResponseBody.mailData.accepted}`,
           );
           setTimeout(() => setEmailResponse(''), 5000);
         }}
