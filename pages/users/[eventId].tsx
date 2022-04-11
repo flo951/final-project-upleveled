@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import BarChart from '../../components/BarChart';
+import PeopleList from '../../components/PeopleList';
 
 import {
   Event,
@@ -529,7 +530,14 @@ export default function UserDetail(props: Props) {
                     Who is participating at {event.eventname}?
                   </h3>
                 </div>
-
+                <PeopleList
+                  peopleInDb={props.peopleInDb}
+                  user={props.user}
+                  setErrors={setErrors}
+                  expenseList={expenseList}
+                  setExpenseList={setExpenseList}
+                  eventId={props.eventInDb.id}
+                />
                 <form
                   onSubmit={async (e) => {
                     e.preventDefault();
