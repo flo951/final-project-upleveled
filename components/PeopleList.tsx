@@ -3,25 +3,25 @@ import { DeletePersonResponseBody } from '../pages/api/person';
 import {
   divPersonListStyles,
   Errors,
+  formStyles,
+  inputSubmitStyles,
   nameInputStyles,
   personStyles,
   spanStyles,
 } from '../pages/createevent';
-import { inputSubmitStyles } from '../pages/login';
 import { removeButtonStyles } from '../pages/users/[eventId]';
-import { formStyles } from '../styles/styles';
 import { Expense, Person, User } from '../util/database';
 
 type Props = {
-  peopleInDb: Person[];
   user: User;
   setErrors: (errors: Errors) => void;
   expenseList: Expense[];
   setExpenseList: (expense: Expense[]) => void;
   eventId: number;
+  setPeopleList: (person: Person[]) => void;
+  peopleList: Person[];
 };
 export default function PeopleList(props: Props) {
-  const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
   const [personName, setPersonName] = useState('');
 
   // function to delete created people
@@ -44,10 +44,10 @@ export default function PeopleList(props: Props) {
       return;
     }
     if ('person' in deletePersonResponseBody) {
-      const newPeopleList = peopleList.filter((person) => {
+      const newPeopleList = props.peopleList.filter((person) => {
         return deletePersonResponseBody.person.id !== person.id;
       });
-      setPeopleList(newPeopleList);
+      props.setPeopleList(newPeopleList);
 
       const newExpenseList = props.expenseList.filter((expense) => {
         return deletePersonResponseBody.person.id !== expense.paymaster;
@@ -79,17 +79,17 @@ export default function PeopleList(props: Props) {
             (await createPersonResponse.json()) as DeletePersonResponseBody;
           if ('person' in createPersonResponseBody) {
             const createdPeople = [
-              ...peopleList,
+              ...props.peopleList,
               createPersonResponseBody.person,
             ];
-            setPeopleList(createdPeople);
+            props.setPeopleList(createdPeople);
 
             setPersonName('');
             return;
           }
 
           if ('errors' in createPersonResponseBody) {
-            setErrors(createPersonResponseBody.errors);
+            props.setErrors(createPersonResponseBody.errors);
             return;
           }
         }}
@@ -114,12 +114,12 @@ export default function PeopleList(props: Props) {
         />
       </form>
       <div css={divPersonListStyles}>
-        {peopleList.map((person: Person) => {
+        {props.peopleList.map((person: Person) => {
           return (
-            person.eventId === event.id && (
+            person.eventId === props.eventId && (
               <div
                 data-test-id={`person-width-id-${person.id}`}
-                key={`this is ${person.name} witdh ${person.id} from event ${event.id}`}
+                key={`this is ${person.name} witdh ${person.id} from event ${props.eventId}`}
               >
                 <div css={personStyles}>
                   <span

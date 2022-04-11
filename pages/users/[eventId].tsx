@@ -19,16 +19,8 @@ import {
 } from '../../util/database';
 import { CreateEventResponseBody, DeleteEventResponseBody } from '../api/event';
 import { DeleteExpenseResponseBody } from '../api/expense';
-import { DeletePersonResponseBody } from '../api/person';
-import {
-  divPersonListStyles,
-  Errors,
-  formStyles,
-  inputSubmitStyles,
-  nameInputStyles,
-  personStyles,
-  spanStyles,
-} from '../createevent';
+
+import { Errors, formStyles, spanStyles } from '../createevent';
 import { errorStyles } from '../login';
 
 const mainStyles = css`
@@ -223,7 +215,7 @@ export default function UserDetail(props: Props) {
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
   const [personExpense, setPersonExpense] = useState('');
   const [expenseName, setExpenseName] = useState('');
-  const [personName, setPersonName] = useState('');
+  // const [personName, setPersonName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
   const [sumEventCosts, setSumEventCosts] = useState('0');
   const [sharedCosts, setSharedCosts] = useState('0');
@@ -281,39 +273,39 @@ export default function UserDetail(props: Props) {
     );
   }
 
-  // function to delete created people
-  async function deletePerson(id: number) {
-    const deleteResponse = await fetch(`/api/person`, {
-      method: 'DELETE',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        personId: id,
-        user: props.user,
-      }),
-    });
-    const deletePersonResponseBody =
-      (await deleteResponse.json()) as DeletePersonResponseBody;
+  // // function to delete created people
+  // async function deletePerson(id: number) {
+  //   const deleteResponse = await fetch(`/api/person`, {
+  //     method: 'DELETE',
+  //     headers: {
+  //       'Content-Type': 'application/json',
+  //     },
+  //     body: JSON.stringify({
+  //       personId: id,
+  //       user: props.user,
+  //     }),
+  //   });
+  //   const deletePersonResponseBody =
+  //     (await deleteResponse.json()) as DeletePersonResponseBody;
 
-    if ('errors' in deletePersonResponseBody) {
-      setErrors(deletePersonResponseBody.errors);
-      return;
-    }
-    if ('person' in deletePersonResponseBody) {
-      const newPeopleList = peopleList.filter((person) => {
-        return deletePersonResponseBody.person.id !== person.id;
-      });
-      setPeopleList(newPeopleList);
+  //   if ('errors' in deletePersonResponseBody) {
+  //     setErrors(deletePersonResponseBody.errors);
+  //     return;
+  //   }
+  //   if ('person' in deletePersonResponseBody) {
+  //     const newPeopleList = peopleList.filter((person) => {
+  //       return deletePersonResponseBody.person.id !== person.id;
+  //     });
+  //     setPeopleList(newPeopleList);
 
-      const newExpenseList = expenseList.filter((expense) => {
-        return deletePersonResponseBody.person.id !== expense.paymaster;
-      });
-      setExpenseList(newExpenseList);
+  //     const newExpenseList = expenseList.filter((expense) => {
+  //       return deletePersonResponseBody.person.id !== expense.paymaster;
+  //     });
+  //     setExpenseList(newExpenseList);
 
-      return;
-    }
-  }
+  //     return;
+  //   }
+  // }
 
   async function deleteExpense(id: number) {
     const deleteResponse = await fetch(`/api/expense`, {
@@ -531,14 +523,15 @@ export default function UserDetail(props: Props) {
                   </h3>
                 </div>
                 <PeopleList
-                  peopleInDb={props.peopleInDb}
+                  peopleList={peopleList}
+                  setPeopleList={setPeopleList}
                   user={props.user}
                   setErrors={setErrors}
                   expenseList={expenseList}
                   setExpenseList={setExpenseList}
                   eventId={props.eventInDb.id}
                 />
-                <form
+                {/* <form
                   onSubmit={async (e) => {
                     e.preventDefault();
 
@@ -591,8 +584,8 @@ export default function UserDetail(props: Props) {
                     type="submit"
                     value="Add Person"
                   />
-                </form>
-                <div css={divPersonListStyles}>
+                </form> */}
+                {/* <div css={divPersonListStyles}>
                   {peopleList.map((person: Person) => {
                     return (
                       person.eventId === event.id && (
@@ -622,7 +615,7 @@ export default function UserDetail(props: Props) {
                       )
                     );
                   })}
-                </div>
+                </div> */}
                 {errors && (
                   <div css={errorStyles}>
                     {errors.map((error) => {
