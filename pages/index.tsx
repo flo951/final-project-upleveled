@@ -48,16 +48,14 @@ export default function Home() {
           <video css={videoStyles} autoPlay loop muted src="/videos/clip4.mov">
             <track kind="captions" />
           </video>
-          <div>
-            <p css={spanStyles}>
-              Splitify allows you to split up expenses fast and easy.
-            </p>
-          </div>
+
           <video css={videoStyles} autoPlay loop muted src="/videos/clip8.mov">
             <track kind="captions" />
           </video>
         </div>
-
+        <p css={spanStyles}>
+          Splitify allows you to split up expenses fast and easy.
+        </p>
         <span css={spanStyles}>
           <a href="./register">Create an Account</a> to use our Service
         </span>
