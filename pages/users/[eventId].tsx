@@ -5,6 +5,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/router';
 import { useEffect, useState } from 'react';
 import BarChart from '../../components/BarChart';
+import ExpenseList from '../../components/ExpenseList';
 import PeopleList from '../../components/PeopleList';
 
 import {
@@ -62,7 +63,7 @@ const eventNameButtonRowStyles = css`
     font-weight: 400;
   }
 `;
-const selectStyles = css`
+export const selectStyles = css`
   padding: 8px;
 
   font-size: 20px;
@@ -73,7 +74,7 @@ export const inputExpenseStyles = css`
     Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 20px;
 `;
-const expenseContainerStyles = css`
+export const expenseContainerStyles = css`
   display: flex;
   flex-direction: column;
   gap: 12px;
@@ -84,7 +85,7 @@ const expenseContainerStyles = css`
     font-weight: 400;
   }
 `;
-const spanErrorStyles = css`
+export const spanErrorStyles = css`
   color: rgb(206, 25, 13);
   font-size: 20px;
 `;
@@ -100,7 +101,7 @@ const expenseBigContainerStyles = css`
   width: 324px;
   height: max-content;
 `;
-const inputExpenseSubmitStyles = css`
+export const inputExpenseSubmitStyles = css`
   background-image: linear-gradient(to right top, #043159, #10528e, #2a689f);
   margin-top: 12px;
   padding: 4px;
@@ -113,7 +114,7 @@ const inputExpenseSubmitStyles = css`
     transition: 0.3s ease-out;
   }
 `;
-const expenseDetailStyles = css`
+export const expenseDetailStyles = css`
   display: flex;
   align-items: center;
   gap: 6px;
@@ -214,7 +215,6 @@ export default function UserDetail(props: Props) {
   const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
   const [personExpense, setPersonExpense] = useState('');
   const [expenseName, setExpenseName] = useState('');
-  // const [personName, setPersonName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
   const [sumEventCosts, setSumEventCosts] = useState('0');
   const [sharedCosts, setSharedCosts] = useState('0');
@@ -428,6 +428,7 @@ export default function UserDetail(props: Props) {
                     X
                   </button>
                 </div>
+                {/* create a component for cloudinary form */}
                 <Image
                   css={eventProfilePicStyles}
                   src={
@@ -510,7 +511,26 @@ export default function UserDetail(props: Props) {
               </div>
 
               <div css={expenseBigContainerStyles}>
-                {/* Create Expense List */}
+                {/* Create Expense List
+                create a component for the expense list
+                */}
+
+                <ExpenseList
+                  personExpense={personExpense}
+                  setPersonExpense={setPersonExpense}
+                  expenseError={expenseError}
+                  setExpenseError={setExpenseError}
+                  selectedPersonId={selectedPersonId}
+                  expenseName={expenseName}
+                  setExpenseName={setExpenseName}
+                  expenseList={expenseList}
+                  setExpenseList={setExpenseList}
+                  setErrors={setErrors}
+                  peopleList={peopleList}
+                  eventId={props.eventInDb.id}
+                  deleteExpense={deleteExpense}
+                  handleSelectPerson={handleSelectPerson}
+                />
 
                 <form
                   css={formStyles}
