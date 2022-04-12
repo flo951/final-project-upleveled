@@ -1,6 +1,14 @@
 import { DeleteExpenseResponseBody } from '../pages/api/expense';
 import { Errors, formStyles, spanStyles } from '../pages/createevent';
-import { inputExpenseStyles } from '../pages/users/[eventId]';
+import {
+  expenseContainerStyles,
+  expenseDetailStyles,
+  inputExpenseStyles,
+  inputExpenseSubmitStyles,
+  removeButtonStyles,
+  selectStyles,
+  spanErrorStyles,
+} from '../pages/users/[eventId]';
 import { Expense, Person } from '../util/database';
 
 type Props = {
@@ -13,11 +21,11 @@ type Props = {
   setExpenseName: (name: string) => void;
   expenseList: Expense[];
   setExpenseList: (expense: Expense[]) => void;
-  errors: Errors | undefined;
-  setErrors: (error: Errors) => void;
+  setErrors: (error: Errors | undefined) => void;
   peopleList: Person[];
   eventId: number;
   deleteExpense: (expenseId: number) => void;
+  handleSelectPerson: (event: React.ChangeEvent<HTMLSelectElement>) => void;
 };
 export default function ExpenseList(props: Props) {
   return (
@@ -84,7 +92,7 @@ export default function ExpenseList(props: Props) {
           <select
             data-test-id="select-person"
             id="person-list"
-            onChange={handleSelectPerson}
+            onChange={props.handleSelectPerson}
             required
             css={selectStyles}
           >
@@ -131,7 +139,7 @@ export default function ExpenseList(props: Props) {
             }}
           />
           {props.expenseError && (
-            <span css={spanErrorStyles}> {expenseError}</span>
+            <span css={spanErrorStyles}> {props.expenseError}</span>
           )}
           <input
             data-test-id="complete-expense"
