@@ -17,6 +17,7 @@ type Props = {
   setErrors: (error: Errors) => void;
   peopleList: Person[];
   eventId: number;
+  deleteExpense: (expenseId: number) => void;
 };
 export default function ExpenseList(props: Props) {
   return (
@@ -57,15 +58,15 @@ export default function ExpenseList(props: Props) {
             }),
           });
 
-          const createPersonResponseBody =
+          const createExpenseResponseBody =
             (await createPersonResponse.json()) as DeleteExpenseResponseBody;
 
           const createdExpenses: Expense[] = [
             ...props.expenseList,
-            createPersonResponseBody.expense,
+            createExpenseResponseBody.expense,
           ];
-          if ('errors' in createPersonResponseBody) {
-            props.setErrors(createPersonResponseBody.errors);
+          if ('errors' in createExpenseResponseBody) {
+            props.setErrors(createExpenseResponseBody.errors);
             return;
           }
 
@@ -92,7 +93,7 @@ export default function ExpenseList(props: Props) {
             </option>
             {props.peopleList.map((person) => {
               return (
-                person.eventId === event.id && (
+                person.eventId === props.eventId && (
                   <option
                     key={`person-${person.name}-${person.id}`}
                     value={person.id}
@@ -162,7 +163,7 @@ export default function ExpenseList(props: Props) {
                 css={removeButtonStyles}
                 aria-label={`Delete Button for Expense: ${expense.expensename}`}
                 onClick={() => {
-                  deleteExpense(expense.id).catch(() => {});
+                  props.deleteExpense(expense.id);
                 }}
               >
                 X
