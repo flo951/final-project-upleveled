@@ -1,7 +1,7 @@
 import { DeleteExpenseResponseBody } from '../pages/api/expense';
-import { Errors, formStyles } from '../pages/createevent';
+import { Errors, formStyles, spanStyles } from '../pages/createevent';
 import { inputExpenseStyles } from '../pages/users/[eventId]';
-import { Expense } from '../util/database';
+import { Expense, Person } from '../util/database';
 
 type Props = {
   personExpense: string;
@@ -10,10 +10,13 @@ type Props = {
   setExpenseError: (error: string) => void;
   selectedPersonId: number;
   expenseName: string;
+  setExpenseName: (name: string) => void;
   expenseList: Expense[];
   setExpenseList: (expense: Expense[]) => void;
   errors: Errors | undefined;
   setErrors: (error: Errors) => void;
+  peopleList: Person[];
+  eventId: number;
 };
 export default function ExpenseList(props: Props) {
   return (
@@ -49,7 +52,7 @@ export default function ExpenseList(props: Props) {
             body: JSON.stringify({
               expensename: props.expenseName,
               cost: parseFloat(props.personExpense) * 100,
-              eventId: event.id,
+              eventId: props.eventId,
               paymaster: props.selectedPersonId,
             }),
           });
@@ -105,12 +108,12 @@ export default function ExpenseList(props: Props) {
             data-test-id="expense-value"
             css={inputExpenseStyles}
             id="expense"
-            value={personExpense}
+            value={props.personExpense}
             placeholder="0 €"
             required
             onChange={(e) => {
               e.currentTarget.value = e.currentTarget.value.replace(/,/g, '.');
-              setPersonExpense(e.currentTarget.value);
+              props.setPersonExpense(e.currentTarget.value);
             }}
           />
 
@@ -119,7 +122,7 @@ export default function ExpenseList(props: Props) {
             css={inputExpenseStyles}
             data-test-id="expense-name"
             id="expense-name"
-            value={expenseName}
+            value={props.expenseName}
             placeholder="Name of the Expense"
             required
             onChange={(e) => {
