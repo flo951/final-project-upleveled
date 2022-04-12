@@ -20,7 +20,7 @@ import {
 } from '../../util/database';
 import { CreateEventResponseBody, DeleteEventResponseBody } from '../api/event';
 import { DeleteExpenseResponseBody } from '../api/expense';
-import { Errors, formStyles, spanStyles } from '../createevent';
+import { Errors, spanStyles } from '../createevent';
 import { errorStyles } from '../login';
 
 const mainStyles = css`
