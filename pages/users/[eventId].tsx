@@ -532,7 +532,7 @@ export default function UserDetail(props: Props) {
                   handleSelectPerson={handleSelectPerson}
                 />
 
-                <form
+                {/* <form
                   css={formStyles}
                   onSubmit={async (e) => {
                     e.preventDefault();
@@ -691,7 +691,7 @@ export default function UserDetail(props: Props) {
                       </div>
                     </div>
                   );
-                })}
+                })} */}
 
                 <span css={spanStyles}>Participants: {peopleList.length}</span>
                 <span css={spanStyles}> Total: {sumEventCosts} €</span>
