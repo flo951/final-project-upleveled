@@ -5,7 +5,6 @@ import { useRouter } from 'next/router';
 import { useState } from 'react';
 import { formContainerStyles, formStyles } from '../styles/styles';
 import { createCsrfToken } from '../util/auth';
-
 import { getValidSessionByToken } from '../util/database';
 import { RegisterResponseBody } from './api/register';
 import { inputSubmitStyles } from './login';
@@ -13,7 +12,6 @@ import { inputSubmitStyles } from './login';
 const nameInputStyles = css`
   padding: 8px 8px;
   font-size: 20px;
-
   border-radius: 4px;
   :focus {
     outline-color: #2a6592;

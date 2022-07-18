@@ -66,7 +66,7 @@ export default async function registerHandler(
       });
       return; // Important: will prevent "Headers already sent" error, if you forget return it will go to the next return
     }
-
+    // 12 is the number of salt rounds, 12^2n
     const passwordHash = await bcrypt.hash(request.body.password, 12);
 
     // Create user in DB
