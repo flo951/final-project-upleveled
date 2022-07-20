@@ -1,6 +1,7 @@
 // Algorithm to calculate who owes how much to hwom
 export function splitPayments(object) {
   const people = Object.keys(object);
+  console.log(people);
   const valuesPaid = Object.values(object);
 
   // totalSum of all expenses
@@ -13,11 +14,12 @@ export function splitPayments(object) {
   const sortedPeople = people.sort(
     (personA, personB) => object[personA] - object[personB],
   );
-
+  console.log(sortedPeople);
   // Sort values array from lowest to highest balanc after deducting sharedamount
   const sortedValuesPaid = sortedPeople.map(
     (person) => object[person] - sharedAmount,
   );
+  console.log(sortedValuesPaid);
   // i is start of the array
   let i = 0;
   // j begins at the end of array
@@ -29,7 +31,7 @@ export function splitPayments(object) {
 
     sortedValuesPaid[i] += debt;
     sortedValuesPaid[j] -= debt;
-
+    console.log(debt);
     resultArray.push(
       ` ${sortedPeople[i]} owes ${sortedPeople[j]} ${debt.toFixed(2)}€`,
     );

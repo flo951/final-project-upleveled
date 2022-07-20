@@ -86,7 +86,7 @@ export default function BarChart(props: Props) {
     (obj, item) => Object.assign(obj, { [item.personName]: item.sum }),
     {},
   );
-
+  console.log(payments);
   const balanceMessages = splitPayments(payments);
 
   const peopleNameArray = props.people.map((person) => person.name);

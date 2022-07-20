@@ -59,6 +59,7 @@ export default function Login(props: Props) {
 
       <div css={formContainerStyles}>
         <h1>Login to use Splitify</h1>
+        <span>Test</span>
         <form
           css={formStyles}
           onSubmit={async (e) => {
