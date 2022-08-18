@@ -8,7 +8,16 @@ export default function createAppHandler(request, response) {
     const userData = {
         username: request.body.username,
         carAssigned: "BMW-X6",
-       carPool: {car1: {type: "BMW-X6", plate: "W-12345"}, car2: {type: "BMW-X2", plate: "W-56473"}, car3: {type: "BMW-X2", plate: "W-22222"}, car4: {type: "BMW-X9", plate: "W-98765"}},
+       carPool: [
+        { label: "Toyota", value: "toyota", plate: "W-92345" },
+        { label: "BMW", value: "bmw", plate: "W-82345" },
+        { label: "Nissan", value: "nissan", plate: "W-02345" },
+        { label: "Aston Martin", value: "aston martin", plate: "W-12345" },
+        { label: "Ferrari", value: "ferrari", plate: "W-22345" },
+        { label: "Lamborghini", value: "lamborghini", plate: "W-32345" },
+        { label: "Mercedes", value: "mercedes", plate: "W-52345" },
+        { label: "VW", value: "vw", plate: "W-42345" },
+      ],
 
 
     }
