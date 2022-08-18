@@ -1,6 +1,6 @@
 import { getCarData } from '../../util/database';
 
-export default function createAppHandler(request, response) {
+export default async function createAppHandler(request, response) {
   if (request.method === 'POST') {
     console.log(request.body.username)
     if(typeof request.body.username === "string") {
