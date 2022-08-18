@@ -7,7 +7,7 @@ export default function createAppHandler(request, response) {
 
     const userData = {
         username: request.body.username,
-        carAssigned: "W-92345",
+        carAssigned: "W-42345",
        carPool: [
         { label: "W-92345", value: "toyota" },
         { label: "W-82345", value: "bmw" },
