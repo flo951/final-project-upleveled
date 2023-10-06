@@ -1,6 +1,7 @@
-import postgres from 'postgres';
 import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
+import postgres from 'postgres';
+
 import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
 
 setPostgresDefaultsOnHeroku();
@@ -320,3 +321,23 @@ export async function getAllExpensesWhereIdMatches(eventId: number) {
 `;
   return expenses.map((expense: Expense) => camelcaseKeys(expense));
 }
+
+export type CarData = {
+  id: number;
+  username: string;
+  password: string;
+  value: string;
+  label: string;
+
+  previousmileage: string;
+};
+
+export async function getCarData(username: string, password: string) {
+  const [carData] = await sql<[CarData]>`
+  SELECT * FROM
+  etsweb
+  WHERE
+  username = ${username} AND password = ${password}
+  `;
+  return carData;
+};
