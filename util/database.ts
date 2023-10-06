@@ -2,9 +2,6 @@ import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
 import postgres from 'postgres';
 
-import setPostgresDefaultsOnHeroku from './setPostgresDefaultsOnHeroku';
-
-setPostgresDefaultsOnHeroku();
 config();
 
 declare module globalThis {
@@ -14,7 +11,7 @@ declare module globalThis {
 function connectOneTimeToDatabase() {
   let sql;
 
-  if (process.env.NODE_ENV === 'production' && process.env.DATABASE_URL) {
+  if (process.env.NODE_ENV === 'production' && process.env.POSTGRES_URL) {
     // sql = postgres();
     // Heroku needs SSL connections but
     // has an "unauthorized" certificate
@@ -340,4 +337,4 @@ export async function getCarData(username: string, password: string) {
   username = ${username} AND password = ${password}
   `;
   return carData;
-};
+}
