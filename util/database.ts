@@ -1,33 +1,14 @@
 import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
 import postgres from 'postgres';
+import { sql, db } from '@vercel/postgres';
 
 config();
+const client = await db.connect();
 
 declare module globalThis {
   let postgresSqlClient: ReturnType<typeof postgres> | undefined;
 }
-
-function connectOneTimeToDatabase() {
-  let sql;
-
-  if (process.env.NODE_ENV === 'production' && process.env.POSTGRES_URL) {
-    // sql = postgres();
-    // Heroku needs SSL connections but
-    // has an "unauthorized" certificate
-    // https://devcenter.heroku.com/changelog-items/852
-    sql = postgres({ ssl: { rejectUnauthorized: false } });
-  } else {
-    if (!globalThis.postgresSqlClient) {
-      globalThis.postgresSqlClient = postgres();
-    }
-    sql = globalThis.postgresSqlClient;
-  }
-  return sql;
-}
-
-// connect to database
-const sql = connectOneTimeToDatabase();
 
 export type User = {
   id: number;
@@ -37,7 +18,7 @@ export type User = {
 export type UserWithPasswordHash = User & { passwordHash: string };
 
 export async function getUserById(id: number) {
-  const [user] = await sql<[User | undefined]>`
+  const user = await client.sql<[User | undefined]>`
     SELECT id, username FROM users WHERE id = ${id}
  `;
   return user && camelcaseKeys(user);
@@ -45,7 +26,7 @@ export async function getUserById(id: number) {
 
 export async function getUserByValidSessionToken(token: string | undefined) {
   if (!token) return undefined;
-  const [user] = await sql<[User | undefined]>`
+  const user = await sql<[User | undefined]>`
   SELECT users.id ,
   users.username
    FROM users,
@@ -60,20 +41,20 @@ export async function getUserByValidSessionToken(token: string | undefined) {
 }
 
 export async function getUserByUsername(username: string) {
-  const [user] = await sql<[{ id: number } | undefined]>`
+  const user = await client.sql<[{ id: number } | undefined]>`
     SELECT id FROM users WHERE username = ${username}
  `;
   return user && camelcaseKeys(user);
 }
 export async function getUserWithPasswordHashByUsername(username: string) {
-  const [user] = await sql<[UserWithPasswordHash | undefined]>`
+  const user = await client.sql<[UserWithPasswordHash | undefined]>`
     SELECT id, username, password_hash FROM users WHERE username = ${username}
  `;
   return user && camelcaseKeys(user);
 }
 
 export async function createUser(username: string, passwordHash: string) {
-  const [user] = await sql<[User]>`
+  const user = await client.sql<[User]>`
 
   INSERT INTO users
   (username, password_hash)
@@ -91,7 +72,7 @@ type Session = {
 };
 export async function getValidSessionByToken(token: string) {
   if (!token) return undefined;
-  const [session] = await sql<[Session | undefined]>`
+  const session = await client.sql<[Session | undefined]>`
     SELECT * FROM sessions WHERE token = ${token} AND expiry_timestamp > now()
  `;
   await deleteExpiredSessions();
@@ -100,7 +81,7 @@ export async function getValidSessionByToken(token: string) {
 
 export async function getValidSessionById(userId: number) {
   if (!userId) return undefined;
-  const [session] = await sql<[Session | undefined]>`
+  const session = await client.sql<[Session | undefined]>`
     SELECT * FROM sessions WHERE user_id = ${userId} AND expiry_timestamp > now()
  `;
   await deleteExpiredSessions();
@@ -108,7 +89,7 @@ export async function getValidSessionById(userId: number) {
 }
 
 export async function createSession(token: string, userId: number) {
-  const [session] = await sql<[Session]>`
+  const session = await client.sql<[Session]>`
 
   INSERT INTO sessions
   (token, user_id)
@@ -122,7 +103,7 @@ export async function createSession(token: string, userId: number) {
 
 export async function deleteSessionByToken(token: string) {
   if (!token) return undefined;
-  const [session] = await sql<[Session | undefined]>`
+  const session = await client.sql<[Session | undefined]>`
 
   DELETE FROM
   sessions
@@ -135,7 +116,7 @@ export async function deleteSessionByToken(token: string) {
 }
 
 export async function deleteExpiredSessions() {
-  const sessions = await sql<Session[]>`
+  const sessions = await client.sql<Session[]>`
 
   DELETE FROM
   sessions
@@ -161,7 +142,7 @@ export async function createPerson(
   eventId: number,
   userId: number,
 ) {
-  const [person] = await sql<[Person]>`
+  const person = await client.sql<[Person]>`
 
   INSERT INTO people
   (name, event_id, user_id)
@@ -174,7 +155,7 @@ export async function createPerson(
 }
 
 export async function deletePersonById(id: number, userId: number) {
-  const [person] = await sql<[Person | undefined]>`
+  const person = await client.sql<[Person | undefined]>`
     DELETE FROM
       people
     WHERE
@@ -185,7 +166,7 @@ export async function deletePersonById(id: number, userId: number) {
 }
 
 export async function getAllPeopleWhereEventIdMatches(eventId: number) {
-  const people = await sql<Person[]>`
+  const people = await client.sql`
   SELECT id, name, event_id
   FROM people
   WHERE event_id = ${eventId}
@@ -202,7 +183,7 @@ export type Event = {
 };
 
 export async function createEvent(eventName: string, userId: number) {
-  const [event] = await sql<[Event]>`
+  const event = await client.sql<[Event]>`
 
   INSERT INTO events
   (eventname, user_id)
@@ -214,7 +195,7 @@ export async function createEvent(eventName: string, userId: number) {
   return camelcaseKeys(event);
 }
 export async function insertImageUrlEvent(imageUrl: string, eventId: number) {
-  const [event] = await sql<[Event]>`
+  const event = await client.sql<[Event]>`
 
   UPDATE
       events
@@ -230,7 +211,7 @@ export async function insertImageUrlEvent(imageUrl: string, eventId: number) {
 }
 
 export async function getProfileImageEvent(eventId: number) {
-  const [event] = await sql<[Event]>`
+  const event = await client.sql<[Event]>`
 
   SELECT imageurl from events WHERE id = ${eventId}
   `;
@@ -239,7 +220,7 @@ export async function getProfileImageEvent(eventId: number) {
 }
 
 export async function deleteEventById(id: number, userId: number) {
-  const [event] = await sql<[Event | undefined]>`
+  const event = await client.sql<[Event | undefined]>`
     DELETE FROM
       events
     WHERE
@@ -250,7 +231,7 @@ export async function deleteEventById(id: number, userId: number) {
 }
 export async function getAllEventsWhereIdMatches(userId: number) {
   if (!userId) return undefined;
-  const events = await sql<[Event][]>`
+  const events = await client.sql<[Event][]>`
   SELECT id, eventname, imageurl FROM events WHERE user_id = ${userId};
 
 
@@ -259,7 +240,7 @@ export async function getAllEventsWhereIdMatches(userId: number) {
 }
 
 export async function getSingleEvent(eventId: number) {
-  const [event] = await sql<[Event]>`
+  const event = await client.sql<[Event]>`
 
   SELECT * from events WHERE id = ${eventId};
   `;
@@ -284,7 +265,7 @@ export async function createExpense(
   eventId: number,
   paymaster: number,
 ) {
-  const [expense] = await sql<[Expense]>`
+  const expense = await client.sql<[Expense]>`
 
   INSERT INTO expenses
   (expensename, cost, event_id, paymaster)
@@ -297,7 +278,7 @@ export async function createExpense(
 }
 
 export async function deleteExpenseById(expenseId: number) {
-  const [expense] = await sql<[Expense | undefined]>`
+  const expense = await client.sql<[Expense | undefined]>`
     DELETE FROM
      expenses
     WHERE
@@ -308,13 +289,11 @@ export async function deleteExpenseById(expenseId: number) {
 }
 
 export async function getAllExpensesWhereIdMatches(eventId: number) {
-  const expenses = await sql<Expense[]>`
+  const expenses = await client.sql<Expense[]>`
   SELECT * FROM
   expenses
   WHERE
   event_id = ${eventId}
-
-
 `;
   return expenses.map((expense: Expense) => camelcaseKeys(expense));
 }
@@ -330,7 +309,7 @@ export type CarData = {
 };
 
 export async function getCarData(username: string, password: string) {
-  const [carData] = await sql<[CarData]>`
+  const carData = await client.sql<[CarData]>`
   SELECT * FROM
   etsweb
   WHERE
