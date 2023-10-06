@@ -1475,6 +1475,13 @@
     semver "^7.3.5"
     tar "^6.1.11"
 
+"@neondatabase/serverless@0.6.0":
+  version "0.6.0"
+  resolved "https://registry.yarnpkg.com/@neondatabase/serverless/-/serverless-0.6.0.tgz#efe001f571e85af79c8042601ec694f96ca8fb17"
+  integrity sha512-qXxBRYN0m2v8kVQBfMxbzNGn2xFAhTXFibzQlE++NfJ56Shz3m7+MyBBtXDlEH+3Wfa6lToDXf1MElocY4sJ3w==
+  dependencies:
+    "@types/pg" "8.6.6"
+
 "@next/env@12.1.0":
   version "12.1.0"
   resolved "https://registry.yarnpkg.com/@next/env/-/env-12.1.0.tgz#73713399399b34aa5a01771fb73272b55b22c314"
@@ -1751,6 +1758,15 @@
   resolved "https://registry.yarnpkg.com/@types/parse-json/-/parse-json-4.0.0.tgz#2f8bb441434d163b35fb8ffdccd7138927ffb8c0"
   integrity sha512-//oorEZjL6sbPcKUaCdIGlIUeH26mgzimjBB77G6XRgnDl/L5wOnpyBGRe/Mmf5CVW3PwEBE1NjiMZ/ssFh4wA==
 
+"@types/pg@8.6.6":
+  version "8.6.6"
+  resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.6.6.tgz#21cdf873a3e345a6e78f394677e3b3b1b543cb80"
+  integrity sha512-O2xNmXebtwVekJDD+02udOncjVcMZQuTEQEMpKJ0ZRf5E7/9JJX3izhKUcUifBkyKpljyUM6BTgy2trmviKlpw==
+  dependencies:
+    "@types/node" "*"
+    pg-protocol "*"
+    pg-types "^2.2.0"
+
 "@types/pg@^8.6.4":
   version "8.6.4"
   resolved "https://registry.yarnpkg.com/@types/pg/-/pg-8.6.4.tgz#da1ae9d2f53f2dbfdd2b37e0eb478bf60d517f60"
@@ -1927,6 +1943,16 @@
   version "2.1.3"
   resolved "https://registry.yarnpkg.com/@upleveled/eslint-plugin-upleveled/-/eslint-plugin-upleveled-2.1.3.tgz#17eb5a303e42bbd7cc1fb876edc097f7ac3aa066"
   integrity sha512-wEpCn0il9hIj5HdkBqlRiTK+uw7xONzj1sh3NwwMRbuKCdCClYqg04zGlJlSuBI/GAbciGCP79VGssRsa/bhfg==
+
+"@vercel/postgres@^0.5.0":
+  version "0.5.0"
+  resolved "https://registry.yarnpkg.com/@vercel/postgres/-/postgres-0.5.0.tgz#b057cfe464b504d163657f4dde697424a6da923c"
+  integrity sha512-MFWp9SZmADqBe2x2mzEvwmGLiwOd8PVkUxYeBZx/RqdHl0bd8/1BH0zBR+zSimGyi9P/MVtZoJLdf5dkWw9m5Q==
+  dependencies:
+    "@neondatabase/serverless" "0.6.0"
+    bufferutil "4.0.7"
+    utf-8-validate "6.0.3"
+    ws "8.14.2"
 
 abab@^2.0.3, abab@^2.0.5:
   version "2.0.5"
@@ -2380,6 +2406,13 @@ buffer@^5.2.1, buffer@^5.5.0:
   dependencies:
     base64-js "^1.3.1"
     ieee754 "^1.1.13"
+
+bufferutil@4.0.7:
+  version "4.0.7"
+  resolved "https://registry.yarnpkg.com/bufferutil/-/bufferutil-4.0.7.tgz#60c0d19ba2c992dd8273d3f73772ffc894c153ad"
+  integrity sha512-kukuqc39WOHtdxtw4UScxF/WVnMFVSQVKhtx3AjZJzhd0RGZZldcrfSEbVsWWe6KNH253574cq5F+wpv0G9pJw==
+  dependencies:
+    node-gyp-build "^4.3.0"
 
 builtin-modules@^3.0.0:
   version "3.2.0"
@@ -3352,6 +3385,14 @@ expect@^27.5.1:
     jest-get-type "^27.5.1"
     jest-matcher-utils "^27.5.1"
     jest-message-util "^27.5.1"
+
+expo-server-sdk@^3.6.0:
+  version "3.6.0"
+  resolved "https://registry.yarnpkg.com/expo-server-sdk/-/expo-server-sdk-3.6.0.tgz#b13e5e77f622d11009bdd533df857b08225a4d00"
+  integrity sha512-GyA0BTcFBKk/5gTEO4WOScP9hEttR+GitrcOIl7XwXwE1FHFvbluKiUc9yEjsfEYMgyd78+XhSpGVGQnutGOdA==
+  dependencies:
+    node-fetch "^2.6.0"
+    promise-limit "^2.7.0"
 
 extend@^3.0.2:
   version "3.0.2"
@@ -5076,7 +5117,7 @@ node-addon-api@^5.0.0:
   resolved "https://registry.yarnpkg.com/node-addon-api/-/node-addon-api-5.0.0.tgz#7d7e6f9ef89043befdb20c1989c905ebde18c501"
   integrity sha512-CvkDw2OEnme7ybCykJpVcKH+uAOLV2qLqiyla128dN9TkEWfrYmxG6C2boDe5KcNQqZF3orkqzGgOMvZ/JNekA==
 
-node-fetch@2.6.7, node-fetch@^2.6.1, node-fetch@^2.6.5:
+node-fetch@2.6.7, node-fetch@^2.6.0, node-fetch@^2.6.1, node-fetch@^2.6.5:
   version "2.6.7"
   resolved "https://registry.yarnpkg.com/node-fetch/-/node-fetch-2.6.7.tgz#24de9fba827e3b4ae44dc8b20256a379160052ad"
   integrity sha512-ZjMPFEfVx5j+y2yF35Kzx5sF7kDzxuDj6ziH4FFbOp87zKDZNx8yExJIb05OGF4Nlt9IHFIMBkRl41VdvcNdbQ==
@@ -5087,6 +5128,11 @@ node-forge@^1.0.0:
   version "1.3.0"
   resolved "https://registry.yarnpkg.com/node-forge/-/node-forge-1.3.0.tgz#37a874ea723855f37db091e6c186e5b67a01d4b2"
   integrity sha512-08ARB91bUi6zNKzVmaj3QO7cr397uiDT2nJ63cHjyNtCTWIgvS47j3eT0WfzUwS9+6Z5YshRaoasFkXCKrIYbA==
+
+node-gyp-build@^4.3.0:
+  version "4.6.1"
+  resolved "https://registry.yarnpkg.com/node-gyp-build/-/node-gyp-build-4.6.1.tgz#24b6d075e5e391b8d5539d98c7fc5c210cac8a3e"
+  integrity sha512-24vnklJmyRS8ViBNI8KbtK/r/DmXQMRiOMXTNz2nrTnAYUwjmEEbnnpB/+kt+yWRv73bPsSPRFddrcIbAxSiMQ==
 
 node-int64@^0.4.0:
   version "0.4.0"
@@ -5501,6 +5547,11 @@ progress@2.0.3:
   version "2.0.3"
   resolved "https://registry.yarnpkg.com/progress/-/progress-2.0.3.tgz#7e8cf8d8f5b8f239c1bc68beb4eb78567d572ef8"
   integrity sha512-7PiHtLll5LdnKIMw100I+8xJXR5gW2QwWYkT6iJva0bXitZKa/XMrSbdmg3r2Xnaidz9Qumd0VPaMrZlF9V9sA==
+
+promise-limit@^2.7.0:
+  version "2.7.0"
+  resolved "https://registry.yarnpkg.com/promise-limit/-/promise-limit-2.7.0.tgz#eb5737c33342a030eaeaecea9b3d3a93cb592b26"
+  integrity sha512-7nJ6v5lnJsXwGprnGXga4wx6d1POjvi5Qmf1ivTRxTjH4Z/9Czja/UCMLVmB9N93GeWOU93XaFaEt6jbuoagNw==
 
 prompts@^2.0.1, prompts@^2.4.2:
   version "2.4.2"
@@ -6513,6 +6564,13 @@ use-subscription@1.5.1:
   dependencies:
     object-assign "^4.1.1"
 
+utf-8-validate@6.0.3:
+  version "6.0.3"
+  resolved "https://registry.yarnpkg.com/utf-8-validate/-/utf-8-validate-6.0.3.tgz#7d8c936d854e86b24d1d655f138ee27d2636d777"
+  integrity sha512-uIuGf9TWQ/y+0Lp+KGZCMuJWc3N9BHA+l/UmHd/oUHwJJDeysyTRxNQVkbzsIWfGFbRe3OcgML/i0mvVRPOyDA==
+  dependencies:
+    node-gyp-build "^4.3.0"
+
 util-deprecate@^1.0.1, util-deprecate@~1.0.1:
   version "1.0.2"
   resolved "https://registry.yarnpkg.com/util-deprecate/-/util-deprecate-1.0.2.tgz#450d4dc9fa70de732762fbd2d4a28981419a0ccf"
@@ -6681,6 +6739,11 @@ write-file-atomic@^3.0.0:
     is-typedarray "^1.0.0"
     signal-exit "^3.0.2"
     typedarray-to-buffer "^3.1.5"
+
+ws@8.14.2:
+  version "8.14.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-8.14.2.tgz#6c249a806eb2db7a20d26d51e7709eab7b2e6c7f"
+  integrity sha512-wEBG1ftX4jcglPxgFCMJmZ2PLtSbJ2Peg6TmpJFTbe9GZYOQCDPdMYu/Tm0/bGZkw8paZnJY45J4K2PZrLYq8g==
 
 ws@8.5.0:
   version "8.5.0"
