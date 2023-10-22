@@ -69,7 +69,7 @@ export default async function loginHandler(
 
     const passwordMatches = await bcrypt.compare(
       request.body.password,
-      userWithPasswordHash.passwordHash,
+      userWithPasswordHash.password_hash,
     );
 
     if (!passwordMatches) {

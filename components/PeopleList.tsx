@@ -11,15 +11,16 @@ import {
 } from '../pages/createevent';
 import { removeButtonStyles } from '../pages/users/[eventId]';
 import { Expense, Person, User } from '../util/database';
+import { expenses, people } from '@prisma/client';
 
 type Props = {
   user: User;
   setErrors: (errors: Errors) => void;
-  expenseList: Expense[];
-  setExpenseList: (expense: Expense[]) => void;
+  expenseList: expenses[];
+  setExpenseList: (expense: expenses[]) => void;
   eventId: number;
-  setPeopleList: (person: Person[]) => void;
-  peopleList: Person[];
+  setPeopleList: (people: people[]) => void;
+  peopleList: people[];
 };
 export default function PeopleList(props: Props) {
   const [personName, setPersonName] = useState('');
@@ -78,7 +79,7 @@ export default function PeopleList(props: Props) {
           const createPersonResponseBody =
             (await createPersonResponse.json()) as DeletePersonResponseBody;
           if ('person' in createPersonResponseBody) {
-            const createdPeople = [
+            const createdPeople: people[] = [
               ...props.peopleList,
               createPersonResponseBody.person,
             ];
@@ -114,9 +115,9 @@ export default function PeopleList(props: Props) {
         />
       </form>
       <div css={divPersonListStyles}>
-        {props.peopleList.map((person: Person) => {
+        {props.peopleList.map((person: people) => {
           return (
-            person.eventId === props.eventId && (
+            person.event_id === props.eventId && (
               <div
                 data-test-id={`person-width-id-${person.id}`}
                 key={`this is ${person.name} witdh ${person.id} from event ${props.eventId}`}

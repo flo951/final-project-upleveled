@@ -11,6 +11,7 @@ import {
 } from '../util/database';
 import { CreateEventResponseBody, DeleteEventResponseBody } from './api/event';
 import { removeButtonStyles } from './users/[eventId]';
+import { events } from '@prisma/client';
 
 const errorStyles = css`
   color: red;
@@ -93,7 +94,7 @@ export const eventListStyles = css`
 `;
 
 type Props = {
-  eventsInDb: Event[];
+  eventsInDb: events[];
   user?: { id: number; username: string };
 
   errors?: string;
@@ -103,7 +104,7 @@ export type Errors = { message: string }[];
 
 export default function CreateEvent(props: Props) {
   const [eventName, setEventName] = useState('');
-  const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
+  const [eventList, setEventList] = useState<events[]>(props.eventsInDb);
   const [errors, setErrors] = useState<Errors | undefined>([]);
 
   if ('errors' in props) {
@@ -167,7 +168,7 @@ export default function CreateEvent(props: Props) {
                 (await createPersonResponse.json()) as CreateEventResponseBody;
               console.log(createEventResponseBody);
               if ('event' in createEventResponseBody) {
-                const createdEvents: Event[] = [
+                const createdEvents: events[] = [
                   ...eventList,
                   createEventResponseBody.event,
                 ];
@@ -211,7 +212,7 @@ export default function CreateEvent(props: Props) {
           <span css={spanStyles}>Click on your event to edit it</span>
         )}
         <div css={eventListStyles}>
-          {eventList.map((event: Event) => {
+          {eventList.map((event: events) => {
             return (
               <div
                 data-test-id={`event-${event.id}`}

@@ -149,7 +149,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
 
   const user = await getUserByValidSessionToken(token);
 
-  if (user === undefined) {
+  if (!user) {
     return {
       props: {
         errors: 'You are not logged in',

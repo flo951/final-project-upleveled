@@ -2,16 +2,16 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import {
   createExpense,
   deleteExpenseById,
-  Expense,
   getUserByValidSessionToken,
 } from '../../util/database';
+import { expenses } from '@prisma/client';
 
 export type CreateExpenseResponseBody =
   | { errors: { message: string }[] }
-  | { expense: Expense };
+  | { expense: expenses };
 
 export type DeleteExpenseResponseBody = {
-  expense: Expense;
+  expense: expenses;
   errors?: { message: string }[];
 };
 

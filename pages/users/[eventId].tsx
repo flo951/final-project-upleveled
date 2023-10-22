@@ -22,6 +22,7 @@ import { CreateEventResponseBody, DeleteEventResponseBody } from '../api/event';
 import { DeleteExpenseResponseBody } from '../api/expense';
 import { Errors, spanStyles } from '../createevent';
 import { errorStyles } from '../login';
+import { expenses, people } from '@prisma/client';
 
 const mainStyles = css`
   margin: 12px;
@@ -203,8 +204,8 @@ type Props = {
   user: { id: number; username: string };
   eventInDb: Event;
   errors: string;
-  peopleInDb: Person[];
-  expensesInDb: Expense[];
+  peopleInDb: people[];
+  expensesInDb: expenses[];
   profileImageInDb: ImageUrl;
   cloudName: string;
   uploadPreset: string;
@@ -212,7 +213,7 @@ type Props = {
 
 export default function UserDetail(props: Props) {
   const [eventList, setEventList] = useState<Event[]>([props.eventInDb]);
-  const [peopleList, setPeopleList] = useState<Person[]>(props.peopleInDb);
+  const [peopleList, setPeopleList] = useState<people[]>(props.peopleInDb);
   const [personExpense, setPersonExpense] = useState('');
   const [expenseName, setExpenseName] = useState('');
   const [selectedPersonId, setSelectedPersonId] = useState<number>(0);
@@ -221,7 +222,9 @@ export default function UserDetail(props: Props) {
   const [errors, setErrors] = useState<Errors | undefined>([]);
   const [expenseError, setExpenseError] = useState('');
   const [uploadError, setUploadError] = useState('');
-  const [expenseList, setExpenseList] = useState<Expense[]>(props.expensesInDb);
+  const [expenseList, setExpenseList] = useState<expenses[]>(
+    props.expensesInDb,
+  );
   const [uploadImage, setUploadImage] = useState<FileList>();
   const [imageUrl, setImageUrl] = useState(props.profileImageInDb.imageurl);
   const [isLoading, setIsLoading] = useState<Boolean>();
@@ -240,7 +243,7 @@ export default function UserDetail(props: Props) {
       }
 
       const cost: number[] = expenseList.map((expense) => {
-        return expense.cost / 100;
+        return expense.cost! / 100;
       });
 
       const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
@@ -580,7 +583,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
     };
   }
 
-  if (user.id !== eventInDb.userId) {
+  if (user.id !== eventInDb?.user_id) {
     return {
       props: {
         errors: 'You are not allowed to see this page',
@@ -589,6 +592,7 @@ export async function getServerSideProps(context: GetServerSidePropsContext) {
   }
 
   const peopleInDb = await getAllPeopleWhereEventIdMatches(parseInt(eventId));
+  console.log('people', peopleInDb);
 
   const expensesInDb = await getAllExpensesWhereIdMatches(parseInt(eventId));
 

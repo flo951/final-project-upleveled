@@ -1,3 +1,4 @@
+import { expenses, people } from '@prisma/client';
 import { DeleteExpenseResponseBody } from '../pages/api/expense';
 import { Errors, formStyles, spanStyles } from '../pages/createevent';
 import {
@@ -19,10 +20,10 @@ type Props = {
   selectedPersonId: number;
   expenseName: string;
   setExpenseName: (name: string) => void;
-  expenseList: Expense[];
-  setExpenseList: (expense: Expense[]) => void;
+  expenseList: expenses[];
+  setExpenseList: (expense: expenses[]) => void;
   setErrors: (error: Errors | undefined) => void;
-  peopleList: Person[];
+  peopleList: people[];
   eventId: number;
   deleteExpense: (expenseId: number) => void;
   handleSelectPerson: (event: React.ChangeEvent<HTMLSelectElement>) => void;
@@ -69,7 +70,7 @@ export default function ExpenseList(props: Props) {
           const createExpenseResponseBody =
             (await createPersonResponse.json()) as DeleteExpenseResponseBody;
 
-          const createdExpenses: Expense[] = [
+          const createdExpenses: expenses[] = [
             ...props.expenseList,
             createExpenseResponseBody.expense,
           ];
@@ -101,7 +102,7 @@ export default function ExpenseList(props: Props) {
             </option>
             {props.peopleList.map((person) => {
               return (
-                person.eventId === props.eventId && (
+                person.event_id === props.eventId && (
                   <option
                     key={`person-${person.name}-${person.id}`}
                     value={person.id}
@@ -159,7 +160,7 @@ export default function ExpenseList(props: Props) {
                   return (
                     person.id === expense.paymaster && (
                       <span key={`expense from person with id ${person.id}`}>
-                        {expense.expensename} {expense.cost / 100}€ paid by{' '}
+                        {expense.expensename} {expense.cost! / 100}€ paid by{' '}
                         {person.name}
                       </span>
                     )

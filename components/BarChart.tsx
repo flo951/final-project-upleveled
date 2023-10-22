@@ -5,8 +5,9 @@ import { css } from '@emotion/react';
 import { spanStyles } from '../pages/createevent';
 import { splitPayments } from '../util/splitPayments';
 
-import { Event, Expense, Person, User } from '../util/database';
+import { Event, User } from '../util/database';
 import SendEmail from './SendEmail';
+import { expenses, people } from '@prisma/client';
 
 Chart.register(ArcElement);
 
@@ -27,8 +28,8 @@ const resultStyles = css`
 `;
 
 type Props = {
-  people: Person[];
-  expenses: Expense[];
+  people: people[];
+  expenses: expenses[];
   sharedCosts: string;
   user: User;
   event: Event;
@@ -41,7 +42,7 @@ export default function BarChart(props: Props) {
       return (
         person.id === expense.paymaster &&
         sendExpenseList.push(
-          ` ${expense.expensename} ${expense.cost / 100}€ paid by ${
+          ` ${expense.expensename} ${expense.cost! / 100}€ paid by ${
             person.name
           }`,
         )
@@ -59,7 +60,7 @@ export default function BarChart(props: Props) {
 
   const expensePerPerson = props.people.map((person) => {
     const cost = props.expenses.map((expense) => {
-      return person.id === expense.paymaster ? expense.cost / 100 : 0;
+      return person.id === expense.paymaster ? expense.cost! / 100 : 0;
     });
 
     const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
@@ -168,7 +169,7 @@ export default function BarChart(props: Props) {
 
           {props.people.map((person) => {
             const cost = props.expenses.map((expense) => {
-              return person.id === expense.paymaster ? expense.cost / 100 : 0;
+              return person.id === expense.paymaster ? expense.cost! / 100 : 0;
             });
 
             const sum = cost.reduce((partialSum, a) => partialSum + a, 0);

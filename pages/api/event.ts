@@ -7,22 +7,16 @@ import {
   insertImageUrlEvent,
   User,
 } from '../../util/database';
-
-type Url = {
-  eventname: string;
-  id: number;
-  imageurl: string;
-  userId: number;
-};
+import { events } from '@prisma/client';
 
 export type CreateEventResponseBody =
   | { errors: { message: string }[] }
-  | { event: Event }
-  | { imageurl: Url };
+  | { event: events }
+  | { imageurl: events };
 
 export type DeleteEventResponseBody =
   | { errors: { message: string }[] }
-  | { event: Event };
+  | { event: events };
 
 type CreateEventRequestBody = {
   eventname: string;
@@ -58,7 +52,7 @@ export default async function createEventHandler(
         return; // Important, prevents error for multiple requests
       }
 
-      const imgUrl: Url = await insertImageUrlEvent(
+      const imgUrl = await insertImageUrlEvent(
         request.body.uploadUrl,
         request.body.eventId,
       );

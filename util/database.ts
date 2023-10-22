@@ -1,56 +1,9 @@
 import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
-import { sql, db } from '@vercel/postgres';
+import { PrismaClient } from '@prisma/client';
 
 config();
-const client = await db.connect();
-
-try {
-  await sql`
-	 CREATE TABLE IF NOT EXISTS users (
-	 	id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-	 	username varchar(30) NOT NULL UNIQUE,
-		password_hash varchar(60) NOT NULL
-		 );
-`;
-  await sql`
-CREATE TABLE IF NOT EXISTS sessions (
-  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  token varchar(90) NOT NULL UNIQUE,
- expiry_timestamp timestamp NOT NULL DEFAULT NOW() + INTERVAL '24 hours',
- user_id integer REFERENCES users (id) ON DELETE CASCADE
-  );
-`;
-  await sql`
-CREATE TABLE IF NOT EXISTS events (
-  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  eventname varchar(30) NOT NULL,
-  imageurl varchar(120),
- user_id integer REFERENCES users (id) ON DELETE CASCADE
-  );
-`;
-  await sql`
-CREATE TABLE IF NOT EXISTS people (
-  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  name varchar(30) NOT NULL,
- event_id integer REFERENCES events (id) ON DELETE CASCADE,
- user_id integer REFERENCES users (id) ON DELETE CASCADE
-
-  );
-`;
-  await sql`
-CREATE TABLE IF NOT EXISTS expenses (
-  id integer PRIMARY KEY GENERATED ALWAYS AS IDENTITY,
-  expensename varchar(30) NOT NULL,
- cost integer,
- event_id integer REFERENCES events (id) ON DELETE CASCADE,
- paymaster integer REFERENCES people (id) ON DELETE CASCADE
-
-  );
-`;
-} catch (error) {
-  console.error('error creating tables', error);
-}
+const prisma = new PrismaClient();
 
 export type User = {
   id: number;
@@ -60,52 +13,91 @@ export type User = {
 export type UserWithPasswordHash = User & { passwordHash: string };
 
 export async function getUserById(id: number) {
-  const user = await client.sql<User>`
-    SELECT id, username FROM users WHERE id = ${id}
- `;
-  return camelcaseKeys(user.rows[0]);
+  return await prisma.users.findUnique({
+    where: {
+      id: id,
+    },
+  });
 }
 
 export async function getUserByValidSessionToken(token: string | undefined) {
   if (!token) return undefined;
-  const user = await sql<User>`
-  SELECT users.id ,
-  users.username
-   FROM users,
-   sessions WHERE sessions.token = ${token}
-    AND sessions.user_id = users.id
-     AND expiry_timestamp > now()
-
-
-
-  `;
-  return camelcaseKeys(user.rows[0]);
+  // const user = await sql<User>`
+  // SELECT users.id ,
+  // users.username
+  //  FROM users,
+  //  sessions WHERE sessions.token = ${token}
+  //   AND sessions.user_id = users.id
+  //    AND expiry_timestamp > now()
+  // `;
+  // return camelcaseKeys(user.rows[0]);
+  return await prisma.users.findFirst({
+    where: {
+      sessions: {
+        some: {
+          token: token,
+          expiry_timestamp: {
+            gt: new Date(),
+          },
+        },
+      },
+    },
+    select: {
+      id: true,
+      username: true,
+    },
+  });
 }
 
 export async function getUserByUsername(username: string) {
-  const user = await client.sql<{ id: number }>`
-    SELECT id FROM users WHERE username = ${username}
- `;
-  return camelcaseKeys(user.rows[0]);
+  //   const user = await client.sql<{ id: number }>`
+  //     SELECT id FROM users WHERE username = ${username}
+  //  `;
+  //   return camelcaseKeys(user.rows[0]);
+  return await prisma.users.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+    },
+  });
 }
 export async function getUserWithPasswordHashByUsername(username: string) {
-  const user = await client.sql<UserWithPasswordHash>`
-    SELECT id, username, password_hash FROM users WHERE username = ${username}
- `;
-  return camelcaseKeys(user.rows[0]);
+  //   const user = await client.sql<UserWithPasswordHash>`
+  //     SELECT id, username, password_hash FROM users WHERE username = ${username}
+  //  `;
+  //   return camelcaseKeys(user.rows[0]);
+  return await prisma.users.findUnique({
+    where: {
+      username,
+    },
+    select: {
+      id: true,
+      username: true,
+      password_hash: true,
+    },
+  });
 }
 
 export async function createUser(username: string, passwordHash: string) {
-  const user = await client.sql<User>`
+  // const user = await client.sql<User>`
 
-  INSERT INTO users
-  (username, password_hash)
-  VALUES
-  (${username}, ${passwordHash})
-  RETURNING id, username
-  `;
+  // INSERT INTO users
+  // (username, password_hash)
+  // VALUES
+  // (${username}, ${passwordHash})
+  // RETURNING id, username
+  // `;
 
-  return camelcaseKeys(user.rows[0]);
+  // return camelcaseKeys(user.rows[0]);
+
+  return await prisma.users.create({
+    data: {
+      username,
+      password_hash: passwordHash,
+    },
+  });
 }
 type Session = {
   id: number;
@@ -114,60 +106,94 @@ type Session = {
 };
 export async function getValidSessionByToken(token: string) {
   if (!token) return undefined;
-  const session = await client.sql<Session>`
-    SELECT * FROM sessions WHERE token = ${token} AND expiry_timestamp > now()
- `;
+  //   const session = await client.sql<Session>`
+  //     SELECT * FROM sessions WHERE token = ${token} AND expiry_timestamp > now()
+  //  `;
+  const session = await prisma.sessions.findFirst({
+    where: {
+      token,
+      expiry_timestamp: {
+        gt: new Date(),
+      },
+    },
+  });
   await deleteExpiredSessions();
-  return camelcaseKeys(session.rows[0]);
+  return session;
 }
 
 export async function getValidSessionById(userId: number) {
   if (!userId) return undefined;
-  const session = await client.sql<Session>`
-    SELECT * FROM sessions WHERE user_id = ${userId} AND expiry_timestamp > now()
- `;
+  //   const session = await client.sql<Session>`
+  //     SELECT * FROM sessions WHERE user_id = ${userId} AND expiry_timestamp > now()
+  //  `;
+  const session = await prisma.sessions.findFirst({
+    where: {
+      user_id: userId,
+      expiry_timestamp: {
+        gt: new Date(),
+      },
+    },
+  });
   await deleteExpiredSessions();
-  return camelcaseKeys(session.rows[0]);
+  return session;
 }
 
 export async function createSession(token: string, userId: number) {
-  const session = await client.sql<Session>`
+  // const session = await client.sql<Session>`
 
-  INSERT INTO sessions
-  (token, user_id)
-  VALUES
-  (${token}, ${userId})
-  RETURNING id, token
-  `;
+  // INSERT INTO sessions
+  // (token, user_id)
+  // VALUES
+  // (${token}, ${userId})
+  // RETURNING id, token
+  // `;
+  const session = await prisma.sessions.create({
+    data: {
+      token,
+      user_id: userId,
+    },
+  });
   await deleteExpiredSessions();
-  return camelcaseKeys(session.rows[0]);
+  return session;
 }
 
 export async function deleteSessionByToken(token: string) {
   if (!token) return undefined;
-  const session = await client.sql<Session>`
+  // const session = await client.sql<Session>`
 
-  DELETE FROM
-  sessions
-  WHERE
-  token = ${token}
-  RETURNING *
-  `;
+  // DELETE FROM
+  // sessions
+  // WHERE
+  // token = ${token}
+  // RETURNING *
+  // `;
 
-  return camelcaseKeys(session.rows[0]);
+  // return camelcaseKeys(session.rows[0]);
+  return await prisma.sessions.delete({
+    where: {
+      token,
+    },
+  });
 }
 
 export async function deleteExpiredSessions() {
-  const sessions = await client.sql<Session>`
+  // const sessions = await client.sql<Session>`
 
-  DELETE FROM
-  sessions
-  WHERE
-  expiry_timestamp < NOW()
-  RETURNING *
-  `;
+  // DELETE FROM
+  // sessions
+  // WHERE
+  // expiry_timestamp < NOW()
+  // RETURNING *
+  // `;
 
-  return sessions.rows.map((session) => camelcaseKeys(session));
+  // return sessions.rows.map((session) => camelcaseKeys(session));
+  return await prisma.sessions.deleteMany({
+    where: {
+      expiry_timestamp: {
+        lt: new Date(),
+      },
+    },
+  });
 }
 
 export type Person = {
@@ -184,37 +210,60 @@ export async function createPerson(
   eventId: number,
   userId: number,
 ) {
-  const person = await client.sql<Person>`
+  // const person = await client.sql<Person>`
 
-  INSERT INTO people
-  (name, event_id, user_id)
-  VALUES
-  (${personName}, ${eventId}, ${userId})
-  RETURNING *
-  `;
-  console.log('person', person);
-  return camelcaseKeys(person.rows[0]);
+  // INSERT INTO people
+  // (name, event_id, user_id)
+  // VALUES
+  // (${personName}, ${eventId}, ${userId})
+  // RETURNING *
+  // `;
+  // console.log('person', person);
+  // return camelcaseKeys(person.rows[0]);
+  return await prisma.people.create({
+    data: {
+      name: personName,
+      event_id: eventId,
+      user_id: userId,
+    },
+  });
 }
 
 export async function deletePersonById(id: number, userId: number) {
-  const person = await client.sql<Person>`
-    DELETE FROM
-      people
-    WHERE
-      id = ${id} AND user_id = ${userId}
-    RETURNING *
-  `;
-  return camelcaseKeys(person.rows[0]);
+  // const person = await client.sql<Person>`
+  //   DELETE FROM
+  //     people
+  //   WHERE
+  //     id = ${id} AND user_id = ${userId}
+  //   RETURNING *
+  // `;
+  // return camelcaseKeys(person.rows[0]);
+  return await prisma.people.delete({
+    where: {
+      id,
+      user_id: userId,
+    },
+  });
 }
 
 export async function getAllPeopleWhereEventIdMatches(eventId: number) {
-  const people = await client.sql<Person>`
-  SELECT id, name, event_id
-  FROM people
-  WHERE event_id = ${eventId}
+  //   const people = await client.sql<Person>`
+  //   SELECT id, name, event_id
+  //   FROM people
+  //   WHERE event_id = ${eventId}
 
-`;
-  return people.rows.map((person: Person) => camelcaseKeys(person));
+  // `;
+  //   return people.rows.map((person: Person) => camelcaseKeys(person));
+  return await prisma.people.findMany({
+    where: {
+      event_id: eventId,
+    },
+    select: {
+      id: true,
+      name: true,
+      event_id: true,
+    },
+  });
 }
 
 export type Event = {
@@ -225,78 +274,118 @@ export type Event = {
 };
 
 export async function createEvent(eventName: string, userId: number) {
-  const event = await client.sql<Event>`
+  // const event = await client.sql<Event>`
 
-  INSERT INTO events
-  (eventname, user_id)
-  VALUES
-  (${eventName}, ${userId})
-  RETURNING *
-  `;
+  // INSERT INTO events
+  // (eventname, user_id)
+  // VALUES
+  // (${eventName}, ${userId})
+  // RETURNING *
+  // `;
 
-  return camelcaseKeys(event.rows[0]);
+  // return camelcaseKeys(event.rows[0]);
+  return await prisma.events.create({
+    data: {
+      eventname: eventName,
+      user_id: userId,
+    },
+  });
 }
 export async function insertImageUrlEvent(imageUrl: string, eventId: number) {
-  const event = await client.sql<Event>`
+  // const event = await client.sql<Event>`
 
-  UPDATE
-      events
-    SET
-      imageurl = ${imageUrl}
+  // UPDATE
+  //     events
+  //   SET
+  //     imageurl = ${imageUrl}
 
-    WHERE
-      id = ${eventId}
-    RETURNING *
-  `;
+  //   WHERE
+  //     id = ${eventId}
+  //   RETURNING *
+  // `;
 
-  return camelcaseKeys(event.rows[0]);
+  // return camelcaseKeys(event.rows[0]);
+  return await prisma.events.update({
+    where: {
+      id: eventId,
+    },
+    data: {
+      imageurl: imageUrl,
+    },
+  });
 }
 
 export async function getProfileImageEvent(eventId: number) {
-  const event = await client.sql<Event>`
+  // const event = await client.sql<Event>`
 
-  SELECT imageurl from events WHERE id = ${eventId}
-  `;
+  // SELECT imageurl from events WHERE id = ${eventId}
+  // `;
 
-  return camelcaseKeys(event.rows[0]);
+  // return camelcaseKeys(event.rows[0]);
+  return await prisma.events.findUnique({
+    where: {
+      id: eventId,
+    },
+    select: {
+      imageurl: true,
+    },
+  });
 }
 
 export async function deleteEventById(id: number, userId: number) {
-  const event = await client.sql<Event>`
-    DELETE FROM
-      events
-    WHERE
-      id = ${id} AND user_id = ${userId}
-    RETURNING *
-  `;
-  return camelcaseKeys(event.rows[0]);
+  // const event = await client.sql<Event>`
+  //   DELETE FROM
+  //     events
+  //   WHERE
+  //     id = ${id} AND user_id = ${userId}
+  //   RETURNING *
+  // `;
+  // return camelcaseKeys(event.rows[0]);
+  return await prisma.events.delete({
+    where: {
+      id,
+      user_id: userId,
+    },
+  });
 }
 export async function getAllEventsWhereIdMatches(userId: number) {
   if (!userId) return undefined;
-  const events = await client.sql<Event>`
-  SELECT id, eventname, imageurl FROM events WHERE user_id = ${userId};
-
-
-`;
-  return events.rows;
+  // const events = await client.sql<Event>`
+  // SELECT id, eventname, imageurl FROM events WHERE user_id = ${userId};
+  // `;
+  //   return events.rows;
+  return await prisma.events.findMany({
+    where: {
+      user_id: userId,
+    },
+    select: {
+      id: true,
+      eventname: true,
+      imageurl: true,
+    },
+  });
 }
 
 export async function getSingleEvent(eventId: number) {
-  const event = await client.sql<Event>`
+  // const event = await client.sql<Event>`
 
-  SELECT * from events WHERE id = ${eventId};
-  `;
+  // SELECT * from events WHERE id = ${eventId};
+  // `;
 
-  return camelcaseKeys(event.rows[0]);
+  // return camelcaseKeys(event.rows[0]);
+  return await prisma.events.findUnique({
+    where: {
+      id: eventId,
+    },
+  });
 }
 
 export type Expense = {
   id: number;
   expensename: string;
-  personExpense: number;
+  personExpense?: number;
   cost: number;
   eventId: number;
-
   paymaster: number;
 };
 
@@ -307,35 +396,48 @@ export async function createExpense(
   eventId: number,
   paymaster: number,
 ) {
-  const expense = await client.sql<Expense>`
+  // const expense = await client.sql<Expense>`
 
-  INSERT INTO expenses
-  (expensename, cost, event_id, paymaster)
-  VALUES
-  (${expenseName},${cost}, ${eventId}, ${paymaster})
-  RETURNING *
-  `;
+  // INSERT INTO expenses
+  // (expensename, cost, event_id, paymaster)
+  // VALUES
+  // (${expenseName},${cost}, ${eventId}, ${paymaster})
+  // RETURNING *
+  // `;
 
-  return camelcaseKeys(expense.rows[0]);
+  // return camelcaseKeys(expense.rows[0]);
+  return await prisma.expenses.create({
+    data: {
+      expensename: expenseName,
+      cost,
+      event_id: eventId,
+      paymaster,
+    },
+  });
 }
 
 export async function deleteExpenseById(expenseId: number) {
-  const expense = await client.sql<Expense>`
-    DELETE FROM
-     expenses
-    WHERE
-      id = ${expenseId}
-    RETURNING *
-  `;
-  return camelcaseKeys(expense.rows[0]);
+  // const expense = await client.sql<Expense>`
+  //   DELETE FROM
+  //    expenses
+  //   WHERE
+  //     id = ${expenseId}
+  //   RETURNING *
+  // `;
+  // return camelcaseKeys(expense.rows[0]);
+  return await prisma.expenses.delete({
+    where: {
+      id: expenseId,
+    },
+  });
 }
 
 export async function getAllExpensesWhereIdMatches(eventId: number) {
-  const expenses = await client.sql<Expense>`
-  SELECT * FROM
-  expenses
-  WHERE
-  event_id = ${eventId}
-`;
-  return expenses.rows.map((expense) => camelcaseKeys(expense));
+  const expenses = await prisma.expenses.findMany({
+    where: {
+      event_id: eventId,
+    },
+  });
+
+  return expenses.map((expense) => camelcaseKeys(expense));
 }

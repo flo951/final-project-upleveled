@@ -6,16 +6,17 @@ import {
   Person,
   User,
 } from '../../util/database';
+import { people } from '@prisma/client';
 
 export type CreatePersonResponseBody = {
   errors?: { message: string }[];
-  person?: Person;
+  person?: people;
   personId?: number;
   user?: User;
 };
 
 export type DeletePersonResponseBody =
-  | { person: Person }
+  | { person: people }
   | { errors: { message: string }[] };
 
 export type CreatePersonRequestBody = {
