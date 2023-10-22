@@ -42,13 +42,12 @@ const flexRowStyles = css`
 type Props = {
   user: { id: number; username: string };
   eventsInDb: Event[];
-
   errors: string;
 };
 type Errors = { message: string }[];
-export default function ProtectedUser(props: Props) {
-  const [errors, setErrors] = useState<Errors | undefined>([]);
-  const [eventList, setEventList] = useState<Event[]>(props.eventsInDb);
+export default function ProtectedUser({ eventsInDb, user, errors }: Props) {
+  const [errorsView, setErrorsView] = useState<Errors | undefined>([]);
+  const [eventList, setEventList] = useState<Event[]>(eventsInDb);
   // function to delete created events
   async function deleteEvent(id: number) {
     const deleteResponse = await fetch(`/api/event`, {
@@ -58,14 +57,14 @@ export default function ProtectedUser(props: Props) {
       },
       body: JSON.stringify({
         eventId: id,
-        user: props.user,
+        user: user,
       }),
     });
     const deleteEventResponseBody =
       (await deleteResponse.json()) as DeleteEventResponseBody;
 
     if ('errors' in deleteEventResponseBody) {
-      setErrors(deleteEventResponseBody.errors);
+      setErrorsView(deleteEventResponseBody.errors);
       return;
     }
 
@@ -75,10 +74,10 @@ export default function ProtectedUser(props: Props) {
 
     setEventList(newEventList);
   }
-  if ('errors' in props) {
+  if (errors) {
     return (
       <main>
-        <p>{props.errors}</p>
+        <p>{errors}</p>
       </main>
     );
   }
@@ -86,21 +85,21 @@ export default function ProtectedUser(props: Props) {
   return (
     <>
       <Head>
-        <title>Event List from {props.user.username}</title>
+        <title>Event List from {user.username}</title>
 
         <meta
-          name={`Event List from ${props.user.username}`}
+          name={`Event List from ${user.username}`}
           content="View Event List connected to user"
         />
       </Head>
-      {errors}
+      {errorsView}
       <main css={mainStyles}>
         {/* Event List */}
         <div css={borderEventListStyles}>
           <h3>
             {eventList.length === 0
               ? ' You have no events yet, click on the Link above to create an event'
-              : `This are your events ${props.user.username}`}
+              : `This are your events ${user.username}`}
           </h3>
           <div css={eventListStyles}>
             {eventList.map((event: Event) => {
@@ -146,8 +145,6 @@ export default function ProtectedUser(props: Props) {
   );
 }
 export async function getServerSideProps(context: GetServerSidePropsContext) {
-  // 1. get a user from the cookie sessiontoken
-
   const token = context.req.cookies.sessionToken;
 
   const user = await getUserByValidSessionToken(token);
