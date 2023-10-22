@@ -13,4 +13,9 @@ module.exports = {
     locales: ['en'],
     defaultLocale: 'en',
   },
+  experimental: { appDir: true },
+  webpack(config) {
+    config.experiments = { ...config.experiments, topLevelAwait: true };
+    return config;
+  },
 };
