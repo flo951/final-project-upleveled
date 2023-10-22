@@ -150,14 +150,14 @@ export async function createPerson(
 }
 
 export async function deletePersonById(id: number, userId: number) {
-  const person = await client.sql<[Person | undefined]>`
+  const person = await client.sql<Person>`
     DELETE FROM
       people
     WHERE
       id = ${id} AND user_id = ${userId}
     RETURNING *
   `;
-  return camelcaseKeys(person);
+  return camelcaseKeys(person.rows[0]);
 }
 
 export async function getAllPeopleWhereEventIdMatches(eventId: number) {
