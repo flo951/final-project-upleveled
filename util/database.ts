@@ -1,14 +1,9 @@
 import camelcaseKeys from 'camelcase-keys';
 import { config } from 'dotenv-safe';
-import postgres from 'postgres';
 import { sql, db } from '@vercel/postgres';
 
 config();
 const client = await db.connect();
-
-declare module globalThis {
-  let postgresSqlClient: ReturnType<typeof postgres> | undefined;
-}
 
 export type User = {
   id: number;
@@ -18,15 +13,15 @@ export type User = {
 export type UserWithPasswordHash = User & { passwordHash: string };
 
 export async function getUserById(id: number) {
-  const user = await client.sql<[User | undefined]>`
+  const user = await client.sql<User>`
     SELECT id, username FROM users WHERE id = ${id}
  `;
-  return user && camelcaseKeys(user);
+  return camelcaseKeys(user.rows[0]);
 }
 
 export async function getUserByValidSessionToken(token: string | undefined) {
   if (!token) return undefined;
-  const user = await sql<[User | undefined]>`
+  const user = await sql<User>`
   SELECT users.id ,
   users.username
    FROM users,
@@ -37,24 +32,24 @@ export async function getUserByValidSessionToken(token: string | undefined) {
 
 
   `;
-  return user && camelcaseKeys(user);
+  return camelcaseKeys(user.rows[0]);
 }
 
 export async function getUserByUsername(username: string) {
-  const user = await client.sql<[{ id: number } | undefined]>`
+  const user = await client.sql<{ id: number }>`
     SELECT id FROM users WHERE username = ${username}
  `;
-  return user && camelcaseKeys(user);
+  return camelcaseKeys(user.rows[0]);
 }
 export async function getUserWithPasswordHashByUsername(username: string) {
-  const user = await client.sql<[UserWithPasswordHash | undefined]>`
+  const user = await client.sql<UserWithPasswordHash>`
     SELECT id, username, password_hash FROM users WHERE username = ${username}
  `;
-  return user && camelcaseKeys(user);
+  return camelcaseKeys(user.rows[0]);
 }
 
 export async function createUser(username: string, passwordHash: string) {
-  const user = await client.sql<[User]>`
+  const user = await client.sql<User>`
 
   INSERT INTO users
   (username, password_hash)
@@ -63,7 +58,7 @@ export async function createUser(username: string, passwordHash: string) {
   RETURNING id, username
   `;
 
-  return camelcaseKeys(user);
+  return camelcaseKeys(user.rows[0]);
 }
 type Session = {
   id: number;
@@ -72,24 +67,24 @@ type Session = {
 };
 export async function getValidSessionByToken(token: string) {
   if (!token) return undefined;
-  const session = await client.sql<[Session | undefined]>`
+  const session = await client.sql<Session>`
     SELECT * FROM sessions WHERE token = ${token} AND expiry_timestamp > now()
  `;
   await deleteExpiredSessions();
-  return session && camelcaseKeys(session);
+  return camelcaseKeys(session.rows[0]);
 }
 
 export async function getValidSessionById(userId: number) {
   if (!userId) return undefined;
-  const session = await client.sql<[Session | undefined]>`
+  const session = await client.sql<Session>`
     SELECT * FROM sessions WHERE user_id = ${userId} AND expiry_timestamp > now()
  `;
   await deleteExpiredSessions();
-  return session && camelcaseKeys(session);
+  return camelcaseKeys(session.rows[0]);
 }
 
 export async function createSession(token: string, userId: number) {
-  const session = await client.sql<[Session]>`
+  const session = await client.sql<Session>`
 
   INSERT INTO sessions
   (token, user_id)
@@ -98,12 +93,12 @@ export async function createSession(token: string, userId: number) {
   RETURNING id, token
   `;
   await deleteExpiredSessions();
-  return camelcaseKeys(session);
+  return camelcaseKeys(session.rows[0]);
 }
 
 export async function deleteSessionByToken(token: string) {
   if (!token) return undefined;
-  const session = await client.sql<[Session | undefined]>`
+  const session = await client.sql<Session>`
 
   DELETE FROM
   sessions
@@ -112,11 +107,11 @@ export async function deleteSessionByToken(token: string) {
   RETURNING *
   `;
 
-  return session && camelcaseKeys(session);
+  return camelcaseKeys(session.rows[0]);
 }
 
 export async function deleteExpiredSessions() {
-  const sessions = await client.sql<Session[]>`
+  const sessions = await client.sql<Session>`
 
   DELETE FROM
   sessions
@@ -125,7 +120,7 @@ export async function deleteExpiredSessions() {
   RETURNING *
   `;
 
-  return sessions.map((session: Session) => camelcaseKeys(session));
+  return sessions.rows.map((session) => camelcaseKeys(session));
 }
 
 export type Person = {
@@ -142,7 +137,7 @@ export async function createPerson(
   eventId: number,
   userId: number,
 ) {
-  const person = await client.sql<[Person]>`
+  const person = await client.sql<Person>`
 
   INSERT INTO people
   (name, event_id, user_id)
@@ -151,7 +146,7 @@ export async function createPerson(
   RETURNING *
   `;
 
-  return camelcaseKeys(person);
+  return camelcaseKeys(person.rows[0]);
 }
 
 export async function deletePersonById(id: number, userId: number) {
@@ -162,17 +157,17 @@ export async function deletePersonById(id: number, userId: number) {
       id = ${id} AND user_id = ${userId}
     RETURNING *
   `;
-  return person && camelcaseKeys(person);
+  return camelcaseKeys(person);
 }
 
 export async function getAllPeopleWhereEventIdMatches(eventId: number) {
-  const people = await client.sql`
+  const people = await client.sql<Person>`
   SELECT id, name, event_id
   FROM people
   WHERE event_id = ${eventId}
 
 `;
-  return people.map((person: Person) => camelcaseKeys(person));
+  return people.rows.map((person: Person) => camelcaseKeys(person));
 }
 
 export type Event = {
@@ -183,7 +178,7 @@ export type Event = {
 };
 
 export async function createEvent(eventName: string, userId: number) {
-  const event = await client.sql<[Event]>`
+  const event = await client.sql<Event>`
 
   INSERT INTO events
   (eventname, user_id)
@@ -192,10 +187,10 @@ export async function createEvent(eventName: string, userId: number) {
   RETURNING *
   `;
 
-  return camelcaseKeys(event);
+  return camelcaseKeys(event.rows[0]);
 }
 export async function insertImageUrlEvent(imageUrl: string, eventId: number) {
-  const event = await client.sql<[Event]>`
+  const event = await client.sql<Event>`
 
   UPDATE
       events
@@ -207,27 +202,27 @@ export async function insertImageUrlEvent(imageUrl: string, eventId: number) {
     RETURNING *
   `;
 
-  return camelcaseKeys(event);
+  return camelcaseKeys(event.rows[0]);
 }
 
 export async function getProfileImageEvent(eventId: number) {
-  const event = await client.sql<[Event]>`
+  const event = await client.sql<Event>`
 
   SELECT imageurl from events WHERE id = ${eventId}
   `;
 
-  return camelcaseKeys(event);
+  return camelcaseKeys(event.rows[0]);
 }
 
 export async function deleteEventById(id: number, userId: number) {
-  const event = await client.sql<[Event | undefined]>`
+  const event = await client.sql<Event>`
     DELETE FROM
       events
     WHERE
       id = ${id} AND user_id = ${userId}
     RETURNING *
   `;
-  return event && camelcaseKeys(event);
+  return camelcaseKeys(event.rows[0]);
 }
 export async function getAllEventsWhereIdMatches(userId: number) {
   if (!userId) return undefined;
@@ -240,12 +235,12 @@ export async function getAllEventsWhereIdMatches(userId: number) {
 }
 
 export async function getSingleEvent(eventId: number) {
-  const event = await client.sql<[Event]>`
+  const event = await client.sql<Event>`
 
   SELECT * from events WHERE id = ${eventId};
   `;
 
-  return camelcaseKeys(event);
+  return camelcaseKeys(event.rows[0]);
 }
 
 export type Expense = {
@@ -265,7 +260,7 @@ export async function createExpense(
   eventId: number,
   paymaster: number,
 ) {
-  const expense = await client.sql<[Expense]>`
+  const expense = await client.sql<Expense>`
 
   INSERT INTO expenses
   (expensename, cost, event_id, paymaster)
@@ -274,46 +269,26 @@ export async function createExpense(
   RETURNING *
   `;
 
-  return camelcaseKeys(expense);
+  return camelcaseKeys(expense.rows[0]);
 }
 
 export async function deleteExpenseById(expenseId: number) {
-  const expense = await client.sql<[Expense | undefined]>`
+  const expense = await client.sql<Expense>`
     DELETE FROM
      expenses
     WHERE
       id = ${expenseId}
     RETURNING *
   `;
-  return expense && camelcaseKeys(expense);
+  return camelcaseKeys(expense.rows[0]);
 }
 
 export async function getAllExpensesWhereIdMatches(eventId: number) {
-  const expenses = await client.sql<Expense[]>`
+  const expenses = await client.sql<Expense>`
   SELECT * FROM
   expenses
   WHERE
   event_id = ${eventId}
 `;
-  return expenses.map((expense: Expense) => camelcaseKeys(expense));
-}
-
-export type CarData = {
-  id: number;
-  username: string;
-  password: string;
-  value: string;
-  label: string;
-
-  previousmileage: string;
-};
-
-export async function getCarData(username: string, password: string) {
-  const carData = await client.sql<[CarData]>`
-  SELECT * FROM
-  etsweb
-  WHERE
-  username = ${username} AND password = ${password}
-  `;
-  return carData;
+  return expenses.rows.map((expense) => camelcaseKeys(expense));
 }
