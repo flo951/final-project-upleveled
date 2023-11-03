@@ -1,5 +1,7 @@
+import { DynamicKeyValueObject } from '../components/BarChart';
+
 // Algorithm to calculate who owes how much to hwom
-export function splitPayments(object) {
+export function splitPayments(object: DynamicKeyValueObject) {
   const people = Object.keys(object);
   console.log(people);
   const valuesPaid = Object.values(object);

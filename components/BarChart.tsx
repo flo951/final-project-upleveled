@@ -5,8 +5,6 @@ import { css } from '@emotion/react';
 import { spanStyles } from '../pages/createevent';
 import { splitPayments } from '../util/splitPayments';
 
-import { Event, User } from '../util/database';
-import SendEmail from './SendEmail';
 import { expenses, people } from '@prisma/client';
 
 Chart.register(ArcElement);
@@ -31,8 +29,10 @@ type Props = {
   people: people[];
   expenses: expenses[];
   sharedCosts: string;
-  user: User;
-  event: Event;
+};
+
+export type DynamicKeyValueObject = {
+  [key: string]: number;
 };
 
 export default function BarChart(props: Props) {
@@ -83,11 +83,10 @@ export default function BarChart(props: Props) {
   }
 
   // Sort balance and name from each person and assign it into a single object
-  const payments = balances.reduce(
+  const payments: DynamicKeyValueObject = balances.reduce(
     (obj, item) => Object.assign(obj, { [item.personName]: item.sum }),
     {},
   );
-  console.log(payments);
   const balanceMessages = splitPayments(payments);
 
   const peopleNameArray = props.people.map((person) => person.name);
@@ -132,70 +131,61 @@ export default function BarChart(props: Props) {
     ],
   };
   return (
-    <>
-      <div css={barChartStyles}>
-        <Bar
-          data={data}
-          height={300}
-          options={{
-            indexAxis: 'x',
-            elements: {
-              bar: {
-                borderWidth: 2,
-              },
+    <div css={barChartStyles}>
+      <Bar
+        data={data}
+        height={300}
+        options={{
+          indexAxis: 'x',
+          elements: {
+            bar: {
+              borderWidth: 2,
             },
-            responsive: true,
-            plugins: {
-              title: {
-                display: true,
-                text: 'Total Balance of each Participant in €',
-              },
-              legend: {
-                display: true,
-                position: 'bottom',
-              },
+          },
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Total Balance of each Participant in €',
             },
-          }}
-        />
-        <div css={resultStyles}>
-          <span css={spanStyles}>Result</span>
-          {balanceMessages.map((item) => {
-            return (
-              <span key={`id ${Math.random()}`} css={spanStyles}>
-                {item}
-              </span>
-            );
-          })}
-
-          {props.people.map((person) => {
-            const cost = props.expenses.map((expense) => {
-              return person.id === expense.paymaster ? expense.cost! / 100 : 0;
-            });
-
-            const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
-            const personSum =
-              Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
-
-            return (
-              personSum > 0 && (
-                <span
-                  key={`person-${person.id} receives money `}
-                  css={spanStyles}
-                >
-                  {` ${person.name} receives ${personSum.toFixed(2)}€`}
-                </span>
-              )
-            );
-          })}
-        </div>
-      </div>
-      <SendEmail
-        user={props.user.username}
-        expenseList={sendExpenseList}
-        balanceMessages={balanceMessages}
-        event={props.event}
-        participants={peopleNameArray}
+            legend: {
+              display: true,
+              position: 'bottom',
+            },
+          },
+        }}
       />
-    </>
+      <div css={resultStyles}>
+        <span css={spanStyles}>Result</span>
+        {balanceMessages.map((item) => {
+          return (
+            <span key={`id ${Math.random()}`} css={spanStyles}>
+              {item}
+            </span>
+          );
+        })}
+
+        {props.people.map((person) => {
+          const cost = props.expenses.map((expense) => {
+            return person.id === expense.paymaster ? expense.cost! / 100 : 0;
+          });
+
+          const sum = cost.reduce((partialSum, a) => partialSum + a, 0);
+          const personSum =
+            Math.round((sum - parseFloat(props.sharedCosts)) * 100) / 100;
+
+          return (
+            personSum > 0 && (
+              <span
+                key={`person-${person.id} receives money `}
+                css={spanStyles}
+              >
+                {` ${person.name} receives ${personSum.toFixed(2)}€`}
+              </span>
+            )
+          );
+        })}
+      </div>
+    </div>
   );
 }
