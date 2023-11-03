@@ -546,8 +546,6 @@ export default function UserDetail(props: Props) {
                 people={peopleList}
                 expenses={expenseList}
                 sharedCosts={sharedCosts}
-                user={props.user}
-                event={props.eventInDb}
               />
             </div>
           );
